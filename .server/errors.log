@@ -1,0 +1,19 @@
+10:04:21 [31merror[39m: Cast to ObjectId failed for value "MNG48155913" (type string) at path "_id" for model "PropertyManager"
+17:01:12 [31merror[39m: Operation `companies.findOne()` buffering timed out after 10000ms
+21:28:47 [31merror[39m: Cannot read property 'slots' of undefined
+21:29:47 [31merror[39m: Cannot read property 'slots' of undefined
+21:30:00 [31merror[39m: Cannot read property 'slots' of undefined
+21:31:39 [31merror[39m: Cannot read property 'slots' of undefined
+21:39:49 [31merror[39m: Cannot read property 'slots' of undefined
+21:41:26 [31merror[39m: Cannot read property 'slots' of undefined
+21:42:35 [31merror[39m: Cannot read property 'slots' of undefined
+21:44:48 [31merror[39m: Cannot read property 'slots' of undefined
+21:45:42 [31merror[39m: Cannot read property 'slots' of undefined
+21:46:37 [31merror[39m: Cannot read property 'slots' of undefined
+21:49:23 [31merror[39m: Cannot read property 'slots' of undefined
+21:50:40 [31merror[39m: Cannot read property 'slots' of undefined
+21:53:35 [31merror[39m: Cannot read property 'slots' of undefined
+21:56:48 [31merror[39m: Cannot read property 'slots' of undefined
+22:00:23 [31merror[39m: Cast to ObjectId failed for value "Chappelle Garden Apartments" (type string) at path "propertyId" because of "BSONTypeError"
+15:02:03 [31merror[39m: Cast to ObjectId failed for value "Chappelle Garden Apartments" (type string) at path "propertyId" because of "BSONTypeError"
+20:22:35 [31merror[39m: Operation `companies.findOne()` buffering timed out after 10000ms
