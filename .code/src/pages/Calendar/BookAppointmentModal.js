@@ -38,6 +38,9 @@ const BookAppointmentModal = ({ open, setOpen, id, defaultDate }) => {
   const [isEdit, setIsEdit] = useState(false);
   const [daysAvailability, setDayAvailability] = useState([]);
   const [splitTimes, setSplitTimes] = useState([]);
+
+  console.log("SplitTimes:", splitTimes);
+
   const [selectedDate, setSelectedDate] = useState("");
   const [reasonType, setReasonType] = useState([]);
   const [reason, setReason] = useState("");
@@ -94,21 +97,29 @@ const BookAppointmentModal = ({ open, setOpen, id, defaultDate }) => {
   };
 
   const setSlots = (date) => {
-    let selectedDate = new Date(date);
-    setCalenderSlots(selectedDate);
+    const localDate = new Date(date);
+    const utcDate = new Date(
+      localDate.getTime() + localDate.getTimezoneOffset() * 60000
+    );
+    setCalenderSlots(utcDate);
   };
+  
   useEffect(() => {
     setSlots(defaultDate);
     setSdate(defaultDate);
   }, [defaultDate]);
 
   const convertToLocalTime = (utcTime) => {
-    const utcMoment = moment_timezone.utc(utcTime);
-    const localTimezone = moment_timezone.tz.guess();
-    const localMoment = utcMoment.clone().tz(localTimezone);
-    const formattedTime = localMoment.format("h:mm A");
+    const utcDate = new Date(`1970-01-01T${utcTime}`);
 
-    return formattedTime;
+    const localTime = utcDate.toLocaleTimeString(undefined, {
+      hour: "numeric",
+      minute: "numeric",
+      hour12: true,
+      timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+    });
+
+    return localTime;
   };
 
   const availabilityData = async (id) => {
@@ -135,6 +146,7 @@ const BookAppointmentModal = ({ open, setOpen, id, defaultDate }) => {
   };
 
   const setCalenderSlots = async (selectedDate) => {
+    console.log("SelectedDate:", selectedDate);
     let dayIndex = selectedDate.getDay();
     let bodyData = {
       method: "POST",
@@ -172,20 +184,22 @@ const BookAppointmentModal = ({ open, setOpen, id, defaultDate }) => {
     let dayAvailability = availability[0];
     setday(dayAvailability.day);
     // console.log(day, "dayAvailability");
-    const timeRecurresive = (slot) => {
+    const timeRecurresive = (slot, index) => {
       console.log(slot, "slot");
       return new Promise(function (myResolve, myReject) {
-        const repeatFunc = (slot) => {
-          calculateTime(bookedEvents, slot.startTime, slot.endTime).then(() => {
-            if (addMoment !== slot.endTime) {
-              repeatFunc(slot);
-            } else {
-              //   console.log(splitedTime)
-              //   setSplitTimes(splitedTime);
-              myResolve();
-              // setSplitTime(time)
+        const repeatFunc = (slot, index) => {
+          calculateTime(bookedEvents, slot.startTime, slot.endTime, index).then(
+            () => {
+              if (addMoment !== slot.endTime) {
+                repeatFunc(slot, index);
+              } else {
+                //   console.log(splitedTime)
+                //   setSplitTimes(splitedTime);
+                myResolve();
+                // setSplitTime(time)
+              }
             }
-          });
+          );
         };
 
         repeatFunc(slot);
@@ -195,7 +209,7 @@ const BookAppointmentModal = ({ open, setOpen, id, defaultDate }) => {
     splitedTime = [];
 
     const NextSlots = (m) => {
-      timeRecurresive(dayAvailability.slots[m]).then(() => {
+      timeRecurresive(dayAvailability.slots[m], m).then(() => {
         m++;
         if (m < dayAvailability.slots.length) {
           newSlot = true;
@@ -233,7 +247,7 @@ const BookAppointmentModal = ({ open, setOpen, id, defaultDate }) => {
 
     return !!selectedDayAvailability;
   };
-  const calculateTime = async (BookedEvents, startTime, endTime) => {
+  const calculateTime = async (BookedEvents, startTime, endTime, index) => {
     return new Promise(function (resolve, reject) {
       if (!newSlot) {
         let oldMoment = addMoment;
@@ -243,22 +257,24 @@ const BookAppointmentModal = ({ open, setOpen, id, defaultDate }) => {
         let slot = `${oldMoment} - ${addMoment}`;
 
         if (!BookedEvents.includes(oldMoment)) {
-          splitedTime.push(slot);
+          splitedTime.push({ slot, index });
           console.log(slot, "slot");
+          resolve(index);
+        } else {
+          resolve(); // Resolve without the index if the slot is booked
         }
-
-        resolve();
       } else {
         // console.log("addMoment  0: ", addMoment);
         addMoment = moment(startTime, ["h:mm A"]).add(30, "m").format("LT");
         // console.log("addMoment  2: ", addMoment);
         let slot = `${startTime} - ${addMoment}`;
         if (!BookedEvents.includes(startTime)) {
-          splitedTime.push(slot);
+          splitedTime.push({ slot, index });
+          resolve(index);
+        } else {
+          resolve();
         }
         newSlot = false;
-
-        resolve();
       }
     });
   };
@@ -574,6 +590,8 @@ const BookAppointmentModal = ({ open, setOpen, id, defaultDate }) => {
                   }}
                   errorMessage="Please select event slot"
                   onChange={(e) => {
+                    const selectedOption =
+                      e.target.options[e.target.selectedIndex];
                     setTime(e.target.value);
                   }}
                 >
@@ -582,7 +600,11 @@ const BookAppointmentModal = ({ open, setOpen, id, defaultDate }) => {
                   {managerAvailability === "" ? (
                     <>
                       {splitTimes?.map((slot) => {
-                        return <option value={slot}>{slot}</option>;
+                        return (
+                          <option value={slot.slot} data-index={slot.index}>
+                            {slot.slot}
+                          </option>
+                        );
                       })}
                     </>
                   ) : (

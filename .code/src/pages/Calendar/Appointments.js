@@ -227,6 +227,23 @@ const Appointment = () => {
       setStartPage(Math.max(1, page - pageLimit / 2));
     }
   };
+
+  const convertToLocalTime = (utcTime) => {
+    if (typeof utcTime === "string" && utcTime.endsWith("Z")) {
+      const utcDate = new Date(utcTime);
+      const localTime = utcDate.toLocaleTimeString(undefined, {
+        hour: "numeric",
+        minute: "numeric",
+        hour12: true,
+        timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+      });
+
+      return localTime;
+    } else {
+      return utcTime;
+    }
+  };
+
   const clearFunc = async () => {
     setStartDate("");
     setEndDate("");
@@ -235,6 +252,7 @@ const Appointment = () => {
     t_col5();
     getAppointments("clear");
   };
+
   return (
     <React.Fragment>
       <div className="page-content">
@@ -474,7 +492,8 @@ const Appointment = () => {
                                   <td>{item.description}</td>
 
                                   <td>
-                                    {item.startTime} - {item.endTime}
+                                    {convertToLocalTime(item.startTime)} -{" "}
+                                    {convertToLocalTime(item.endTime)}
                                   </td>
                                   <td>
                                     {moment(item.date)

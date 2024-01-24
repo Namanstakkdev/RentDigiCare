@@ -132,13 +132,16 @@ const Calender = (props) => {
   const [totalEvents, setTotalEvents] = useState([]);
 
   const [events, setEvents] = useState([]);
-
   const [event, setEvent] = useState({});
+  console.log("Event:", event);
   const [selectedDay, setSelectedDay] = useState(0);
   const [isEdit, setIsEdit] = useState(false);
   const [daysAvailability, setDayAvailability] = useState([]);
+  const [utcDaysAvailability, setUtcDaysAvailability] = useState([]);
   const [splitTimes, setSplitTimes] = useState([]);
   const [day, setDay] = useState("");
+
+  console.log("UTCDaysAvailability:", utcDaysAvailability);
 
   const [companyManagers, setCompanyManagers] = useState([]);
   const [managerData, setmanagerData] = useState({});
@@ -253,7 +256,7 @@ const Calender = (props) => {
           type: "tickets",
         };
       });
-      //   console.log(ticketEvent)
+      console.log("Ticket Event:", ticketEvent);
       setEvents(ticketEvent);
       setTotalEvents(ticketEvent);
     }
@@ -519,6 +522,14 @@ const Calender = (props) => {
       getManagersOfProperty(filteredEvent[0]?.propertyId);
     }
 
+    const slot = filteredEvent[0]?.slot
+      .split(" - ")
+      .map((time) => {
+        console.log("Time:", time);
+        return convertToLocalTime(time);
+      })
+      .join(" - ");
+
     setEvent({
       id: event.id,
       name: filteredEvent[0]?.name,
@@ -528,7 +539,7 @@ const Calender = (props) => {
       description: filteredEvent[0]?.description,
       // start: event.start.split("T")[0],
       date: filteredEvent[0]?.eventDate.split("T")[0],
-      slot: filteredEvent[0]?.slot,
+      slot,
       property: filteredEvent[0]?.property,
       propertyManager: filteredEvent[0]?.propertyManager,
       layoutType: filteredEvent[0]?.layoutType,
@@ -600,8 +611,27 @@ const Calender = (props) => {
   };
 
   const handleValidEventSubmitcategory = async (event, values) => {
-    console.log("HandleValidEventSubmitcategory get called:", values);
+    console.log(
+      "HandleValidEventSubmitcategory get called:",
+      moment(values.date).format("ddd")
+    );
     setAddEventError("");
+    const [startTime, endTime] = values.time.split(" - ");
+
+    const [utcStartTime, utcEndTime] = [startTime, endTime].map((time) => {
+      const dateTimeString = `${values.date} ${time}`;
+      const dateTimeObject = new Date(dateTimeString);
+
+      // Check if the date-time is valid
+      if (!isNaN(dateTimeObject)) {
+        const utcString = dateTimeObject.toISOString();
+        const utcDateTimeObject = new Date(utcString);
+
+        return { utcString, timeInMilliseconds: utcDateTimeObject.getTime() };
+      }
+
+      return { utcString: null, timeInMilliseconds: null };
+    });
 
     let role = decode.role;
 
@@ -611,15 +641,13 @@ const Calender = (props) => {
       role = "technicalStaff";
     }
 
-    let slots = values.time.split(" - ");
-
     const reqData = {
       authEmail: values.auth_email,
       manager_id: values.manager ? values.manager : decode.id,
       day: moment(values.date).format("ddd"),
       eventDate: values.date,
-      StartTime: slots[0],
-      endTime: slots[1],
+      StartTime: utcStartTime.utcString,
+      endTime: utcEndTime.utcString,
       createdBy: decode.id,
       type: values.reasonType,
       propertyId: values.property,
@@ -628,6 +656,7 @@ const Calender = (props) => {
       description: values.event_description,
       event_id: selectedEventId,
       role: role,
+      available: true,
     };
     console.log("Request Date:", reqData);
 
@@ -759,12 +788,22 @@ const Calender = (props) => {
   };
 
   const convertToLocalTime = (utcTime) => {
-    const utcMoment = moment_timezone.utc(utcTime);
-    const localTimezone = moment_timezone.tz.guess();
-    const localMoment = utcMoment.clone().tz(localTimezone);
-    const formattedTime = localMoment.format("h:mm A");
+    let utcDate;
 
-    return formattedTime;
+    if (utcTime.includes("T")) {
+      utcDate = new Date(utcTime);
+    } else {
+      utcDate = new Date(`1970-01-01T${utcTime}`);
+    }
+
+    const localTime = utcDate.toLocaleTimeString(undefined, {
+      hour: "numeric",
+      minute: "numeric",
+      hour12: true,
+      timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+    });
+
+    return localTime;
   };
 
   const getManagerAvailability = async (id) => {
@@ -786,6 +825,9 @@ const Calender = (props) => {
           );
 
         setDayAvailability(convertedAvailability);
+        setUtcDaysAvailability(
+          response.data.ManagerAvailability.daysOfWeekAvailability
+        );
 
         let availabilityArray = [];
         response.data.ManagerAvailability.daysOfWeekAvailability.map(
@@ -1018,6 +1060,7 @@ const Calender = (props) => {
   };
 
   const renderEvent = (info) => {
+    console.log("Info:", info);
     let startTime = info.event.start;
     let endTime = info.event.end;
     startTime = startTime?.toLocaleTimeString([], {
@@ -1700,7 +1743,7 @@ const Calender = (props) => {
                             type="text"
                             // errorMessage="Please Enter the description"
                             validate={{
-                              required: { value: true },
+                              required: { value: false },
                             }}
                             value={event.layoutType ? event.layoutType : ""}
                             disabled={true}

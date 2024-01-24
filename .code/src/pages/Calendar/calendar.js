@@ -49,6 +49,7 @@ function Calendarurl() {
   const [phone1, setPhone1] = useState("");
   const [sdate, setSdate] = useState("");
   const [time, setTime] = useState("");
+  const [availabilityObjectIndex, setAvailabilityObjectIndex] = useState(null);
   const [description, setdescription] = useState("");
   const [day, setday] = useState("");
   const [properties, setProperties] = useState([]);
@@ -58,7 +59,9 @@ function Calendarurl() {
   const [selectedDay, setSelectedDay] = useState(0);
   const [isEdit, setIsEdit] = useState(false);
   const [daysAvailability, setDayAvailability] = useState([]);
+  const [utcDaysAvailability, setUtcDaysAvailability] = useState([]);
   const [splitTimes, setSplitTimes] = useState([]);
+
   const [selectedDate, setSelectedDate] = useState("");
   const [reasonType, setReasonType] = useState([]);
   const [reason, setReason] = useState("");
@@ -105,6 +108,103 @@ function Calendarurl() {
     );
   };
 
+  /* Logic Start */
+
+  // Extract start and end time from the input string
+  const [startTime, endTime] = time.split(" - ");
+
+  // Display input details
+  console.table({
+    StartTime: startTime,
+    EndTime: endTime,
+    "Calendar Date": sdate,
+  });
+
+  // Convert start and end time to UTC format
+  const [utcStartTime, utcEndTime] = [startTime, endTime].map((time) => {
+    const dateTimeString = `${sdate} ${time}`;
+    const dateTimeObject = new Date(dateTimeString);
+
+    // Check if the date-time is valid
+    if (!isNaN(dateTimeObject)) {
+      const utcString = dateTimeObject.toISOString();
+      const utcDateTimeObject = new Date(utcString);
+
+      return { utcString, timeInMilliseconds: utcDateTimeObject.getTime() };
+    }
+
+    return { utcString: null, timeInMilliseconds: null };
+  });
+
+  // Display UTC details
+  console.table({
+    UTCStartTime: utcStartTime.utcString,
+    UTCEndTime: utcEndTime.utcString,
+  });
+
+  // Display time in milliseconds
+  console.table({
+    StartTimeInMilliseconds: utcStartTime.timeInMilliseconds,
+    EndTimeInMilliseconds: utcEndTime.timeInMilliseconds,
+  });
+
+  // Display day information
+  console.table({
+    Day: day,
+  });
+
+  // Filter UTC day availability based on the given day
+  const utcDayAvailability = utcDaysAvailability.filter(
+    (availability) => availability.day === day
+  );
+
+  let isAvailable = false;
+
+  // Check if slot information is available
+  if (utcDayAvailability[0]?.slots[availabilityObjectIndex]) {
+    const { startTime: managerStartTime, endTime: managerEndTime } =
+      utcDayAvailability[0]?.slots[availabilityObjectIndex];
+
+    const updatedManagerStartTime = `${
+      utcStartTime.utcString.split("T")[0]
+    }T${managerStartTime}`;
+    const updatedManagerEndTime = `${
+      utcStartTime.utcString.split("T")[0]
+    }T${managerEndTime}`;
+
+    console.table({
+      ManagerStartTime: managerStartTime,
+      ManagerEndTime: managerEndTime,
+      UpdatedManagerStartTime: updatedManagerStartTime,
+      UpdatedManagerEndTime: updatedManagerEndTime,
+    });
+
+    // Convert manager's start and end time to milliseconds
+    const utcManDateSTimeObject = new Date(updatedManagerStartTime);
+    const utcManDateETimeObject = new Date(updatedManagerEndTime);
+
+    const manStartTimeInMilli = utcManDateSTimeObject.getTime();
+    const manEndTimeInMilli = utcManDateETimeObject.getTime();
+
+    // Display manager's start and end time in milliseconds
+    console.table({
+      ManagerStartTimeInMilli: manStartTimeInMilli,
+      ManagerEndTimeInMilli: manEndTimeInMilli,
+    });
+
+    // Check availability using the updated UTC times
+    const available =
+      utcStartTime.timeInMilliseconds >= manStartTimeInMilli &&
+      utcEndTime.timeInMilliseconds <= manEndTimeInMilli;
+
+    isAvailable = available;
+    console.log("Available:", available ? "Yes" : "No");
+  } else {
+    console.log("Slot information not available.");
+  }
+
+  /* Logic End */
+
   const getReasonTypes = async (val) => {
     try {
       const res = await fetch(
@@ -121,9 +221,13 @@ function Calendarurl() {
   };
 
   const setSlots = (date) => {
-    let selectedDate = new Date(date);
-    setCalenderSlots(selectedDate);
+    const localDate = new Date(date);
+    const utcDate = new Date(
+      localDate.getTime() + localDate.getTimezoneOffset() * 60000
+    );
+    setCalenderSlots(utcDate);
   };
+
   const isDateDisabled = (date, daysAvailability) => {
     const selectedDate = moment(date);
 
@@ -140,12 +244,16 @@ function Calendarurl() {
   };
 
   const convertToLocalTime = (utcTime) => {
-    const utcMoment = moment_timezone.utc(utcTime);
-    const localTimezone = moment_timezone.tz.guess();
-    const localMoment = utcMoment.clone().tz(localTimezone);
-    const formattedTime = localMoment.format("h:mm A");
+    const utcDate = new Date(`1970-01-01T${utcTime}`);
 
-    return formattedTime;
+    const localTime = utcDate.toLocaleTimeString(undefined, {
+      hour: "numeric",
+      minute: "numeric",
+      hour12: true,
+      timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+    });
+
+    return localTime;
   };
 
   const availabilityData = async (id) => {
@@ -164,14 +272,14 @@ function Calendarurl() {
         }));
 
       setDayAvailability(convertedAvailability);
+      setUtcDaysAvailability(data?.ManagerAvailability?.daysOfWeekAvailability);
     } else {
       setDayAvailability([]);
     }
-    // console.log("response:", data.ManagerAvailability.daysOfWeekAvailability);
-    // console.log("setDayAvailability:", daysAvailability);
   };
 
   const setCalenderSlots = async (selectedDate) => {
+    console.log("Selected Slot:", selectedDate);
     let dayIndex = selectedDate.getDay();
     let bodyData = {
       method: "POST",
@@ -209,36 +317,35 @@ function Calendarurl() {
     let dayAvailability = availability[0];
     setday(dayAvailability.day);
     // console.log(day, "dayAvailability");
-    const timeRecurresive = (slot) => {
+    const timeRecurresive = (slot, index) => {
       console.log(slot, "slot");
       return new Promise(function (myResolve, myReject) {
-        const repeatFunc = (slot) => {
-          calculateTime(bookedEvents, slot.startTime, slot.endTime).then(() => {
-            if (addMoment !== slot.endTime) {
-              repeatFunc(slot);
-            } else {
-              //   console.log(splitedTime)
-              //   setSplitTimes(splitedTime);
-              myResolve();
-              // setSplitTime(time)
+        const repeatFunc = (slot, index) => {
+          calculateTime(bookedEvents, slot.startTime, slot.endTime, index).then(
+            () => {
+              if (addMoment !== slot.endTime) {
+                repeatFunc(slot, index);
+              } else {
+                myResolve();
+              }
             }
-          });
+          );
         };
 
-        repeatFunc(slot);
+        repeatFunc(slot, index);
       });
     };
 
     splitedTime = [];
 
     const NextSlots = (m) => {
-      timeRecurresive(dayAvailability.slots[m]).then(() => {
+      console.log("MM:", m);
+      timeRecurresive(dayAvailability.slots[m], m).then(() => {
         m++;
         if (m < dayAvailability.slots.length) {
           newSlot = true;
           NextSlots(m);
         } else {
-          //   console.log(splitedTime);
           setSplitTimes(splitedTime);
         }
       });
@@ -257,35 +364,33 @@ function Calendarurl() {
     // timeRecurresive()
   };
 
-  const calculateTime = async (BookedEvents, startTime, endTime) => {
+  const calculateTime = async (BookedEvents, startTime, endTime, index) => {
     return new Promise(function (resolve, reject) {
       if (!newSlot) {
         let oldMoment = addMoment;
-        // console.log("addMoment  3: ", addMoment);
         addMoment = moment(addMoment, ["h:mm A"]).add(30, "m").format("LT");
-        // console.log("addMoment  4: ", addMoment);
         let slot = `${oldMoment} - ${addMoment}`;
 
         if (!BookedEvents.includes(oldMoment)) {
-          splitedTime.push(slot);
-          console.log(slot, "slot");
+          splitedTime.push({ slot, index });
+          resolve(index); // Pass the index when resolving the promise
+        } else {
+          resolve(); // Resolve without the index if the slot is booked
         }
-
-        resolve();
       } else {
-        // console.log("addMoment  0: ", addMoment);
         addMoment = moment(startTime, ["h:mm A"]).add(30, "m").format("LT");
-        // console.log("addMoment  2: ", addMoment);
         let slot = `${startTime} - ${addMoment}`;
         if (!BookedEvents.includes(startTime)) {
-          splitedTime.push(slot);
+          splitedTime.push({ slot, index });
+          resolve(index); // Pass the index when resolving the promise
+        } else {
+          resolve(); // Resolve without the index if the slot is booked
         }
         newSlot = false;
-
-        resolve();
       }
     });
   };
+
   console.log("reason", reason);
   const onHandleSubmit = async () => {
     console.log(time, "time");
@@ -309,11 +414,12 @@ function Calendarurl() {
         email: email,
         description: description,
         date: sdate,
-        StartTime: tim[0],
-        endTime: tim[1],
+        StartTime: `${sdate}T${utcStartTime.utcString.split("T")[1]}`,
+        endTime: `${sdate}T${utcEndTime.utcString.split("T")[1]}`,
         day: day,
         reasonId: reason,
         propertyId: property,
+        available: isAvailable,
       }),
     };
     const foundProperty = properties.find((item) => item._id === property);
@@ -328,7 +434,7 @@ function Calendarurl() {
       let data = await response.json();
 
       if (data.status == 200) {
-        // toast("Your Appointment is booked!");
+        toast("Your Appointment is booked!");
         const applicantStepForm = document.getElementById("bookAppoimentForm");
         const thanks = document.getElementById("thanks");
         applicantStepForm.style.display = "none";
@@ -614,6 +720,12 @@ function Calendarurl() {
                       }}
                       errorMessage="Please select event slot"
                       onChange={(e) => {
+                        const selectedOption =
+                          e.target.options[e.target.selectedIndex];
+                        const selectedSlotIndex =
+                          selectedOption.getAttribute("data-index");
+                        console.log("Index:", selectedSlotIndex);
+                        setAvailabilityObjectIndex(selectedSlotIndex);
                         setTime(e.target.value);
                       }}
                     >
@@ -622,7 +734,11 @@ function Calendarurl() {
                       {managerAvailability === "" ? (
                         <>
                           {splitTimes?.map((slot) => {
-                            return <option value={slot}>{slot}</option>;
+                            return (
+                              <option value={slot.slot} data-index={slot.index}>
+                                {slot.slot}
+                              </option>
+                            );
                           })}
                         </>
                       ) : (
