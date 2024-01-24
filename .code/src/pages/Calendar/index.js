@@ -44,7 +44,6 @@ import calendar from "../../assets/images/undraw-calendar.svg";
 
 //moment
 import moment from "moment";
-import moment_timezone from "moment-timezone";
 
 //Import Breadcrumb
 import Breadcrumbs from "../../components/Common/Breadcrumb";
@@ -758,15 +757,6 @@ const Calender = (props) => {
     }
   };
 
-  const convertToLocalTime = (utcTime) => {
-    const utcMoment = moment_timezone.utc(utcTime);
-    const localTimezone = moment_timezone.tz.guess();
-    const localMoment = utcMoment.clone().tz(localTimezone);
-    const formattedTime = localMoment.format("h:mm A");
-
-    return formattedTime;
-  };
-
   const getManagerAvailability = async (id) => {
     try {
       const response = await axios.get(
@@ -774,18 +764,9 @@ const Calender = (props) => {
       );
 
       if (response.data.status == 200) {
-        const convertedAvailability =
-          response.data.ManagerAvailability.daysOfWeekAvailability.map(
-            (day) => ({
-              ...day,
-              slots: day.slots.map((slot) => ({
-                startTime: convertToLocalTime(slot.startTime),
-                endTime: convertToLocalTime(slot.endTime),
-              })),
-            })
-          );
-
-        setDayAvailability(convertedAvailability);
+        setDayAvailability(
+          response.data.ManagerAvailability.daysOfWeekAvailability
+        );
 
         let availabilityArray = [];
         response.data.ManagerAvailability.daysOfWeekAvailability.map(

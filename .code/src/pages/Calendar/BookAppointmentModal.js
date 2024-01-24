@@ -5,7 +5,6 @@ import jwt_decode from "jwt-decode";
 import { SERVER_URL } from "../ServerLink";
 import { ToastContainer, toast } from "react-toastify";
 import moment from "moment";
-import moment_timezone from "moment-timezone";
 
 const BookAppointmentModal = ({ open, setOpen, id, defaultDate }) => {
   console.log(defaultDate, "nelogggggggggggggggggg");
@@ -102,31 +101,13 @@ const BookAppointmentModal = ({ open, setOpen, id, defaultDate }) => {
     setSdate(defaultDate);
   }, [defaultDate]);
 
-  const convertToLocalTime = (utcTime) => {
-    const utcMoment = moment_timezone.utc(utcTime);
-    const localTimezone = moment_timezone.tz.guess();
-    const localMoment = utcMoment.clone().tz(localTimezone);
-    const formattedTime = localMoment.format("h:mm A");
-
-    return formattedTime;
-  };
-
   const availabilityData = async (id) => {
     let res = await fetch(
       SERVER_URL + `/calender/get-availability/?manager_id=${id}`
     );
     let data = await res.json();
     if (data?.ManagerAvailability != null) {
-      const convertedAvailability =
-        data?.ManagerAvailability?.daysOfWeekAvailability.map((day) => ({
-          ...day,
-          slots: day.slots.map((slot) => ({
-            startTime: convertToLocalTime(slot.startTime),
-            endTime: convertToLocalTime(slot.endTime),
-          })),
-        }));
-
-      setDayAvailability(convertedAvailability);
+      setDayAvailability(data?.ManagerAvailability?.daysOfWeekAvailability);
     } else {
       setDayAvailability([]);
     }

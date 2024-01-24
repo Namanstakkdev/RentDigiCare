@@ -14,7 +14,6 @@ require("dotenv").config();
 const Email = require("../utils/Email");
 
 const moment = require("moment");
-const moment_timezone = require("moment-timezone");
 const { ObjectID } = require("bson");
 // importing database models
 const ManagerAvailability = require("../Database/calender_availability");
@@ -695,15 +694,6 @@ router.get("/get-id", async (req, res) => {
   }
 });
 
-const convertToLocalTime = (utcTime) => {
-  const utcMoment = moment_timezone.utc(utcTime);
-  const localTimezone = moment_timezone.tz.guess();
-  const localMoment = utcMoment.clone().tz(localTimezone);
-  const formattedTime = localMoment.format("h:mm A");
-
-  return formattedTime;
-};
-
 router.post("/add_slot", async (req, res) => {
   try {
     // console.log(req.body.event_id)
@@ -712,20 +702,14 @@ router.post("/add_slot", async (req, res) => {
       eventAssignedTo: req.body.manager_id,
     });
 
-    const convertedManagerAvailability =
-      managerAvailability[0].daysOfWeekAvailability.map((day) => ({
-        ...day,
-        slots: day.slots.map((slot) => ({
-          startTime: convertToLocalTime(slot.startTime),
-          endTime: convertToLocalTime(slot.endTime),
-        })),
-      }));
-
-    let dayAvailability = convertedManagerAvailability.filter((dayItem) => {
-      if (dayItem.day == req.body.day) {
-        return dayItem;
+    let dayAvailability = managerAvailability[0].daysOfWeekAvailability.filter(
+      (dayItem) => {
+        if (dayItem.day == req.body.day) {
+          return dayItem;
+        }
       }
-    });
+    );
+
     dayAvailability = dayAvailability[0];
     // moment.tz.add("Asia/Calcutta|HMT BURT IST IST|-5R.k -6u -5u -6u|01232|-18LFR.k 1unn.k HB0 7zX0");
 

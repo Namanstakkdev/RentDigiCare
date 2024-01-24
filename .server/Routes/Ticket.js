@@ -744,11 +744,11 @@ router.post("/filter_tickets_company", authToken, async (req, res) => {
         };
       }
       if (req.body.ticketID) {
-        query._id = req.body.ticketID;
+        query._id = ObjectId(req.body.ticketID);
       }
 
       if (req.body.propertyID) {
-        query.propertyID = req.body.propertyID;
+        query.propertyID = ObjectId(req.body.propertyID);
       }
 
       const countQuery = function (callback) {
@@ -894,6 +894,106 @@ router.post("/filter_tickets_company", authToken, async (req, res) => {
       message: "Please provide Company Domain",
       tickets: [],
     });
+  }
+});
+
+router.post("/report", authToken, async (req, res) => {
+  try {
+    const { companyDomain, pageNumber } = req.body;
+
+    if (!companyDomain) {
+      return res.status(400).json({
+        status: 400,
+        message: "Please provide Company Domain",
+        tickets: [],
+      });
+    }
+
+    const PAGE_LIMIT = 10;
+    const startIndex = (pageNumber - 1) * PAGE_LIMIT;
+
+    // const query = { companyDomain };
+
+    // const total = await Ticket.countDocuments(query);
+    // const tickets = await Ticket.find(query)
+    //   .sort({ createdAt: -1 })
+    //   .skip(startIndex)
+    //   .limit(PAGE_LIMIT)
+    //   .populate(
+    //     "assignedTo assignVendor confirmedQuote assignSpecificVendors propertyManagerId"
+    //   )
+    //   .exec();
+
+    const aggregationPipeline = [
+      {
+        $match: { companyDomain },
+      },
+      {
+        $lookup: {
+          from: "propertymanagers",
+          localField: "propertyManagerId",
+          foreignField: "_id",
+          as: "propertyManager",
+        },
+      },
+      {
+        $unwind: "$propertyManager",
+      },
+      {
+        $group: {
+          _id: {
+            managerName: {
+              $concat: [
+                "$propertyManager.firstname",
+                " ",
+                "$propertyManager.lastname",
+              ],
+            },
+            property: "$property",
+          },
+          totalTickets: { $sum: 1 },
+          statusCounts: { $push: "$status" },
+        },
+      },
+      {
+        $group: {
+          _id: "$_id.managerName",
+          properties: {
+            $push: {
+              name: "$_id.property",
+              totalTickets: "$totalTickets",
+              statusCounts: {},
+            },
+          },
+        },
+      },
+      {
+        $sort: {
+          createdAt: -1,
+        },
+      },
+      {
+        $skip: startIndex,
+      },
+      // {
+      //   $limit: PAGE_LIMIT,
+      // },
+    ];
+
+    const tickets = await Ticket.aggregate(aggregationPipeline);
+
+    console.log("Tickets:", tickets);
+
+    res.status(200).json({
+      status: 200,
+      message: "The resources have been fetched",
+      tickets: tickets,
+    });
+  } catch (error) {
+    console.error(error);
+    res
+      .status(500)
+      .json({ status: 500, message: "Something Went Wrong", tickets: [] });
   }
 });
 

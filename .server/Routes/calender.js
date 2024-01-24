@@ -2,7 +2,6 @@ const router = require("express").Router();
 const logger = require("../Logger/LoggerFactory").getProductionLogger();
 const { google } = require("googleapis");
 const moment = require("moment");
-const moment_timezone = require("moment-timezone");
 const jwt = require("jsonwebtoken");
 const {
   GOOGLE_CALENDAR_ID,
@@ -375,15 +374,6 @@ const insertEventGoogleCalendar = async (event, accessToken) => {
   }
 };
 
-const convertToLocalTime = (utcTime) => {
-  const utcMoment = moment_timezone.utc(utcTime);
-  const localTimezone = moment_timezone.tz.guess();
-  const localMoment = utcMoment.clone().tz(localTimezone);
-  const formattedTime = localMoment.format("h:mm A");
-
-  return formattedTime;
-};
-
 router.get("/add-event", async (req, res) => {
   try {
     const code = req.query.code;
@@ -414,16 +404,7 @@ router.get("/add-event", async (req, res) => {
         eventAssignedTo: event.manager_id,
       });
 
-      const convertedManagerAvailability =
-        managerAvailability.daysOfWeekAvailability.map((day) => ({
-          ...day,
-          slots: day.slots.map((slot) => ({
-            startTime: convertToLocalTime(slot.startTime),
-            endTime: convertToLocalTime(slot.endTime),
-          })),
-        }));
-
-      const dayAvailability = convertedManagerAvailability.find(
+      const dayAvailability = managerAvailability.daysOfWeekAvailability.find(
         (dayItem) => dayItem.day === event.day
       );
 

@@ -226,7 +226,6 @@ const TicketList = () => {
         };
 
         response = await axios.post(CUSTOMER_SEARCH_URL, query);
-        console.log(response);
       } else if (decode.role == "manager") {
         query = {
           pageNumber: pageNumber,
@@ -263,7 +262,6 @@ const TicketList = () => {
         setNotesCount(response.data.notesCount);
         setTotalTickets(response.data.totalCount);
         setTicketPropertyList(response.data.propertyList);
-        setTicketIDs(response.data.tickets.map((t) => t._id));
         setStats((prev) => ({
           ...prev,
           total: response.data.total?.Total || 0,
@@ -291,6 +289,67 @@ const TicketList = () => {
       }
     }
   };
+
+  const fetchTicketIds = async (type) => {
+    try {
+      let query = {};
+      let response;
+      if (decode.role == "customer") {
+        query = {
+          customerID: decode.id,
+          pageNumber: pageNumber,
+          startDate: filterFromDate,
+          endDate: filterToDate,
+          status: filterStatus,
+          propertyID: selectProperty.value,
+          ticketID: filterID,
+          suite: filtername,
+          requestType: requestTypeFilter.value,
+        };
+
+        response = await axios.post(CUSTOMER_SEARCH_URL, query);
+      } else if (decode.role == "manager") {
+        query = {
+          pageNumber: pageNumber,
+          startDate: filterFromDate,
+          endDate: filterToDate,
+          status: filterStatus,
+          propertyID: selectProperty.value,
+          ticketID: filterID.value,
+          suite: filtername,
+          managerID: decode.id,
+          requestType: requestTypeFilter.value,
+        };
+
+        response = await axios.post(MANAGER_SEARCH_URL, query);
+      } else {
+        query = {
+          pageNumber: pageNumber,
+          startDate: filterFromDate,
+          endDate: filterToDate,
+          status: filterStatus,
+          propertyID: selectProperty.value,
+          ticketID: filterID.value,
+          propertyManagerID: filterPropertyManager,
+          suite: filtername,
+          companyDomain: decode.domain,
+          requestType: requestTypeFilter.value,
+        };
+
+        response = await axios.post(COMPNAY_SEARCH_URL, query);
+      }
+
+      if (response.status === 200) {
+        setTicketIDs(response.data.tickets.map((t) => t._id));
+      }
+    } catch (error) {
+      console.log(error); // TODO proper error
+    }
+  };
+
+  useEffect(() => {
+    fetchTicketIds();
+  }, []);
 
   /**
    * Formats the size

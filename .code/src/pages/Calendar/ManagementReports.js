@@ -11,6 +11,8 @@ const ManagementReports = () => {
   const [filterPropertyManager, setFilterPropertyManager] = useState("");
   const [propertyManagerList, setPropertyManagerList] = useState([]);
   const [tickets, setTickets] = useState([]);
+
+  console.log("Tickets:", tickets);
   const decode = jwt_decode(window.localStorage.getItem("accessToken"));
   const userRole = JSON.parse(window.localStorage.getItem("authUser")).role;
 
@@ -36,13 +38,14 @@ const ManagementReports = () => {
     if (decode.role === "company") {
       const getTickets = async () => {
         try {
-          const ticketResponse = await axios.post(
-            "/ticket/filter_tickets_company",
-            {
-              companyDomain: decode.domain,
-            }
-          );
-          setTickets(ticketResponse.data.tickets);
+          const ticketResponse = await axios.post("/ticket/report", {
+            companyDomain: decode.domain,
+            pageNumber: 1,
+          });
+
+          console.log("TicketResponse:", ticketResponse);
+
+          // setTickets(ticketResponse.data.tickets);
         } catch (error) {
           console.error("Error fetching tickets:", error.message);
         }

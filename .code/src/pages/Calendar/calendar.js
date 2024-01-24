@@ -5,7 +5,6 @@ import { Link } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import MetaTags from "react-meta-tags";
 import moment from "moment";
-import moment_timezone from "moment-timezone";
 import { AvField, AvForm } from "availity-reactstrap-validation";
 import ThankYou from "../../assets/images/thnx.gif";
 
@@ -121,9 +120,13 @@ function Calendarurl() {
   };
 
   const setSlots = (date) => {
-    let selectedDate = new Date(date);
-    setCalenderSlots(selectedDate);
+    const localDate = new Date(date);
+    const utcDate = new Date(
+      localDate.getTime() + localDate.getTimezoneOffset() * 60000
+    );
+    setCalenderSlots(utcDate);
   };
+
   const isDateDisabled = (date, daysAvailability) => {
     const selectedDate = moment(date);
 
@@ -139,31 +142,13 @@ function Calendarurl() {
     return !!selectedDayAvailability;
   };
 
-  const convertToLocalTime = (utcTime) => {
-    const utcMoment = moment_timezone.utc(utcTime);
-    const localTimezone = moment_timezone.tz.guess();
-    const localMoment = utcMoment.clone().tz(localTimezone);
-    const formattedTime = localMoment.format("h:mm A");
-
-    return formattedTime;
-  };
-
   const availabilityData = async (id) => {
     let res = await fetch(
       SERVER_URL + `/calender/get-availability/?manager_id=${id}`
     );
     let data = await res.json();
     if (data?.ManagerAvailability != null) {
-      const convertedAvailability =
-        data?.ManagerAvailability?.daysOfWeekAvailability.map((day) => ({
-          ...day,
-          slots: day.slots.map((slot) => ({
-            startTime: convertToLocalTime(slot.startTime),
-            endTime: convertToLocalTime(slot.endTime),
-          })),
-        }));
-
-      setDayAvailability(convertedAvailability);
+      setDayAvailability(data?.ManagerAvailability?.daysOfWeekAvailability);
     } else {
       setDayAvailability([]);
     }
@@ -172,6 +157,7 @@ function Calendarurl() {
   };
 
   const setCalenderSlots = async (selectedDate) => {
+    console.log("Selected Slot:", selectedDate);
     let dayIndex = selectedDate.getDay();
     let bodyData = {
       method: "POST",
