@@ -174,23 +174,35 @@ const Calender_availabilty = () => {
     timeRecurresive(0);
   }, []);
 
+  // const convertToUTC = (localTime) => {
+  //   const currentDate = new Date();
+
+  //   const year = currentDate.getFullYear();
+  //   const month = String(currentDate.getMonth() + 1).padStart(2, "0");
+  //   const day = String(currentDate.getDate()).padStart(2, "0");
+
+  //   const formattedDate = `${year}-${month}-${day}`;
+  //   const dateTimeString = `${formattedDate} ${localTime}`;
+
+  //   const dateTimeObject = new Date(dateTimeString);
+
+  //   if (!isNaN(dateTimeObject)) {
+  //     const utcString = dateTimeObject.toISOString();
+  //     const utcTimePart = utcString.split("T")[1];
+  //     return utcTimePart;
+  //   }
+  // };
+
   const convertToUTC = (localTime) => {
     const currentDate = new Date();
-
-    const year = currentDate.getFullYear();
-    const month = String(currentDate.getMonth() + 1).padStart(2, "0");
-    const day = String(currentDate.getDate()).padStart(2, "0");
-
-    const formattedDate = `${year}-${month}-${day}`;
+    const formattedDate = currentDate.toISOString().split("T")[0];
     const dateTimeString = `${formattedDate} ${localTime}`;
 
     const dateTimeObject = new Date(dateTimeString);
 
-    if (!isNaN(dateTimeObject)) {
-      const utcString = dateTimeObject.toISOString();
-      const utcTimePart = utcString.split("T")[1];
-      return utcTimePart;
-    }
+    return !isNaN(dateTimeObject)
+      ? dateTimeObject.toISOString().split("T")[1]
+      : undefined;
   };
 
   const submit = async (e) => {

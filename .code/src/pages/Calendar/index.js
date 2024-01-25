@@ -132,6 +132,9 @@ const Calender = (props) => {
   const [totalEvents, setTotalEvents] = useState([]);
 
   const [events, setEvents] = useState([]);
+
+  console.log("Events:", events);
+
   const [event, setEvent] = useState({});
   console.log("Event:", event);
   const [selectedDay, setSelectedDay] = useState(0);
@@ -391,6 +394,7 @@ const Calender = (props) => {
       setProperties(properties);
       // let totalEvents = [...ticketEvent, ...eventArray];
       let totalEvents = [...eventArray];
+      console.log("TotalEvents:", totalEvents);
       setEvents(totalEvents);
       setTotalEvents(totalEvents);
     }
@@ -400,6 +404,7 @@ const Calender = (props) => {
     // dispatch(onGetEvents());
 
     if (["manager", "technical staff", "vendor"].includes(decode.role)) {
+      console.log("Called1");
       getManagerProperties();
       getManagerAvailability(decode.id);
       getTickets();
@@ -1060,18 +1065,9 @@ const Calender = (props) => {
   };
 
   const renderEvent = (info) => {
-    console.log("Info:", info);
-    let startTime = info.event.start;
-    let endTime = info.event.end;
-    startTime = startTime?.toLocaleTimeString([], {
-      hour: "2-digit",
-      minute: "2-digit",
-    });
-    endTime = endTime?.toLocaleTimeString([], {
-      hour: "2-digit",
-      minute: "2-digit",
-    });
-    // console.log(info.event, "SDD");
+    const [startTime, endTime] = info.event.extendedProps.slot
+      .split(" - ")
+      .map((time) => convertToLocalTime(time));
 
     return (
       <div className="d-flex flex-column justify-content-start align-items-start overflow-auto">

@@ -28,6 +28,7 @@ const BookAppointmentModal = ({ open, setOpen, id, defaultDate }) => {
   const [phone1, setPhone1] = useState("");
   const [sdate, setSdate] = useState("");
   const [time, setTime] = useState("");
+  const [availabilityObjectIndex, setAvailabilityObjectIndex] = useState(null);
   const [description, setdescription] = useState("");
   const [day, setday] = useState("");
   const [properties, setProperties] = useState([]);
@@ -37,6 +38,7 @@ const BookAppointmentModal = ({ open, setOpen, id, defaultDate }) => {
   const [selectedDay, setSelectedDay] = useState(0);
   const [isEdit, setIsEdit] = useState(false);
   const [daysAvailability, setDayAvailability] = useState([]);
+  const [utcDaysAvailability, setUtcDaysAvailability] = useState([]);
   const [splitTimes, setSplitTimes] = useState([]);
 
   console.log("SplitTimes:", splitTimes);
@@ -81,6 +83,103 @@ const BookAppointmentModal = ({ open, setOpen, id, defaultDate }) => {
     );
   };
 
+  /* Logic Start */
+
+  // Extract start and end time from the input string
+  const [startTime, endTime] = time.split(" - ");
+
+  // Display input details
+  console.table({
+    StartTime: startTime,
+    EndTime: endTime,
+    "Calendar Date": sdate,
+  });
+
+  // Convert start and end time to UTC format
+  const [utcStartTime, utcEndTime] = [startTime, endTime].map((time) => {
+    const dateTimeString = `${sdate} ${time}`;
+    const dateTimeObject = new Date(dateTimeString);
+
+    // Check if the date-time is valid
+    if (!isNaN(dateTimeObject)) {
+      const utcString = dateTimeObject.toISOString();
+      const utcDateTimeObject = new Date(utcString);
+
+      return { utcString, timeInMilliseconds: utcDateTimeObject.getTime() };
+    }
+
+    return { utcString: null, timeInMilliseconds: null };
+  });
+
+  // Display UTC details
+  console.table({
+    UTCStartTime: utcStartTime.utcString,
+    UTCEndTime: utcEndTime.utcString,
+  });
+
+  // Display time in milliseconds
+  console.table({
+    StartTimeInMilliseconds: utcStartTime.timeInMilliseconds,
+    EndTimeInMilliseconds: utcEndTime.timeInMilliseconds,
+  });
+
+  // Display day information
+  console.table({
+    Day: day,
+  });
+
+  // Filter UTC day availability based on the given day
+  const utcDayAvailability = utcDaysAvailability.filter(
+    (availability) => availability.day === day
+  );
+
+  let isAvailable = false;
+
+  // Check if slot information is available
+  if (utcDayAvailability[0]?.slots[availabilityObjectIndex]) {
+    const { startTime: managerStartTime, endTime: managerEndTime } =
+      utcDayAvailability[0]?.slots[availabilityObjectIndex];
+
+    const updatedManagerStartTime = `${
+      utcStartTime.utcString.split("T")[0]
+    }T${managerStartTime}`;
+    const updatedManagerEndTime = `${
+      utcStartTime.utcString.split("T")[0]
+    }T${managerEndTime}`;
+
+    console.table({
+      ManagerStartTime: managerStartTime,
+      ManagerEndTime: managerEndTime,
+      UpdatedManagerStartTime: updatedManagerStartTime,
+      UpdatedManagerEndTime: updatedManagerEndTime,
+    });
+
+    // Convert manager's start and end time to milliseconds
+    const utcManDateSTimeObject = new Date(updatedManagerStartTime);
+    const utcManDateETimeObject = new Date(updatedManagerEndTime);
+
+    const manStartTimeInMilli = utcManDateSTimeObject.getTime();
+    const manEndTimeInMilli = utcManDateETimeObject.getTime();
+
+    // Display manager's start and end time in milliseconds
+    console.table({
+      ManagerStartTimeInMilli: manStartTimeInMilli,
+      ManagerEndTimeInMilli: manEndTimeInMilli,
+    });
+
+    // Check availability using the updated UTC times
+    const available =
+      utcStartTime.timeInMilliseconds >= manStartTimeInMilli &&
+      utcEndTime.timeInMilliseconds <= manEndTimeInMilli;
+
+    isAvailable = available;
+    console.log("Available:", available ? "Yes" : "No");
+  } else {
+    console.log("Slot information not available.");
+  }
+
+  /* Logic End */
+
   const getReasonTypes = async (val) => {
     try {
       const res = await fetch(
@@ -103,7 +202,7 @@ const BookAppointmentModal = ({ open, setOpen, id, defaultDate }) => {
     );
     setCalenderSlots(utcDate);
   };
-  
+
   useEffect(() => {
     setSlots(defaultDate);
     setSdate(defaultDate);
@@ -138,6 +237,7 @@ const BookAppointmentModal = ({ open, setOpen, id, defaultDate }) => {
         }));
 
       setDayAvailability(convertedAvailability);
+      setUtcDaysAvailability(data?.ManagerAvailability?.daysOfWeekAvailability);
     } else {
       setDayAvailability([]);
     }
@@ -202,7 +302,7 @@ const BookAppointmentModal = ({ open, setOpen, id, defaultDate }) => {
           );
         };
 
-        repeatFunc(slot);
+        repeatFunc(slot, index);
       });
     };
 
@@ -233,6 +333,7 @@ const BookAppointmentModal = ({ open, setOpen, id, defaultDate }) => {
 
     // timeRecurresive()
   };
+
   const isDateDisabled = (date, daysAvailability) => {
     const selectedDate = moment(date);
 
@@ -301,11 +402,12 @@ const BookAppointmentModal = ({ open, setOpen, id, defaultDate }) => {
         email: email,
         description: description,
         date: sdate,
-        StartTime: tim[0],
-        endTime: tim[1],
+        StartTime: `${sdate}T${utcStartTime.utcString.split("T")[1]}`,
+        endTime: `${sdate}T${utcEndTime.utcString.split("T")[1]}`,
         day: day,
         reasonId: reason,
         propertyId: property,
+        available: isAvailable,
         status: "pending",
       }),
     };
@@ -592,6 +694,10 @@ const BookAppointmentModal = ({ open, setOpen, id, defaultDate }) => {
                   onChange={(e) => {
                     const selectedOption =
                       e.target.options[e.target.selectedIndex];
+                    const selectedSlotIndex =
+                      selectedOption.getAttribute("data-index");
+                    console.log("Index:", selectedSlotIndex);
+                    setAvailabilityObjectIndex(selectedSlotIndex);
                     setTime(e.target.value);
                   }}
                 >
