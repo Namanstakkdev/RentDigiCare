@@ -1463,17 +1463,20 @@ const TicketList = () => {
                         <tr>
                           <th scope="col">#</th>
                           <th scope="col">ID</th>
+                          <th style={{ minWidth: "110px" }}>Suite No.</th>
                           <th scope="col">Type</th>
-                          {decode.role !== "customer" ? (
+                          {decode.role !== "customer" && (
                             <>
                               <th>Property</th>
                               <th style={{ minWidth: "110px" }}>
                                 Submitted By
                               </th>
                             </>
-                          ) : (
-                            <th>Suit</th>
-                          )}
+                          ) 
+                          // : (
+                          //   <th>Suit</th>
+                          // )
+                          }
                           <th scope="col" style={{ minWidth: "80px" }}>
                             Created
                           </th>

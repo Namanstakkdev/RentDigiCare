@@ -684,6 +684,7 @@ export default function TicketRow(props) {
     <tr key={props._key}>
       <td>{props.number}</td>
       <td>{props.id.substring(props.id.length - 6)}</td>
+      <td>{props.suite}</td>
       <td>
         {props.type}
 
@@ -1392,7 +1393,7 @@ export default function TicketRow(props) {
           </div>
         </Modal>
       </td>
-      {decode.role !== "customer" ? (
+      {decode.role !== "customer" && (
         <>
           {/* <td>{props.property}</td> */}
           <td>{props.propertySignature}</td>
@@ -1404,9 +1405,11 @@ export default function TicketRow(props) {
             {/* {props.suite} */}
           </td>
         </>
-      ) : (
-        <td>{props.suite}</td>
-      )}
+      )
+      //  : (
+      //   <td>{props.suite}</td>
+      // )
+      }
       <td style={{ minWidth: "max-content" }}>
         {moment(props.createdAt).format("DD-MM-YY")}
       </td>
