@@ -60,22 +60,22 @@ const eventUpdate = (eventId, event) => {
 router.post("/auth", async (req, res) => {
   const existingEvent = await Events.findOne({ authEmail: req.body.authEmail });
   const eventData = req.body;
-  const { eventDate, StartTime, endTime } = eventData;
+  // const { eventDate, StartTime, endTime } = eventData;
 
-  const editedEventData = {
-    ...eventData,
-    StartTime: `${eventDate}T${StartTime.split("T")[1]}`,
-    endTime: `${eventDate}T${endTime.split("T")[1]}`,
-  };
+  // const editedEventData = {
+  //   ...eventData,
+  //   StartTime: `${eventDate}T${StartTime.split("T")[1]}`,
+  //   endTime: `${eventDate}T${endTime.split("T")[1]}`,
+  // };
 
   if (existingEvent) {
     const updatedEvent = await Events.findOneAndUpdate(
       { authEmail: req.body.authEmail },
-      editedEventData,
+      eventData,
       { new: true }
     );
   } else {
-    const newEvent = await Events.create(editedEventData);
+    const newEvent = await Events.create(eventData);
     console.log("Newly Created Event Data:", newEvent);
   }
 
@@ -418,33 +418,6 @@ router.get("/add-event", async (req, res) => {
         });
       }
 
-      const inAvailableTime = dayAvailability.slots.some((slot) => {
-        const eventStartTime = new Date(event.StartTime).getTime();
-        const slotStartTime = new Date(
-          `${event.eventDate}T${slot.startTime}`
-        ).getTime();
-        const slotEndTime = new Date(
-          `${event.eventDate}T${slot.endTime}`
-        ).getTime();
-
-        return eventStartTime >= slotStartTime && eventStartTime < slotEndTime;
-      });
-
-      if (!inAvailableTime) {
-        const responseData = {
-          message: "Slot is unavailable",
-          status: 500,
-        };
-
-        const encodedResponse = encodeURIComponent(
-          JSON.stringify(responseData)
-        );
-
-        res.redirect(
-          `http://localhost:3000/apps-calendar?response=${encodedResponse}`
-        );
-      }
-
       const bookedEvents = await Calender_events.find({
         eventDate: event.eventDate,
         eventAssignedTo: event.manager_id,
@@ -452,12 +425,24 @@ router.get("/add-event", async (req, res) => {
 
       const isSlotBooked = () =>
         bookedEvents.some((booked) => {
-          const eventStartTime = new Date(event.StartTime).getTime();
-          const bookedStartTime = new Date(booked.startTime).getTime();
-          const bookedEndTime = new Date(booked.endTime).getTime();
+          const eventStartTime = Math.ceil(
+            moment(event.StartTime, "h:mm A").valueOf() / 1000
+          );
+
+          const eventEndTime = Math.ceil(
+            moment(event.endTime, "h:mm A").valueOf() / 1000
+          );
+
+          const bookedStartTime = Math.ceil(
+            moment(booked.startTime, "h:mm A").valueOf() / 1000
+          );
+
+          const bookedEndTime = Math.ceil(
+            moment(booked.endTime, "h:mm A").valueOf() / 1000
+          );
 
           return (
-            eventStartTime >= bookedStartTime && eventStartTime < bookedEndTime
+            eventStartTime === bookedStartTime && eventEndTime === bookedEndTime
           );
         });
 

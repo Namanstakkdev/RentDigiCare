@@ -108,26 +108,31 @@ function Calendarurl() {
     );
   };
 
+  const convertToLocalTime = (utcTime) => {
+    const utcDate = new Date(`1970-01-01T${utcTime}`);
+
+    const localTime = utcDate.toLocaleTimeString(undefined, {
+      hour: "numeric",
+      minute: "numeric",
+      hour12: true,
+      timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+    });
+
+    return localTime;
+  };
+
   /* Logic Start */
 
-  // Extract start and end time from the input string
   const [startTime, endTime] = time.split(" - ");
 
-  // Display input details
-  console.table({
-    StartTime: startTime,
-    EndTime: endTime,
-    "Calendar Date": sdate,
-  });
-
-  // Convert start and end time to UTC format
   const [utcStartTime, utcEndTime] = [startTime, endTime].map((time) => {
     const dateTimeString = `${sdate} ${time}`;
     const dateTimeObject = new Date(dateTimeString);
 
     // Check if the date-time is valid
     if (!isNaN(dateTimeObject)) {
-      const utcString = dateTimeObject.toISOString();
+      const utcStringDateTimeObject = new Date(dateTimeObject.toISOString());
+      const utcString = utcStringDateTimeObject.toISOString();
       const utcDateTimeObject = new Date(utcString);
 
       return { utcString, timeInMilliseconds: utcDateTimeObject.getTime() };
@@ -135,73 +140,6 @@ function Calendarurl() {
 
     return { utcString: null, timeInMilliseconds: null };
   });
-
-  // Display UTC details
-  console.table({
-    UTCStartTime: utcStartTime.utcString,
-    UTCEndTime: utcEndTime.utcString,
-  });
-
-  // Display time in milliseconds
-  console.table({
-    StartTimeInMilliseconds: utcStartTime.timeInMilliseconds,
-    EndTimeInMilliseconds: utcEndTime.timeInMilliseconds,
-  });
-
-  // Display day information
-  console.table({
-    Day: day,
-  });
-
-  // Filter UTC day availability based on the given day
-  const utcDayAvailability = utcDaysAvailability.filter(
-    (availability) => availability.day === day
-  );
-
-  let isAvailable = false;
-
-  // Check if slot information is available
-  if (utcDayAvailability[0]?.slots[availabilityObjectIndex]) {
-    const { startTime: managerStartTime, endTime: managerEndTime } =
-      utcDayAvailability[0]?.slots[availabilityObjectIndex];
-
-    const updatedManagerStartTime = `${
-      utcStartTime.utcString.split("T")[0]
-    }T${managerStartTime}`;
-    const updatedManagerEndTime = `${
-      utcStartTime.utcString.split("T")[0]
-    }T${managerEndTime}`;
-
-    console.table({
-      ManagerStartTime: managerStartTime,
-      ManagerEndTime: managerEndTime,
-      UpdatedManagerStartTime: updatedManagerStartTime,
-      UpdatedManagerEndTime: updatedManagerEndTime,
-    });
-
-    // Convert manager's start and end time to milliseconds
-    const utcManDateSTimeObject = new Date(updatedManagerStartTime);
-    const utcManDateETimeObject = new Date(updatedManagerEndTime);
-
-    const manStartTimeInMilli = utcManDateSTimeObject.getTime();
-    const manEndTimeInMilli = utcManDateETimeObject.getTime();
-
-    // Display manager's start and end time in milliseconds
-    console.table({
-      ManagerStartTimeInMilli: manStartTimeInMilli,
-      ManagerEndTimeInMilli: manEndTimeInMilli,
-    });
-
-    // Check availability using the updated UTC times
-    const available =
-      utcStartTime.timeInMilliseconds >= manStartTimeInMilli &&
-      utcEndTime.timeInMilliseconds <= manEndTimeInMilli;
-
-    isAvailable = available;
-    console.log("Available:", available ? "Yes" : "No");
-  } else {
-    console.log("Slot information not available.");
-  }
 
   /* Logic End */
 
@@ -241,19 +179,6 @@ function Calendarurl() {
     );
 
     return !!selectedDayAvailability;
-  };
-
-  const convertToLocalTime = (utcTime) => {
-    const utcDate = new Date(`1970-01-01T${utcTime}`);
-
-    const localTime = utcDate.toLocaleTimeString(undefined, {
-      hour: "numeric",
-      minute: "numeric",
-      hour12: true,
-      timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-    });
-
-    return localTime;
   };
 
   const availabilityData = async (id) => {
@@ -414,12 +339,12 @@ function Calendarurl() {
         email: email,
         description: description,
         date: sdate,
-        StartTime: `${sdate}T${utcStartTime.utcString.split("T")[1]}`,
-        endTime: `${sdate}T${utcEndTime.utcString.split("T")[1]}`,
+        StartTime: utcStartTime.utcString,
+        endTime: utcEndTime.utcString,
         day: day,
         reasonId: reason,
         propertyId: property,
-        available: isAvailable,
+        // available: isAvailable,
       }),
     };
     const foundProperty = properties.find((item) => item._id === property);

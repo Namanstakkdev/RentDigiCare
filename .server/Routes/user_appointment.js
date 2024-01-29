@@ -696,10 +696,6 @@ router.get("/get-id", async (req, res) => {
 });
 
 router.post("/add_slot", async (req, res) => {
-  console.table({
-    StartTime: req.body.StartTime,
-    EndTime: req.body.endTime,
-  });
   try {
     const managerAvailability = await ManagerAvailability.findOne({
       eventAssignedTo: req.body.manager_id,
@@ -712,44 +708,33 @@ router.post("/add_slot", async (req, res) => {
 
     let alreadyBooked = false;
 
-    const findBooked = async (startTime, endTime, date) => {
-      const databaseDate = new Date(date).toISOString();
-
-      const newStartTime = `${databaseDate.split("T")[0]}T${
-        startTime.split("T")[1]
-      }`;
-      const newEndTime = `${databaseDate.split("T")[0]}T${
-        endTime.split("T")[1]
-      }`;
-
-      const requestTime = new Date(req.body.StartTime);
-      const startTimeObject = new Date(newStartTime);
-      const endTimeObject = new Date(newEndTime);
+    const findBooked = async (startTime, endTime) => {
+      const requestStartTimeEpoch = Math.ceil(
+        moment(req.body.StartTime, "h:mm A").valueOf() / 1000
+      );
+      const requestEndTimeEpoch = Math.ceil(
+        moment(req.body.endTime, "h:mm A").valueOf() / 1000
+      );
+      const startTimeEpoch = Math.ceil(
+        moment(startTime, "h:mm A").valueOf() / 1000
+      );
+      const endTimeEpoch = Math.ceil(
+        moment(endTime, "h:mm A").valueOf() / 1000
+      );
 
       return new Promise((resolve, reject) => {
-        // Get time in milliseconds
-        const requestTimeMillis = requestTime.getTime();
-        const startTimeMillis = startTimeObject.getTime();
-        const endTimeMillis = endTimeObject.getTime();
-
         // Compare times
         alreadyBooked =
-          requestTimeMillis >= startTimeMillis &&
-          requestTimeMillis < endTimeMillis;
+          requestStartTimeEpoch === startTimeEpoch &&
+          requestEndTimeEpoch === endTimeEpoch;
 
         resolve(alreadyBooked);
       });
     };
 
-    let inAvailableTime;
+    console.log(dayAvailability.available);
 
-    if (req.body.available) {
-      inAvailableTime = req.body.available;
-    }
-
-    console.log(dayAvailability.available, inAvailableTime);
-
-    if (dayAvailability.available && inAvailableTime) {
+    if (dayAvailability.available) {
       let BookedEvents = await User_appointment.find({
         date: req.body.date,
         eventAssignedTo: req.body.manager_id,
@@ -934,133 +919,99 @@ router.post("/add_slot", async (req, res) => {
         }
       } else {
         const findNext = async (i) => {
-          findBooked(
-            BookedEvents[i].startTime,
-            BookedEvents[i].endTime,
-            BookedEvents[i].date
-          ).then(async (result) => {
-            if (result) {
-              return res.json({
-                status: 500,
-                message: "Slot is already Booked",
-              });
-            } else if (BookedEvents.length - 1 == i) {
-              if (req.body.slot_id) {
-                let updatedEvent = await User_appointment.findOneAndUpdate(
-                  { _id: req.body.slot_id },
-                  {
+          findBooked(BookedEvents[i].startTime, BookedEvents[i].endTime).then(
+            async (result) => {
+              if (result) {
+                return res.json({
+                  status: 500,
+                  message: "Slot is already Booked",
+                });
+              } else if (BookedEvents.length - 1 == i) {
+                if (req.body.slot_id) {
+                  let updatedEvent = await User_appointment.findOneAndUpdate(
+                    { _id: req.body.slot_id },
+                    {
+                      date: req.body.date,
+                      startTime: req.body.StartTime,
+                      endTime: req.body.endTime,
+                    }
+                  );
+
+                  return res.status(200).send({
+                    success: true,
+                    message: "Successfully Updated",
+                    status: 200,
+                    updatedEvent: updatedEvent,
+                  });
+                } else {
+                  let event = await User_appointment.create({
+                    eventAssignedTo: req.body.manager_id,
+                    assignedToType: req.body.role,
+                    propertyId: req.body.propertyId,
+                    layoutId: req.body.layoutId,
+                    reasonId: req.body.reasonId,
+                    name: req.body.name,
+                    phone: req.body.phone,
+                    phone1: req.body.phone1,
+                    email: req.body.email,
+                    description: req.body.description,
                     date: req.body.date,
                     startTime: req.body.StartTime,
                     endTime: req.body.endTime,
-                  }
-                );
-
-                return res.status(200).send({
-                  success: true,
-                  message: "Successfully Updated",
-                  status: 200,
-                  updatedEvent: updatedEvent,
-                });
-              } else {
-                let event = await User_appointment.create({
-                  eventAssignedTo: req.body.manager_id,
-                  assignedToType: req.body.role,
-                  propertyId: req.body.propertyId,
-                  layoutId: req.body.layoutId,
-                  reasonId: req.body.reasonId,
-                  name: req.body.name,
-                  phone: req.body.phone,
-                  phone1: req.body.phone1,
-                  email: req.body.email,
-                  description: req.body.description,
-                  date: req.body.date,
-                  startTime: req.body.StartTime,
-                  endTime: req.body.endTime,
-                  startTimeEpoch: Math.ceil(
-                    moment(req.body.StartTime, "h:mm A").valueOf() / 1000
-                  ),
-                  endTimeEpoch: Math.ceil(
-                    moment(req.body.endTime, "h:mm A").valueOf() / 1000
-                  ),
-                  companyDomain: req.body.companyDomain,
-                  status: req.body.status ? req.body.status : "pending",
-                });
-                let userData = [];
-                if (req.body.role == "manager") {
-                  userData = await propertyManager.aggregate([
-                    {
-                      $match: {
-                        _id: ObjectID(req.body.manager_id),
-                      },
-                    },
-                    {
-                      $addFields: {
-                        companyID: {
-                          $toObjectId: "$companyID",
+                    startTimeEpoch: Math.ceil(
+                      moment(req.body.StartTime, "h:mm A").valueOf() / 1000
+                    ),
+                    endTimeEpoch: Math.ceil(
+                      moment(req.body.endTime, "h:mm A").valueOf() / 1000
+                    ),
+                    companyDomain: req.body.companyDomain,
+                    status: req.body.status ? req.body.status : "pending",
+                  });
+                  let userData = [];
+                  if (req.body.role == "manager") {
+                    userData = await propertyManager.aggregate([
+                      {
+                        $match: {
+                          _id: ObjectID(req.body.manager_id),
                         },
                       },
-                    },
-                    {
-                      $lookup: {
-                        from: "companies",
-                        localField: "companyID",
-                        foreignField: "_id",
-                        as: "company",
+                      {
+                        $addFields: {
+                          companyID: {
+                            $toObjectId: "$companyID",
+                          },
+                        },
                       },
-                    },
-                  ]);
-                } else {
-                  userData = await Company.find({
-                    _id: ObjectID(req.body.manager_id),
-                  });
-                }
+                      {
+                        $lookup: {
+                          from: "companies",
+                          localField: "companyID",
+                          foreignField: "_id",
+                          as: "company",
+                        },
+                      },
+                    ]);
+                  } else {
+                    userData = await Company.find({
+                      _id: ObjectID(req.body.manager_id),
+                    });
+                  }
 
-                const property = await Property.findOne({
-                  _id: req.body.propertyId,
-                });
-                const layout = await Layout.findOne({
-                  _id: req.body.layoutId,
-                });
-                const company = await Company.findOne({
-                  _id: property.companyID,
-                });
-                let EmailData = {
-                  applicantName: req.body.name,
-                  applicantPhone: req.body.phone,
-                  applicantEmail: req.body.email,
-                  applicantDescription: req.body.description,
-                  logo: company?.logo,
-                  date: req.body.date,
-                  startTime: req.body.StartTime,
-                  endTime: req.body.endTime,
-                  email: req.body.email,
-                  companyDomain: req.body.companyDomain,
-                  companyName: property?.company,
-                  property: property?.title,
-                  layout: layout?.layoutName,
-                };
-                if (req.body.role == "manager") {
-                  EmailData.managerName =
-                    userData[0].firstname + " " + userData[0].lastname;
-                  EmailData.managerEmail = userData[0].email;
-                  EmailData.managerPhone = userData[0].mobile;
-                } else {
-                  EmailData.managerName = userData[0].ownerName;
-                  EmailData.managerEmail = userData[0].email;
-                  EmailData.managerPhone = userData[0].phone;
-                }
-                const options = Email.generateOptions(
-                  [req.body.email],
-                  "SLOT_BOOKING_SUBMITTED",
-                  EmailData
-                );
-                const isEmailSent = Email.send(options);
-                if (userData?.length > 0) {
-                  let EmailDataManager = {
+                  const property = await Property.findOne({
+                    _id: req.body.propertyId,
+                  });
+                  const layout = await Layout.findOne({
+                    _id: req.body.layoutId,
+                  });
+                  const company = await Company.findOne({
+                    _id: property.companyID,
+                  });
+                  let EmailData = {
                     applicantName: req.body.name,
                     applicantPhone: req.body.phone,
                     applicantEmail: req.body.email,
                     applicantDescription: req.body.description,
+                    logo: company?.logo,
                     date: req.body.date,
                     startTime: req.body.StartTime,
                     endTime: req.body.endTime,
@@ -1068,35 +1019,67 @@ router.post("/add_slot", async (req, res) => {
                     companyDomain: req.body.companyDomain,
                     companyName: property?.company,
                     property: property?.title,
-                    layout:
-                      layout?.layoutName === undefined
-                        ? "NA"
-                        : layout?.layoutName,
+                    layout: layout?.layoutName,
                   };
                   if (req.body.role == "manager") {
-                    EmailDataManager.managerName = userData[0].firstname;
+                    EmailData.managerName =
+                      userData[0].firstname + " " + userData[0].lastname;
+                    EmailData.managerEmail = userData[0].email;
+                    EmailData.managerPhone = userData[0].mobile;
                   } else {
-                    EmailDataManager.managerName = userData[0].ownerName;
+                    EmailData.managerName = userData[0].ownerName;
+                    EmailData.managerEmail = userData[0].email;
+                    EmailData.managerPhone = userData[0].phone;
                   }
-
-                  const options1 = Email.generateOptions(
-                    userData[0].email,
-                    "SLOT_BOOKING_SUBMITTED_TO_MANAGER",
-                    EmailDataManager
+                  const options = Email.generateOptions(
+                    [req.body.email],
+                    "SLOT_BOOKING_SUBMITTED",
+                    EmailData
                   );
-                  const isEmailSent = Email.send(options1);
+                  const isEmailSent = Email.send(options);
+                  if (userData?.length > 0) {
+                    let EmailDataManager = {
+                      applicantName: req.body.name,
+                      applicantPhone: req.body.phone,
+                      applicantEmail: req.body.email,
+                      applicantDescription: req.body.description,
+                      date: req.body.date,
+                      startTime: req.body.StartTime,
+                      endTime: req.body.endTime,
+                      email: req.body.email,
+                      companyDomain: req.body.companyDomain,
+                      companyName: property?.company,
+                      property: property?.title,
+                      layout:
+                        layout?.layoutName === undefined
+                          ? "NA"
+                          : layout?.layoutName,
+                    };
+                    if (req.body.role == "manager") {
+                      EmailDataManager.managerName = userData[0].firstname;
+                    } else {
+                      EmailDataManager.managerName = userData[0].ownerName;
+                    }
+
+                    const options1 = Email.generateOptions(
+                      userData[0].email,
+                      "SLOT_BOOKING_SUBMITTED_TO_MANAGER",
+                      EmailDataManager
+                    );
+                    const isEmailSent = Email.send(options1);
+                  }
+                  return res.json({
+                    status: 200,
+                    message: "slot Created",
+                    event: event,
+                  });
                 }
-                return res.json({
-                  status: 200,
-                  message: "slot Created",
-                  event: event,
-                });
+              } else {
+                i++;
+                findNext(i);
               }
-            } else {
-              i++;
-              findNext(i);
             }
-          });
+          );
         };
 
         findNext(0);

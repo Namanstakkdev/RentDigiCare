@@ -629,7 +629,8 @@ const Calender = (props) => {
 
       // Check if the date-time is valid
       if (!isNaN(dateTimeObject)) {
-        const utcString = dateTimeObject.toISOString();
+        const utcStringDateTimeObject = new Date(dateTimeObject.toISOString());
+        const utcString = utcStringDateTimeObject.toISOString();
         const utcDateTimeObject = new Date(utcString);
 
         return { utcString, timeInMilliseconds: utcDateTimeObject.getTime() };
