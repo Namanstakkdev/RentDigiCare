@@ -58,19 +58,12 @@ const eventUpdate = (eventId, event) => {
 };
 
 router.post("/auth", async (req, res) => {
-  const existingEvent = await Events.findOne({ authEmail: req.body.authEmail });
+  const existingEvent = await Events.findOne({ event_id: req.body.event_id });
   const eventData = req.body;
-  // const { eventDate, StartTime, endTime } = eventData;
-
-  // const editedEventData = {
-  //   ...eventData,
-  //   StartTime: `${eventDate}T${StartTime.split("T")[1]}`,
-  //   endTime: `${eventDate}T${endTime.split("T")[1]}`,
-  // };
 
   if (existingEvent) {
     const updatedEvent = await Events.findOneAndUpdate(
-      { authEmail: req.body.authEmail },
+      { event_id: req.body.event_id },
       eventData,
       { new: true }
     );
@@ -457,7 +450,7 @@ router.get("/add-event", async (req, res) => {
         );
 
         res.redirect(
-          `http://localhost:3000/apps-calendar?response=${encodedResponse}`
+          `${process.env.DOMAIN}/apps-calendar?response=${encodedResponse}`
         );
       }
 
@@ -568,7 +561,7 @@ router.get("/add-event", async (req, res) => {
           );
 
           res.redirect(
-            `http://localhost:3000/apps-calendar?response=${encodedResponse}`
+            `${process.env.DOMAIN}/apps-calendar?response=${encodedResponse}`
           );
         } else {
           const responseData = {
@@ -581,7 +574,7 @@ router.get("/add-event", async (req, res) => {
           );
 
           res.redirect(
-            `http://localhost:3000/apps-calendar?response=${encodedResponse}`
+            `${process.env.DOMAIN}/apps-calendar?response=${encodedResponse}`
           );
         }
       }
@@ -594,7 +587,7 @@ router.get("/add-event", async (req, res) => {
       const encodedResponse = encodeURIComponent(JSON.stringify(responseData));
 
       res.redirect(
-        `http://localhost:3000/apps-calendar?response=${encodedResponse}`
+        `${process.env.DOMAIN}/apps-calendar?response=${encodedResponse}`
       );
     }
   } catch (error) {
@@ -607,7 +600,7 @@ router.get("/add-event", async (req, res) => {
     const encodedResponse = encodeURIComponent(JSON.stringify(responseData));
 
     res.redirect(
-      `http://localhost:3000/apps-calendar?response=${encodedResponse}`
+      `${process.env.DOMAIN}/apps-calendar?response=${encodedResponse}`
     );
   }
 });
