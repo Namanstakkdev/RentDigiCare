@@ -1,0 +1,1 @@
+{"indexes":[{"v":{"$numberInt":"2"},"key":{"_id":{"$numberInt":"1"}},"name":"_id_"},{"v":{"$numberInt":"2"},"key":{"primaryID":{"$numberInt":"1"}},"name":"primaryID_1","background":true,"unique":true}],"uuid":"d73892dc57194f72a05feeb98db1d8a6","collectionName":"rentdigileads","type":"collection"}

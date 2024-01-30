@@ -1,0 +1,1 @@
+{"indexes":[{"v":{"$numberInt":"2"},"key":{"_id":{"$numberInt":"1"}},"name":"_id_"},{"v":{"$numberInt":"2"},"key":{"reasonType":{"$numberInt":"1"}},"name":"reasonType_1","background":true,"unique":true}],"uuid":"76013764edf3444b933840c45d7f7186","collectionName":"calendar_reason_types","type":"collection"}
