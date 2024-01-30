@@ -265,8 +265,6 @@ const Appointment = () => {
                 } else {
                   console.error("Response data not found in the URL");
                 }
-              } else {
-                setAddEventError(response.data.message);
               }
             } catch (error) {
               console.log(error);
