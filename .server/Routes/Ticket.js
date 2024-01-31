@@ -912,18 +912,6 @@ router.post("/report", authToken, async (req, res) => {
     const PAGE_LIMIT = 10;
     const startIndex = (pageNumber - 1) * PAGE_LIMIT;
 
-    // const query = { companyDomain };
-
-    // const total = await Ticket.countDocuments(query);
-    // const tickets = await Ticket.find(query)
-    //   .sort({ createdAt: -1 })
-    //   .skip(startIndex)
-    //   .limit(PAGE_LIMIT)
-    //   .populate(
-    //     "assignedTo assignVendor confirmedQuote assignSpecificVendors propertyManagerId"
-    //   )
-    //   .exec();
-
     const aggregationPipeline = [
       {
         $match: { companyDomain },
@@ -956,13 +944,41 @@ router.post("/report", authToken, async (req, res) => {
         },
       },
       {
+        $unwind: "$statusCounts",
+      },
+      {
+        $group: {
+          _id: {
+            managerName: "$_id.managerName",
+            property: "$_id.property",
+            status: "$statusCounts",
+          },
+          count: { $sum: 1 },
+        },
+      },
+      {
+        $group: {
+          _id: {
+            managerName: "$_id.managerName",
+            property: "$_id.property",
+          },
+          totalTickets: { $sum: "$count" },
+          statusCounts: {
+            $push: {
+              status: "$_id.status",
+              count: "$count",
+            },
+          },
+        },
+      },
+      {
         $group: {
           _id: "$_id.managerName",
           properties: {
             $push: {
               name: "$_id.property",
               totalTickets: "$totalTickets",
-              statusCounts: {},
+              statusCounts: "$statusCounts",
             },
           },
         },
