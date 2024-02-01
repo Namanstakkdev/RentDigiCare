@@ -13,10 +13,9 @@ const ManagementReports = () => {
   const [tickets, setTickets] = useState([]);
 
   console.log("Tickets:", tickets);
+
   const decode = jwt_decode(window.localStorage.getItem("accessToken"));
   const userRole = JSON.parse(window.localStorage.getItem("authUser")).role;
-
-  console.log("Tickets:", tickets);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -43,9 +42,7 @@ const ManagementReports = () => {
             pageNumber: 1,
           });
 
-          console.log("TicketResponse:", ticketResponse);
-
-          // setTickets(ticketResponse.data.tickets);
+          setTickets(ticketResponse.data.tickets);
         } catch (error) {
           console.error("Error fetching tickets:", error.message);
         }
@@ -153,9 +150,9 @@ const ManagementReports = () => {
                           <thead>
                             <tr>
                               <th scope="col">#</th>
-                              <th scope="col">Property Name</th>
                               <th scope="col">Manager Name</th>
-                              <th scope="col">Created On</th>
+                              <th scope="col">Property Name</th>
+                              <th scope="col">Total</th>
                               <th scope="col">Open</th>
                               <th scope="col">Inprogress</th>
                               <th scope="col">Completed</th>
@@ -163,22 +160,35 @@ const ManagementReports = () => {
                             </tr>
                           </thead>
                           <tbody>
-                            {tickets.map((ticket) => {
-                              return (
-                                <>
+                            {tickets.map((ticket, index) =>
+                              ticket.properties.map(
+                                (property, propertyIndex) => (
                                   <tr>
-                                    <td></td>
-                                    <td>{ticket.property}</td>
-                                    <td>{`${ticket.propertyManagerId[0].firstname} ${ticket.propertyManagerId[0].lastname}`}</td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
+                                    {propertyIndex === 0 && (
+                                      <td rowSpan={ticket.properties.length}>
+                                        {propertyIndex === 0 ? index + 1 : null}
+                                      </td>
+                                    )}
+                                    {propertyIndex === 0 && (
+                                      <td rowSpan={ticket.properties.length}>
+                                        {ticket._id}
+                                      </td>
+                                    )}
+                                    <td>{property.name}</td>
+                                    <td>{property.totalTickets}</td>
+                                    {property.statusCounts.map(
+                                      (statusCount, statusIndex) => (
+                                        <td
+                                          key={`${index}-${propertyIndex}-${statusIndex}`}
+                                        >
+                                          {statusCount.count}
+                                        </td>
+                                      )
+                                    )}  
                                   </tr>
-                                </>
-                              );
-                            })}
+                                )
+                              )
+                            )}
                           </tbody>
                         </Table>
                       </div>
