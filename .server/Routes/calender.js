@@ -67,7 +67,7 @@ function authToken(req, res, next) {
   });
 }
 
-router.post("/report", /* authToken */ async (req, res) => {
+router.post("/report", authToken, async (req, res) => {
   try {
     const { companyDomain, pageNumber } = req.body;
 
@@ -179,7 +179,6 @@ router.post("/report", /* authToken */ async (req, res) => {
       .json({ status: 500, message: "Something Went Wrong", appointments: [] });
   }
 });
-
 
 router.post("/auth", async (req, res) => {
   const existingEvent = await Events.findOne({ authEmail: req.body.authEmail });
