@@ -119,15 +119,11 @@ const ManagementReports = () => {
                           <thead>
                             <tr>
                               <th scope="col">#</th>
-                              <th scope="col">Property Name</th>
-                              <th scope="col">Applicant</th>
-                              <th scope="col">Address</th>
-                              <th scope="col">Created On</th>
-                              <th scope="col">Documents</th>
-                              <th scope="col">Id Proof's</th>
+                              <th scope="col">Manager Name</th>
+                              <th scope="col">Properties</th>
+                              <th scope="col">Reason Types</th>
+                              <th scope="col">Availabilities</th>
                               <th scope="col">Status</th>
-                              <th scope="col">Source</th>
-                              <th scope="col">Action</th>
                             </tr>
                           </thead>
                           <tbody></tbody>
@@ -184,7 +180,7 @@ const ManagementReports = () => {
                                           {statusCount.count}
                                         </td>
                                       )
-                                    )}  
+                                    )}
                                   </tr>
                                 )
                               )
