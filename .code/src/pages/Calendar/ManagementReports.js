@@ -156,7 +156,6 @@ const ManagementReports = () => {
                               <th scope="col">Open</th>
                               <th scope="col">Inprogress</th>
                               <th scope="col">Completed</th>
-                              <th scope="col">Unresolved</th>
                             </tr>
                           </thead>
                           <tbody>
@@ -176,15 +175,17 @@ const ManagementReports = () => {
                                     )}
                                     <td>{property.name}</td>
                                     <td>{property.totalTickets}</td>
-                                    {property.statusCounts.map(
-                                      (statusCount, statusIndex) => (
+                                    {["Open", "Inprogress", "Completed"].map(
+                                      (status, statusIndex) => (
                                         <td
                                           key={`${index}-${propertyIndex}-${statusIndex}`}
                                         >
-                                          {statusCount.count}
+                                          {property.statusCounts.find(
+                                            (count) => count.status === status
+                                          )?.count || 0}
                                         </td>
                                       )
-                                    )}  
+                                    )}
                                   </tr>
                                 )
                               )
