@@ -56,6 +56,131 @@ const eventUpdate = (eventId, event) => {
   );
 };
 
+function authToken(req, res, next) {
+  const authHeader = req.headers["authorization"];
+  const token = authHeader && authHeader.split(" ")[1];
+  if (token == null) return res.sendStatus(401);
+  jwt.verify(token, process.env.ACCESS_TOKEN_KEY, (err, user) => {
+    if (err) return res.sendStatus(403);
+    req.user = user;
+    next();
+  });
+}
+
+router.post("/report", /* authToken */ async (req, res) => {
+  try {
+    const { companyDomain, pageNumber } = req.body;
+
+    if (!companyDomain) {
+      return res.status(400).json({
+        status: 400,
+        message: "Please provide Company Domain",
+        appointments: [],
+      });
+    }
+
+    const PAGE_LIMIT = 10;
+    const startIndex = (pageNumber - 1) * PAGE_LIMIT;
+
+    const aggregationPipeline = [
+      {
+        $match: {
+          companyDomain: companyDomain,
+        },
+      },
+      {
+        $lookup: {
+          from: "propertymanagers",
+          localField: "eventAssignedTo",
+          foreignField: "_id",
+          as: "propertyManager",
+        },
+      },
+      {
+        $unwind: "$propertyManager",
+      },
+      {
+        $group: {
+          _id: {
+            managerName: {
+              $concat: [
+                "$propertyManager.firstname",
+                " ",
+                "$propertyManager.lastname",
+              ],
+            },
+            property: "$propertyName",
+          },
+          totalAppointments: { $sum: 1 },
+          statusCounts: { $push: "$type" },
+        },
+      },
+      {
+        $unwind: "$statusCounts",
+      },
+      {
+        $group: {
+          _id: {
+            managerName: "$_id.managerName",
+            property: "$_id.property",
+            status: "$statusCounts",
+          },
+          count: { $sum: 1 },
+        },
+      },
+      {
+        $group: {
+          _id: {
+            managerName: "$_id.managerName",
+            property: "$_id.property",
+          },
+          totalAppointments: { $sum: "$count" },
+          statusCounts: {
+            $push: {
+              status: "$_id.status",
+              count: "$count",
+            },
+          },
+        },
+      },
+      {
+        $group: {
+          _id: "$_id.managerName",
+          properties: {
+            $push: {
+              name: "$_id.property",
+              totalAppointments: "$totalAppointments",
+              statusCounts: "$statusCounts",
+            },
+          },
+        },
+      },
+      {
+        $sort: {
+          createdAt: -1,
+        },
+      },
+      {
+        $skip: startIndex,
+      },
+    ];
+
+    const appointments = await Calender_events.aggregate(aggregationPipeline);
+
+    res.status(200).json({
+      status: 200,
+      message: "The resources have been fetched",
+      appointments: appointments,
+    });
+  } catch (error) {
+    console.error(error);
+    res
+      .status(500)
+      .json({ status: 500, message: "Something Went Wrong", appointments: [] });
+  }
+});
+
+
 router.post("/auth", async (req, res) => {
   const existingEvent = await Events.findOne({ authEmail: req.body.authEmail });
   const eventData = req.body;
