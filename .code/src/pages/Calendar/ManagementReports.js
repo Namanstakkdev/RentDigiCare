@@ -12,8 +12,6 @@ const ManagementReports = () => {
   const [propertyManagerList, setPropertyManagerList] = useState([]);
   const [tickets, setTickets] = useState([]);
 
-  console.log("Tickets:", tickets);
-
   const decode = jwt_decode(window.localStorage.getItem("accessToken"));
   const userRole = JSON.parse(window.localStorage.getItem("authUser")).role;
 
@@ -25,6 +23,44 @@ const ManagementReports = () => {
         });
         if (response?.data?.managers) {
           setPropertyManagerList(response.data.managers);
+
+          // Fetch tickets and appointments only if the user is a company
+          if (decode.role === "company") {
+            const getTickets = async () => {
+              try {
+                const ticketResponse = await axios.post("/ticket/report", {
+                  companyDomain: decode.domain,
+                  pageNumber: 1,
+                });
+
+                setTickets(ticketResponse.data.tickets);
+              } catch (error) {
+                console.error("Error fetching tickets:", error.message);
+              }
+            };
+
+            const getAppointments = async () => {
+              try {
+                const appointmentResponse = await axios.post(
+                  "/calender/report",
+                  {
+                    companyDomain: decode.domain,
+                    pageNumber: 1,
+                  }
+                );
+                console.log(
+                  "Appointment Response:",
+                  appointmentResponse.data.appointments
+                );
+              } catch (error) {
+                console.error("Error fetching appointments:", error.message);
+              }
+            };
+
+            // Fetch tickets and appointments sequentially
+            await getTickets();
+            await getAppointments();
+          }
         }
       } catch (error) {
         console.error("Error fetching property manager list:", error.message);
@@ -32,25 +68,7 @@ const ManagementReports = () => {
     };
 
     fetchData();
-
-    // Fetch tickets if the user is a company
-    if (decode.role === "company") {
-      const getTickets = async () => {
-        try {
-          const ticketResponse = await axios.post("/ticket/report", {
-            companyDomain: decode.domain,
-            pageNumber: 1,
-          });
-
-          setTickets(ticketResponse.data.tickets);
-        } catch (error) {
-          console.error("Error fetching tickets:", error.message);
-        }
-      };
-
-      getTickets();
-    }
-  }, [decode.id]);
+  }, [decode.id, decode.role, decode.domain]);
 
   const handleSorting = (e) => {
     setSortingOption(e.target.value);

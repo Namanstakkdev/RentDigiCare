@@ -33,6 +33,7 @@ const Calender_events = require("../Database/calender_events");
 const Property = require("../Database/Property");
 const insertEvents = require("../utils/GoogleCalendar");
 const CalendarReasonTypes = require("../Database/CalendarReasonTypes");
+const PropertyManager = require("../Database/PropertyManager");
 const ObjectId = require("mongodb").ObjectId;
 
 const eventUpdate = (eventId, event) => {
@@ -69,73 +70,248 @@ function authToken(req, res, next) {
 
 router.post("/report", authToken, async (req, res) => {
   try {
-    const { companyDomain, pageNumber } = req.body;
+    const { companyDomain } = req.body;
 
-    if (!companyDomain) {
-      return res.status(400).json({
-        status: 400,
-        message: "Please provide Company Domain",
-        appointments: [],
-      });
-    }
+    console.log({ companyDomain });
 
-    const PAGE_LIMIT = 10;
-    const startIndex = (pageNumber - 1) * PAGE_LIMIT;
-
-    const aggregationPipeline = [
+    const managerAvailabilities = await PropertyManager.aggregate([
       {
         $match: {
-          companyDomain: companyDomain,
+          companyAssigned: companyDomain,
         },
       },
       {
         $lookup: {
-          from: "propertymanagers",
-          localField: "eventAssignedTo",
-          foreignField: "_id",
-          as: "propertyManager",
-        },
-      },
-      {
-        $unwind: "$propertyManager",
-      },
-      {
-        $group: {
-          _id: {
-            managerName: {
-              $concat: [
-                "$propertyManager.firstname",
-                " ",
-                "$propertyManager.lastname",
-              ],
+          from: "properties",
+          let: { propertyIds: "$properties" },
+          pipeline: [
+            {
+              $match: {
+                $expr: {
+                  $in: ["$_id", "$$propertyIds"],
+                },
+              },
             },
-            property: "$propertyName",
-          },
-          totalAppointments: { $sum: 1 },
-          statusCounts: { $push: "$type" },
+          ],
+          as: "propertiesData",
         },
       },
       {
-        $unwind: "$statusCounts",
+        $lookup: {
+          from: "manager_availabilities",
+          let: { managerId: "$_id" },
+          pipeline: [
+            {
+              $match: {
+                $expr: { $eq: ["$eventAssignedTo", "$$managerId"] },
+              },
+            },
+          ],
+          as: "managerAvailabilities",
+        },
       },
+      {
+        $lookup: {
+          from: "user_appointments",
+          let: { managerId: "$_id" },
+          pipeline: [
+            {
+              $match: {
+                $expr: { $eq: ["$eventAssignedTo", "$$managerId"] },
+              },
+            },
+          ],
+          as: "userAppointments",
+        },
+      },
+      {
+        $project: {
+          managerId: "$_id",
+          managerName: { $concat: ["$firstname", " ", "$lastname"] },
+          email: 1,
+          mobile: 1,
+          managerAvailabilities: {
+            $map: {
+              input: "$managerAvailabilities",
+              as: "managerAvailability",
+              in: {
+                daysOfWeekAvailability:
+                  "$$managerAvailability.daysOfWeekAvailability",
+              },
+            },
+          },
+          propertiesData: {
+            $map: {
+              input: "$propertiesData",
+              as: "property",
+              in: {
+                propertyId: "$$property._id",
+                name: "$$property.title",
+              },
+            },
+          },
+          userAppointments: {
+            $map: {
+              input: "$userAppointments",
+              as: "userAppointment",
+              in: {
+                date: "$$userAppointment.date",
+                propertyId: "$$userAppointment.propertyId",
+                reasonId: "$$userAppointment.reasonId",
+                status: "$$userAppointment.status",
+              },
+            },
+          },
+        },
+      },
+      {
+        $addFields: {
+          totalAppointments: { $ifNull: [{ $size: "$userAppointments" }, 0] },
+        },
+      },
+      {
+        $unwind: {
+          path: "$userAppointments",
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
+        $unwind: "$propertiesData",
+      },
+      // {
+      //   $group: {
+      //     _id: {
+      //       managerId: "$managerId",
+      //       managerName: "$managerName",
+      //       // propertyId: "$propertiesData.propertyId",
+      //     },
+      //     email: { $first: "$email" },
+      //     mobile: { $first: "$mobile" },
+      //     managerAvailabilities: { $first: "$managerAvailabilities" },
+      //     propertiesData: { $first: "$propertiesData" },
+      //     totalAppointments: { $first: "$totalAppointments" },
+      //     userAppointments: { $push: "$userAppointments" },
+      //     hasUserAppointments: {
+      //       $addToSet: {
+      //         $cond: {
+      //           if: {
+      //             $eq: [
+      //               "$propertiesData.propertyId",
+      //               "$userAppointments.propertyId",
+      //             ],
+      //           },
+      //           then: {
+      //             appointment: "$userAppointments",
+      //             hasUserAppointments: true,
+      //           },
+      //           else: false,
+      //         },
+      //       },
+      //     },
+      //   },
+      // },
+      // {
+      //   $group: {
+      //     _id: "$_id.managerId",
+      //     managerName: { $first: "$_id.managerName" },
+      //     email: { $first: "$email" },
+      //     mobile: { $first: "$mobile" },
+      //     managerAvailabilities: { $first: "$managerAvailabilities" },
+      //     totalAppointments: { $sum: "$totalAppointments" },
+      //     properties: {
+      //       $push: {
+      //         propertyId: "$_id.propertyId",
+      //         hasUserAppointments: {
+      //           $in: [true, "$hasUserAppointments.hasUserAppointments"],
+      //         },
+      //         userAppointments: {
+      //           $cond: {
+      //             if: "$hasUserAppointments.hasUserAppointments",
+      //             then: "$hasUserAppointments.appointment",
+      //             else: [],
+      //           },
+      //         },
+      //       },
+      //     },
+      //     allPropertiesWithUserAppointments: {
+      //       $addToSet: {
+      //         $cond: {
+      //           if: {
+      //             $eq: [
+      //               false,
+      //               {
+      //                 $in: [false, "$hasUserAppointments.hasUserAppointments"],
+      //               },
+      //             ],
+      //           },
+      //           then: "$_id.propertyId",
+      //           else: null,
+      //         },
+      //       },
+      //     },
+      //   },
+      // },
+
+      // {
+      //   $project: {
+      //     managerAvailabilities: 1,
+      //     managerName: 1,
+      //     email: 1,
+      //     mobile: 1,
+      //     propertiesData: 1,
+      //     totalAppointments: 1,
+      //     userAppointments: {
+      //       $cond: {
+      //         if: {
+      //           $eq: [
+      //             "$propertiesData.propertyId",
+      //             "$userAppointments.propertyId",
+      //           ],
+      //         },
+      //         then: "$userAppointments",
+      //         else: [],
+      //       },
+      //     },
+      //   },
+      // },
+
+      /*   
       {
         $group: {
           _id: {
-            managerName: "$_id.managerName",
-            property: "$_id.property",
-            status: "$statusCounts",
+            managerId: "$_id",
+            managerName: "$managerName",
+            status: { $ifNull: ["$userAppointments.status", "No Status"] },
+            reasonId: "$userAppointments.reasonId",
           },
           count: { $sum: 1 },
+          managerAvailabilities: { $first: "$managerAvailabilities" },
+          propertiesData: { $first: "$propertiesData" },
+          totalAppointments: { $first: "$totalAppointments" },
+          reasonIds: {
+            $push: {
+              reasonId: "$userAppointments.reasonId",
+            },
+          },
         },
+      }, */
+
+      /* {
+        $unwind: "$reasonIds",
       },
       {
         $group: {
           _id: {
+            managerId: "$_id.managerId",
             managerName: "$_id.managerName",
-            property: "$_id.property",
+            status: "$_id.status",
+            reasonId: "$reasonIds.reasonId",
           },
-          totalAppointments: { $sum: "$count" },
-          statusCounts: {
+          count: { $sum: "$count" },
+          managerAvailabilities: { $first: "$managerAvailabilities" },
+          propertiesData: { $first: "$propertiesData" },
+          totalAppointments: { $first: "$totalAppointments" },
+          statuses: {
             $push: {
               status: "$_id.status",
               count: "$count",
@@ -145,32 +321,158 @@ router.post("/report", authToken, async (req, res) => {
       },
       {
         $group: {
-          _id: "$_id.managerName",
-          properties: {
+          _id: {
+            managerId: "$_id.managerId",
+            managerName: "$_id.managerName",
+          },
+          managerAvailabilities: { $first: "$managerAvailabilities" },
+          propertiesData: { $first: "$propertiesData" },
+          totalAppointments: { $first: "$totalAppointments" },
+          reasons: {
             $push: {
-              name: "$_id.property",
-              totalAppointments: "$totalAppointments",
-              statusCounts: "$statusCounts",
+              reasonId: "$_id.reasonId",
+              count: "$count",
+            },
+          },
+          statuses: {
+            $push: "$statuses",
+          },
+        },
+      },
+      {
+        $unwind: "$statuses",
+      },
+      {
+        $group: {
+          _id: {
+            managerId: "$_id.managerId",
+            managerName: "$_id.managerName",
+            status: "$statuses.status",
+          },
+          count: { $sum: "$statuses.count" },
+          managerAvailabilities: { $first: "$managerAvailabilities" },
+          propertiesData: { $first: "$propertiesData" },
+          totalAppointments: { $first: "$totalAppointments" },
+          reasons: { $first: "$reasons" },
+        },
+      },
+      {
+        $group: {
+          _id: {
+            managerId: "$_id.managerId",
+            managerName: "$_id.managerName",
+          },
+          managerAvailabilities: { $first: "$managerAvailabilities" },
+          propertiesData: { $first: "$propertiesData" },
+          totalAppointments: { $first: "$totalAppointments" },
+          reasons: { $first: "$reasons" },
+          statuses: {
+            $push: {
+              status: "$_id.status",
+              count: "$count",
             },
           },
         },
       },
       {
-        $sort: {
-          createdAt: -1,
+        $unwind: "$reasons",
+      },
+      {
+        $group: {
+          _id: {
+            managerId: "$_id.managerId",
+            managerName: "$_id.managerName",
+            reasonId: "$reasons.reasonId",
+          },
+          count: { $sum: "$reasons.count" },
+          managerAvailabilities: { $first: "$managerAvailabilities" },
+          propertiesData: { $first: "$propertiesData" },
+          totalAppointments: { $first: "$totalAppointments" },
+          statuses: { $first: "$statuses" },
         },
       },
       {
-        $skip: startIndex,
-      },
-    ];
+        $group: {
+          _id: {
+            managerId: "$_id.managerId",
+            managerName: "$_id.managerName",
+          },
+          managerAvailabilities: { $first: "$managerAvailabilities" },
+          propertiesData: { $first: "$propertiesData" },
+          totalAppointments: { $first: "$totalAppointments" },
+          statuses: { $first: "$statuses" },
+          reasons: {
+            $push: {
+              reasonId: "$_id.reasonId",
+              count: "$count",
+            },
+          },
+        },
+      }, */
 
-    const appointments = await Calender_events.aggregate(aggregationPipeline);
+      // {
+      //   $group: {
+      //     _id: {
+      //       managerId: "$_id.managerId",
+      //       managerName: "$_id.managerName",
+      //     },
+      //     managerAvailabilities: { $first: "$managerAvailabilities" },
+      //     propertiesData: { $first: "$propertiesData" },
+      //     totalAppointments: { $first: "$totalAppointments" },
+      //     statuses: {
+      //       $push: {
+      //         status: "$_id.status",
+      //         count: "$count",
+      //       },
+      //     },
+      //     reasonIds: { $first: "$reasonIds" },
+      //   },
+      // },
+      // {
+      //   $unwind: {
+      //     path: "$reasonIds",
+      //     preserveNullAndEmptyArrays: true,
+      //   },
+      // },
+      // {
+      //   $group: {
+      //     _id: {
+      //       managerId: "$_id.managerId",
+      //       managerName: "$_id.managerName",
+      //       reasonId: "$reasonIds.reasonId",
+      //     },
+      //     managerAvailabilities: { $first: "$managerAvailabilities" },
+      //     propertiesData: { $first: "$propertiesData" },
+      //     totalAppointments: { $first: "$totalAppointments" },
+      //     statuses: { $first: "$statuses" },
+      //     count: { $sum: 1 },
+      //   },
+      // },
+      // {
+      //   $group: {
+      //     _id: {
+      //       managerId: "$_id.managerId",
+      //       managerName: "$_id.managerName",
+      //     },
+      //     managerAvailabilities: { $first: "$managerAvailabilities" },
+      //     propertiesData: { $first: "$propertiesData" },
+      //     totalAppointments: { $first: "$totalAppointments" },
+      //     statuses: { $first: "$statuses" },
+      //     reasonCounts: {
+      //       $push: {
+      //         reasonId: "$_id.reasonId",
+      //         count: "$count",
+      //       },
+      //     },
+      //     totalReasonCount: { $sum: "$count" },
+      //   },
+      // },
+    ]);
 
     res.status(200).json({
       status: 200,
       message: "The resources have been fetched",
-      appointments: appointments,
+      appointments: managerAvailabilities,
     });
   } catch (error) {
     console.error(error);
