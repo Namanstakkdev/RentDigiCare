@@ -175,9 +175,16 @@ router.post("/report", authToken, async (req, res) => {
           preserveNullAndEmptyArrays: true,
         },
       },
-      {
-        $unwind: "$propertiesData",
-      },
+      
+      // {
+      //   $unwind: {
+      //     path: "$userAppointments",
+      //     preserveNullAndEmptyArrays: true,
+      //   },
+      // },
+      // {
+      //   $unwind: "$propertiesData",
+      // },
       // {
       //   $group: {
       //     _id: {

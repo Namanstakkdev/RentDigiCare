@@ -899,7 +899,7 @@ router.post("/filter_tickets_company", authToken, async (req, res) => {
 
 router.post("/report", authToken, async (req, res) => {
   try {
-    const { companyDomain, pageNumber } = req.body;
+    const { companyDomain } = req.body;
 
     if (!companyDomain) {
       return res.status(400).json({
@@ -908,9 +908,6 @@ router.post("/report", authToken, async (req, res) => {
         tickets: [],
       });
     }
-
-    const PAGE_LIMIT = 10;
-    const startIndex = (pageNumber - 1) * PAGE_LIMIT;
 
     const aggregationPipeline = [
       {
@@ -984,16 +981,8 @@ router.post("/report", authToken, async (req, res) => {
         },
       },
       {
-        $sort: {
-          createdAt: -1,
-        },
+        $sort: { _id: 1 },
       },
-      {
-        $skip: startIndex,
-      },
-      // {
-      //   $limit: PAGE_LIMIT,
-      // },
     ];
 
     const tickets = await Ticket.aggregate(aggregationPipeline);

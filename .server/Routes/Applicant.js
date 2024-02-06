@@ -4,7 +4,7 @@ const jwt = require("jsonwebtoken");
 const fs = require("fs");
 const path = require("path");
 const logger = require("../Logger/LoggerFactory").getProductionLogger();
-const { uploadTicketDocumentsToS3 } = require('../utils/bucket');
+const { uploadTicketDocumentsToS3 } = require("../utils/bucket");
 
 // PDF Generation
 var htmlToPdf = require("pdf-creator-node");
@@ -50,7 +50,7 @@ router.post("/upload-documents", upload.array("file", 10), async (req, res) => {
     // if (!fs.existsSync(dir)) {
     //   fs.mkdirSync(dir);
     // }
-   
+
     if (req.files) {
       // req.files.forEach((file) => {
       //   zip.addLocalFile(file.path);
@@ -85,21 +85,31 @@ router.post("/upload-documents", upload.array("file", 10), async (req, res) => {
       await Promise.all(
         req.files.map(async (file) => {
           const filename = `${req.headers.id}_${Date.now()}_${file.filename}`;
-          await uploadTicketDocumentsToS3(process.env.DO_SPACES_NAME, filename, file.path, 'applicant');
+          await uploadTicketDocumentsToS3(
+            process.env.DO_SPACES_NAME,
+            filename,
+            file.path,
+            "applicant"
+          );
           const filePath = `${process.env.BUCKET_URL}applicant/${filename}`;
-          let applicant = await Applicant.updateOne({ _id: req.headers.id }, { $push: { documents: filePath } })
+          let applicant = await Applicant.updateOne(
+            { _id: req.headers.id },
+            { $push: { documents: filePath } }
+          );
           if (req.headers.applicant1) {
-            let applicant1 = await Applicant.updateOne({ _id: req.headers.id },
+            let applicant1 = await Applicant.updateOne(
+              { _id: req.headers.id },
               {
-              $push: { 'applicants.0.documents': filePath },
+                $push: { "applicants.0.documents": filePath },
               }
-            )
+            );
           } else if (req.headers.applicant2) {
-            let applicant2 = await Applicant.updateOne({ _id: req.headers.id },
+            let applicant2 = await Applicant.updateOne(
+              { _id: req.headers.id },
               {
-                $push: { 'applicants.1.documents': filePath },
+                $push: { "applicants.1.documents": filePath },
               }
-            )
+            );
           }
         })
       );
@@ -133,6 +143,153 @@ router.post("/list", PaginatedResults(Applicant), async (req, res) => {
     results: res.paginatedResults,
     filterPropertyNames: res.filterPropertyNames,
   });
+});
+
+router.post("/report", async (req, res) => {
+  try {
+    const { companyDomain } = req.body;
+
+    const aggregationPipeline = [
+      {
+        $match: { companyDomain },
+      },
+      {
+        $addFields: {
+          propertyId: "$main.propertyID",
+        },
+      },
+      {
+        $lookup: {
+          from: "properties",
+          let: { propertyId: "$propertyId" },
+          pipeline: [
+            {
+              $match: {
+                $expr: {
+                  $in: [
+                    { $toObjectId: "$_id" },
+                    {
+                      $map: {
+                        input: ["$$propertyId"],
+                        as: "id",
+                        in: { $toObjectId: "$$id" },
+                      },
+                    },
+                  ],
+                },
+              },
+            },
+          ],
+          as: "property",
+        },
+      },
+      {
+        $addFields: {
+          managerId: { $arrayElemAt: ["$property.managers", 0] },
+        },
+      },
+      {
+        $lookup: {
+          from: "propertymanagers",
+          let: { managerId: { $arrayElemAt: ["$managerId", 0] } },
+          pipeline: [
+            {
+              $match: {
+                $expr: {
+                  $in: [
+                    { $toObjectId: "$_id" },
+                    {
+                      $map: {
+                        input: ["$$managerId"],
+                        as: "id",
+                        in: { $toObjectId: "$$id" },
+                      },
+                    },
+                  ],
+                },
+              },
+            },
+          ],
+          as: "propertyManager",
+        },
+      },
+      {
+        $unwind: "$propertyManager",
+      },
+      {
+        $group: {
+          _id: {
+            managerName: {
+              $concat: [
+                "$propertyManager.firstname",
+                " ",
+                "$propertyManager.lastname",
+              ],
+            },
+            property: "$property",
+          },
+          totalApplicants: { $sum: 1 },
+          statusCounts: { $push: "$status" },
+        },
+      },
+      {
+        $unwind: "$statusCounts",
+      },
+      {
+        $group: {
+          _id: {
+            managerName: "$_id.managerName",
+            property: "$_id.property",
+            status: "$statusCounts",
+          },
+          count: { $sum: 1 },
+        },
+      },
+      {
+        $group: {
+          _id: {
+            managerName: "$_id.managerName",
+            property: "$_id.property",
+          },
+          totalApplicants: { $sum: "$count" },
+          statusCounts: {
+            $push: {
+              status: "$_id.status",
+              count: "$count",
+            },
+          },
+        },
+      },
+      {
+        $group: {
+          _id: "$_id.managerName",
+          properties: {
+            $push: {
+              name: "$_id.property",
+              totalApplicants: "$totalApplicants",
+              statusCounts: "$statusCounts",
+            },
+          },
+        },
+      },
+      {
+        $sort: { _id: 1 },
+      },
+    ];
+
+    const applicants = await Applicant.aggregate(aggregationPipeline);
+
+    res.status(200).json({
+      status: 200,
+      message: "The resources have been fetched",
+      applicants,
+    });
+  } catch (error) {
+    console.error(error);
+    res
+      .status(500)
+      .json({ status: 500, message: "Something Went Wrong", appointments: [] });
+  }
 });
 
 router.get("/updatemany", async (req, res) => {
@@ -330,7 +487,7 @@ router.post("/status-update", authToken, async (req, res) => {
           propertyLayout: application.main.layout,
           companyName: company.name,
           applicationStatus: application.status,
-          logo:company?.logo
+          logo: company?.logo,
         };
         // const options = Email.generateOptions(company.email, "APPLICATION_STATUS_CHANGE_EMAIL_TO_COMPANY", data);
         // const isEmailSent = await Email.send(options)
@@ -360,7 +517,7 @@ router.post("/status-update", authToken, async (req, res) => {
 //  Adding new Applicant
 router.post("/add", async (req, res) => {
   try {
-    console.log('new');
+    console.log("new");
     const oldApplicant = false;
     if (!oldApplicant) {
       let totalApplicant = 1;
@@ -377,8 +534,8 @@ router.post("/add", async (req, res) => {
       const haveLastName = !!req.body.applicants[0].lastname;
       const applicantFullName = haveLastName
         ? req.body.applicants[0].firstname +
-        " " +
-        req.body.applicants[0].lastname
+          " " +
+          req.body.applicants[0].lastname
         : req.body.applicants[0].firstname;
 
       const newApplicant = await Applicant.create({
@@ -398,10 +555,10 @@ router.post("/add", async (req, res) => {
       const secondApplicantData =
         totalApplicant === 2
           ? {
-            email: req.body.applicants[1].email,
-            firstname: req.body.applicants[1].firstname,
-            companyDomain: req.body.companyDomain,
-          }
+              email: req.body.applicants[1].email,
+              firstname: req.body.applicants[1].firstname,
+              companyDomain: req.body.companyDomain,
+            }
           : {};
 
       try {
@@ -609,13 +766,15 @@ router.get("/download-document", (req, res) => {
   }
 });
 
-router.post('/download-zip', async (req, res) => {
+router.post("/download-zip", async (req, res) => {
   const { urls } = req.body;
   try {
     const zip = new admZip();
 
     for (const url of urls) {
-      const response = await axios.get(url.url, { responseType: 'arraybuffer' });
+      const response = await axios.get(url.url, {
+        responseType: "arraybuffer",
+      });
       if (response.status === 200) {
         const buffer = Buffer.from(response.data);
         const fileName = url.name;
@@ -624,16 +783,14 @@ router.post('/download-zip', async (req, res) => {
     }
 
     const zipBuffer = zip.toBuffer();
-    res.set('Content-Type', 'application/zip');
-    res.set('Content-Disposition', 'attachment; filename=documents.zip');
+    res.set("Content-Type", "application/zip");
+    res.set("Content-Disposition", "attachment; filename=documents.zip");
     res.send(zipBuffer);
   } catch (error) {
-    console.error('Error creating zip:', error);
-    res.status(500).send('Error creating zip');
+    console.error("Error creating zip:", error);
+    res.status(500).send("Error creating zip");
   }
 });
-
-
 
 // TO delete Applicants Application
 router.delete("/delete", authToken, async (req, res) => {
@@ -661,7 +818,7 @@ router.delete("/delete", authToken, async (req, res) => {
 });
 //application filter for graph
 router.get("/dashboardfilter", async (req, res) => {
-  console.log(req.query, '----------------')
+  console.log(req.query, "----------------");
   try {
     let applicant = "";
     var searchCriteria = {};
@@ -684,12 +841,12 @@ router.get("/dashboardfilter", async (req, res) => {
 
     if (req.query.filterBy === "barChart") {
       let matchConditions = {};
-      const propertyManagerID = req.query.propertyManagerID !== ''
-        ? ObjectId(req.query.propertyManagerID)
-        : null;
-      const propertyID = req.query.propertyId !== ''
-        ? req.query.propertyId
-        : null;
+      const propertyManagerID =
+        req.query.propertyManagerID !== ""
+          ? ObjectId(req.query.propertyManagerID)
+          : null;
+      const propertyID =
+        req.query.propertyId !== "" ? req.query.propertyId : null;
       // if (role == "manager") {
 
       //   if (propertyManagerID !== null) {
@@ -700,8 +857,6 @@ router.get("/dashboardfilter", async (req, res) => {
       // } else if (role == "company") {
       //   searchCriteria.companyDomain = domain;
       // }
-
-   
 
       if (propertyManagerID !== null && role === "company") {
         matchConditions = {
@@ -720,97 +875,96 @@ router.get("/dashboardfilter", async (req, res) => {
       }
       if (propertyID !== null) {
         matchConditions = {
-          "_id": ObjectId(propertyID),
+          _id: ObjectId(propertyID),
         };
       }
       const applicant2 = await Applicant.aggregate([
         {
           $match: matchConditions,
-        }])
-      console.log(matchConditions,'matchConditions')
-      console.log(searchCriteria,'searchCriteria')
-      console.log(applicant2.length,'---applicant2------')
+        },
+      ]);
+      console.log(matchConditions, "matchConditions");
+      console.log(searchCriteria, "searchCriteria");
+      console.log(applicant2.length, "---applicant2------");
 
-
-
-        // if (propertyID !== null) {
-        //   applicant = await Applicant.aggregate([
-        //     {
-        //       $match: matchConditions,
-        //     },
-        //     {
-        //       $addFields: {
-        //         propertyId: { $toString: "$_id" },
-        //       },
-        //     },
-        //     // {
-        //     //   $lookup: {
-        //     //     from: "applicants",
-        //     //     localField: "propertyId",
-        //     //     foreignField: "main.propertyID",
-        //     //     as: "applicant",
-        //     //     pipeline: [
-        //     //       {
-        //     //         $match: searchCriteria,
-        //     //       },
-        //     //       {
-        //     //         $group: {
-        //     //           _id: {
-        //     //             month: {
-        //     //               $dateToString: { format: "%Y-%m", date: "$createdAt" },
-        //     //             },
-        //     //             year: {
-        //     //               $dateToString: { format: "%Y", date: "$createdAt" },
-        //     //             },
-        //     //           },
-        //     //           total: { $sum: 1 },
-        //     //           pending: {
-        //     //             $sum: {
-        //     //               $cond: {
-        //     //                 if: { $eq: ["$status", "Pending"] },
-        //     //                 then: 1,
-        //     //                 else: 0,
-        //     //               },
-        //     //             },
-        //     //           },
-        //     //           approved: {
-        //     //             $sum: {
-        //     //               $cond: {
-        //     //                 if: { $eq: ["$status", "Approved"] },
-        //     //                 then: 1,
-        //     //                 else: 0,
-        //     //               },
-        //     //             },
-        //     //           },
-        //     //           denied: {
-        //     //             $sum: {
-        //     //               $cond: {
-        //     //                 if: { $eq: ["$status", "Denied"] },
-        //     //                 then: 1,
-        //     //                 else: 0,
-        //     //               },
-        //     //             },
-        //     //           },
-        //     //         },
-        //     //       },
-        //     //       {
-        //     //         $sort: { "_id.year": 1, "_id.month": 1 },
-        //     //       },
-        //     //     ],
-        //     //   },
-        //     // },
-        //     // {
-        //     //   $unwind: "$applicant",
-        //     // },
-        //     // {
-        //     //   $project: {
-        //     //     applicant: 1,
-        //     //     _id: 0,
-        //     //   },
-        //     // },
-        //   ]);
-        //   console.log(applicant,'-------------')
-        // }  
+      // if (propertyID !== null) {
+      //   applicant = await Applicant.aggregate([
+      //     {
+      //       $match: matchConditions,
+      //     },
+      //     {
+      //       $addFields: {
+      //         propertyId: { $toString: "$_id" },
+      //       },
+      //     },
+      //     // {
+      //     //   $lookup: {
+      //     //     from: "applicants",
+      //     //     localField: "propertyId",
+      //     //     foreignField: "main.propertyID",
+      //     //     as: "applicant",
+      //     //     pipeline: [
+      //     //       {
+      //     //         $match: searchCriteria,
+      //     //       },
+      //     //       {
+      //     //         $group: {
+      //     //           _id: {
+      //     //             month: {
+      //     //               $dateToString: { format: "%Y-%m", date: "$createdAt" },
+      //     //             },
+      //     //             year: {
+      //     //               $dateToString: { format: "%Y", date: "$createdAt" },
+      //     //             },
+      //     //           },
+      //     //           total: { $sum: 1 },
+      //     //           pending: {
+      //     //             $sum: {
+      //     //               $cond: {
+      //     //                 if: { $eq: ["$status", "Pending"] },
+      //     //                 then: 1,
+      //     //                 else: 0,
+      //     //               },
+      //     //             },
+      //     //           },
+      //     //           approved: {
+      //     //             $sum: {
+      //     //               $cond: {
+      //     //                 if: { $eq: ["$status", "Approved"] },
+      //     //                 then: 1,
+      //     //                 else: 0,
+      //     //               },
+      //     //             },
+      //     //           },
+      //     //           denied: {
+      //     //             $sum: {
+      //     //               $cond: {
+      //     //                 if: { $eq: ["$status", "Denied"] },
+      //     //                 then: 1,
+      //     //                 else: 0,
+      //     //               },
+      //     //             },
+      //     //           },
+      //     //         },
+      //     //       },
+      //     //       {
+      //     //         $sort: { "_id.year": 1, "_id.month": 1 },
+      //     //       },
+      //     //     ],
+      //     //   },
+      //     // },
+      //     // {
+      //     //   $unwind: "$applicant",
+      //     // },
+      //     // {
+      //     //   $project: {
+      //     //     applicant: 1,
+      //     //     _id: 0,
+      //     //   },
+      //     // },
+      //   ]);
+      //   console.log(applicant,'-------------')
+      // }
       applicant = await Property.aggregate([
         {
           $match: matchConditions,
@@ -887,7 +1041,7 @@ router.get("/dashboardfilter", async (req, res) => {
         },
       ]);
 
-      console.log(applicant.length,"applicant-----------------")  
+      console.log(applicant.length, "applicant-----------------");
     }
     const actual = applicant.map((v) => v.applicant);
     const expected = actual.reduce((acc, cur, index) => {
@@ -913,7 +1067,7 @@ router.get("/dashboardfilter", async (req, res) => {
     });
     // console.log("applicant",applicant[0].applicant)
     // console.log(results,'-results')
-    
+
     res.json({
       status: 201,
       data: results.sort((a, b) => {
@@ -964,7 +1118,7 @@ async function sendEmails(propertyData, applicantOneData, applicantTwoData) {
         companyName: company.name,
         managersNumbers: managerPhoneNumbers,
         companyDomain: applicant.companyDomain,
-        logo:company?.logo
+        logo: company?.logo,
       };
       const options = Email.generateOptions(
         applicant.email,
@@ -976,8 +1130,8 @@ async function sendEmails(propertyData, applicantOneData, applicantTwoData) {
 
     // Sending email to property manager
     const managerList = await getManagersList(propertyData.propertyID);
-    console.log('propertyData: ', propertyData);
-    console.log('managerList: ', managerList);
+    console.log("propertyData: ", propertyData);
+    console.log("managerList: ", managerList);
     for (const manager of managerList) {
       const data = {
         propertyManager: manager.firstname,
@@ -987,7 +1141,7 @@ async function sendEmails(propertyData, applicantOneData, applicantTwoData) {
         applicantEmail: applicantsList[0].email,
         applicantName: applicantsList[0].firstname,
         companyName: company.name,
-        logo:company?.logo
+        logo: company?.logo,
       };
       const options = Email.generateOptions(
         manager.email,
