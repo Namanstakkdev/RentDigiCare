@@ -6,7 +6,7 @@ import "react-toastify/dist/ReactToastify.css";
 import { Row, Col, Card, CardBody, CardHeader, Label, Input } from "reactstrap";
 
 //moment
-import moment from "moment";
+import moment, { utc } from "moment";
 
 //Import Breadcrumb
 import Breadcrumbs from "../../components/Common/Breadcrumb";
@@ -119,6 +119,19 @@ const Calender_availabilty = () => {
     });
   };
 
+  const convertToLocalTime = (utcTime) => {
+    const utcDate = new Date(`1970-01-01T${utcTime}`);
+
+    const localTime = utcDate.toLocaleTimeString(undefined, {
+      hour: "numeric",
+      minute: "numeric",
+      hour12: true,
+      timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+    });
+
+    return localTime;
+  };
+
   const getManagerAvailability = async () => {
     try {
       const response = await axios.get(
@@ -152,6 +165,37 @@ const Calender_availabilty = () => {
 
     timeRecurresive(0);
   }, []);
+
+  // const convertToUTC = (localTime) => {
+  //   const currentDate = new Date();
+
+  //   const year = currentDate.getFullYear();
+  //   const month = String(currentDate.getMonth() + 1).padStart(2, "0");
+  //   const day = String(currentDate.getDate()).padStart(2, "0");
+
+  //   const formattedDate = `${year}-${month}-${day}`;
+  //   const dateTimeString = `${formattedDate} ${localTime}`;
+
+  //   const dateTimeObject = new Date(dateTimeString);
+
+  //   if (!isNaN(dateTimeObject)) {
+  //     const utcString = dateTimeObject.toISOString();
+  //     const utcTimePart = utcString.split("T")[1];
+  //     return utcTimePart;
+  //   }
+  // };
+
+  const convertToUTC = (localTime) => {
+    const currentDate = new Date();
+    const formattedDate = currentDate.toISOString().split("T")[0];
+    const dateTimeString = `${formattedDate} ${localTime}`;
+
+    const dateTimeObject = new Date(dateTimeString);
+
+    return !isNaN(dateTimeObject)
+      ? dateTimeObject.toISOString().split("T")[1]
+      : undefined;
+  };
 
   const submit = async (e) => {
     e.preventDefault();
@@ -227,13 +271,25 @@ const Calender_availabilty = () => {
     }
   };
 
-  const changeAvailability = (i, type, data, j = 0) => {
+  const changeAvailability = (
+    i,
+    type,
+    data,
+    j = 0,
+    defaultValues = [
+      {
+        startTime: "9:00 AM",
+        endTime: "5:00 PM",
+      },
+    ]
+  ) => {
     let changedData = daysAvailability.map((item, index) => {
       if (i == index) {
         if (type == "available") {
           return {
             ...item,
             available: data.target.checked,
+            slots: defaultValues,
           };
         } else if (type == "startTime") {
           item.slots[j].startTime = data;
@@ -264,6 +320,8 @@ const Calender_availabilty = () => {
         return item;
       }
     });
+
+    console.log("ChangedData:", changedData);
 
     setDayAvailability(changedData);
   };

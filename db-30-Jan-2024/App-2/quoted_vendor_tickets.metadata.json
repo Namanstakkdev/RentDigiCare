@@ -1,0 +1,1 @@
+{"indexes":[{"v":{"$numberInt":"2"},"key":{"_id":{"$numberInt":"1"}},"name":"_id_"}],"uuid":"44fd858169744e6ea270c5d42754c058","collectionName":"quoted_vendor_tickets","type":"collection"}

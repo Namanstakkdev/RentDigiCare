@@ -25,8 +25,14 @@ let jwtInformation = {};
 let verificationCodeToken = "";
 // Post Company Login
 router.post("/", async (req, res) => {
+  console.log("Login hitted");
   const email = req.body.email.toLowerCase().toString();
   const password = req.body.password;
+
+  console.table({
+    Email: email,
+    Password: password
+  })
 
   try {
     // Authenticate Company

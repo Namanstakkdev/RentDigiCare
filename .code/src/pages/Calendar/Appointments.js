@@ -67,6 +67,8 @@ const Appointment = () => {
   });
   const pageTotal = Math.ceil(stats.total / pageLimit);
 
+  const [authEmail, setAuthEmail] = useState("");
+
   // Get the current date
   const currentDate = new Date();
 
@@ -185,6 +187,96 @@ const Appointment = () => {
     // console.log(data, "data");
   };
 
+  const bookedAndSyncWithGoogleCalendar = async (id, status, authEmail) => {
+    const update = {
+      method: "POST",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ slot_id: id, status, reason }),
+    };
+
+    try {
+      const res = await fetch(
+        SERVER_URL + `/user_appointment/update-event-status`,
+        update
+      );
+      const data = await res.json();
+      if (data.status === 200) {
+        getAppointments();
+        if (status === "booked") {
+          const event = data.event;
+
+          toggle_one();
+          toast("Appointment moved to calendar.");
+
+          let role = decode2.role;
+
+          if (role == "manager" || role == "company") {
+            role = "PropertyManager";
+          } else if (role == "technical staff") {
+            role = "technicalStaff";
+          }
+
+          const filteredEvent = filteredBooked.find(
+            (event) => event._id === id
+          );
+
+          const reqData = {
+            authEmail: authEmail ?? decode2.email,
+            manager_id: decode2.id,
+            day: moment(event.date).format("ddd"),
+            eventDate: event.date,
+            StartTime: event.startTime,
+            endTime: event.endTime,
+            createdBy: decode2.id,
+            type: filteredEvent.reasonType[0].reasonType,
+            propertyId: filteredEvent.properties[0].title,
+            companyDomain: decode2?.managerOf
+              ? decode2?.managerOf
+              : decode2?.domain,
+            title: event.name,
+            description: event.description,
+            event_id: id,
+            role: role,
+            available: true,
+          };
+
+          setTimeout(async () => {
+            toast("Sync with calendar process start");
+
+            try {
+              const ADD_EVENT = "/calender/auth";
+              const response = await axios.post(ADD_EVENT, reqData);
+
+              if (response.status === 200) {
+                console.log("Response:", response.data);
+                window.location.href = response.data;
+
+                const urlParams = new URLSearchParams(window.location.search);
+                const encodedResponse = urlParams.get("response");
+
+                if (encodedResponse) {
+                  const decodedResponse = JSON.stringify(
+                    decodeURIComponent(encodedResponse)
+                  );
+                  console.log(decodedResponse);
+                } else {
+                  console.error("Response data not found in the URL");
+                }
+              }
+            } catch (error) {
+              console.log(error);
+            }
+          }, 2000);
+        }
+      }
+    } catch (error) {
+      console.error("Error updating event status:", error);
+    }
+  };
+
   const deleteAppoitnment = async () => {
     let update = {
       method: "POST",
@@ -227,6 +319,23 @@ const Appointment = () => {
       setStartPage(Math.max(1, page - pageLimit / 2));
     }
   };
+
+  const convertToLocalTime = (utcTime) => {
+    if (typeof utcTime === "string" && utcTime.endsWith("Z")) {
+      const utcDate = new Date(utcTime);
+      const localTime = utcDate.toLocaleTimeString(undefined, {
+        hour: "numeric",
+        minute: "numeric",
+        hour12: true,
+        timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+      });
+
+      return localTime;
+    } else {
+      return utcTime;
+    }
+  };
+
   const clearFunc = async () => {
     setStartDate("");
     setEndDate("");
@@ -235,6 +344,7 @@ const Appointment = () => {
     t_col5();
     getAppointments("clear");
   };
+
   return (
     <React.Fragment>
       <div className="page-content">
@@ -474,7 +584,8 @@ const Appointment = () => {
                                   <td>{item.description}</td>
 
                                   <td>
-                                    {item.startTime} - {item.endTime}
+                                    {convertToLocalTime(item.startTime)} -{" "}
+                                    {convertToLocalTime(item.endTime)}
                                   </td>
                                   <td>
                                     {moment(item.date)
@@ -690,6 +801,15 @@ const Appointment = () => {
                     <ModalHeader style={{ border: "none" }} toggle={toggle_one}>
                       Are you Sure?
                     </ModalHeader>
+                    <ModalBody>
+                      <label htmlFor="authEmail">Auth Email:</label>
+                      <input
+                        type="email"
+                        id="authEmail"
+                        value={authEmail}
+                        onChange={(e) => setAuthEmail(e.target.value)}
+                      />
+                    </ModalBody>
                     <ModalFooter style={{ border: "none" }}>
                       <Button
                         color="primary"
@@ -698,7 +818,19 @@ const Appointment = () => {
                         }}
                       >
                         Yes
-                      </Button>{" "}
+                      </Button>
+                      <Button
+                        style={{ backgroundColor: "#4285f4", border: "none" }}
+                        onClick={() => {
+                          bookedAndSyncWithGoogleCalendar(
+                            selectedId,
+                            "booked",
+                            authEmail
+                          );
+                        }}
+                      >
+                        Sync with Google Calendar
+                      </Button>
                       <Button color="secondary" onClick={toggle_one}>
                         No
                       </Button>

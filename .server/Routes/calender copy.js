@@ -379,7 +379,10 @@ router.post("/add-event", async (req, res) => {
       eventAssignedTo: req.body.manager_id,
     });
 
-    console.log("ManagerAvailability:", managerAvailability[0].daysOfWeekAvailability);
+    console.log(
+      "ManagerAvailability:",
+      managerAvailability[0].daysOfWeekAvailability
+    );
 
     let dayAvailability = managerAvailability[0].daysOfWeekAvailability.filter(
       (dayItem) => {

@@ -696,60 +696,44 @@ router.get("/get-id", async (req, res) => {
 
 router.post("/add_slot", async (req, res) => {
   try {
-    // console.log(req.body.event_id)
-
-    let managerAvailability = await ManagerAvailability.find({
+    const managerAvailability = await ManagerAvailability.findOne({
       eventAssignedTo: req.body.manager_id,
     });
 
-    let dayAvailability = managerAvailability[0].daysOfWeekAvailability.filter(
-      (dayItem) => {
-        if (dayItem.day == req.body.day) {
-          return dayItem;
-        }
-      }
+    // Find the manager's availability for the specified day
+    const dayAvailability = managerAvailability.daysOfWeekAvailability.find(
+      (dayItem) => dayItem.day === req.body.day
     );
-
-    dayAvailability = dayAvailability[0];
-    // moment.tz.add("Asia/Calcutta|HMT BURT IST IST|-5R.k -6u -5u -6u|01232|-18LFR.k 1unn.k HB0 7zX0");
-
-    let inAvailableTime = false;
-
-    for (let l = 0; l < dayAvailability.slots.length; l++) {
-      console.log(
-        req.body.StartTime,
-        dayAvailability.slots[l].startTime,
-        dayAvailability.slots[l].endTime
-      );
-      let available = moment(req.body.StartTime, ["h:mm A"]).isBetween(
-        moment(dayAvailability.slots[l].startTime, ["h:mm A"]),
-        moment(dayAvailability.slots[l].endTime, ["h:mm A"]),
-        "minute",
-        "[)"
-      );
-      if (available) {
-        inAvailableTime = true;
-        break;
-      }
-    }
 
     let alreadyBooked = false;
 
     const findBooked = async (startTime, endTime) => {
+      const requestStartTimeEpoch = Math.ceil(
+        moment(req.body.StartTime, "h:mm A").valueOf() / 1000
+      );
+      const requestEndTimeEpoch = Math.ceil(
+        moment(req.body.endTime, "h:mm A").valueOf() / 1000
+      );
+      const startTimeEpoch = Math.ceil(
+        moment(startTime, "h:mm A").valueOf() / 1000
+      );
+      const endTimeEpoch = Math.ceil(
+        moment(endTime, "h:mm A").valueOf() / 1000
+      );
+
       return new Promise((resolve, reject) => {
-        alreadyBooked = moment(req.body.StartTime, ["h:mm A"]).isBetween(
-          moment(startTime, ["h:mm A"]),
-          moment(endTime, ["h:mm A"]),
-          "minute",
-          "[)"
-        );
+        // Compare times
+        alreadyBooked =
+          requestStartTimeEpoch === startTimeEpoch &&
+          requestEndTimeEpoch === endTimeEpoch;
+
         resolve(alreadyBooked);
       });
     };
 
-    console.log(dayAvailability.available, inAvailableTime);
+    console.log(dayAvailability.available);
 
-    if (dayAvailability.available && inAvailableTime) {
+    if (dayAvailability.available) {
       let BookedEvents = await User_appointment.find({
         date: req.body.date,
         eventAssignedTo: req.body.manager_id,
