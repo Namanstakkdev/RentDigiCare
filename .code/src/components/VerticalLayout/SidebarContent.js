@@ -512,11 +512,6 @@ const SidebarContent = (props) => {
                         {props.t("Calendar View")}
                       </Link>
                     </li>
-                    {decode.company == "GSK Properties" && (
-                      <li>
-                        <Link to="/calendar-reports">Management Reports</Link>
-                      </li>
-                    )}
                   </ul>
                 </li>
 
@@ -707,6 +702,22 @@ const SidebarContent = (props) => {
                     {/* <li>
                         <Link to="/pages-maintenance">{props.t("Maintance")}</Link>
                       </li>   */}
+                  </ul>
+                </li>
+                <li>
+                  <Link to="/#" className="has-arrow ">
+                    <FeatherIcon icon="file-text" />
+                    <span>Manager Reports</span>
+                  </Link>
+                  <ul className="sub-menu">
+                    <li>
+                      <Link to="/work-scheduling">Work Schedule</Link>
+                    </li>
+                  {decode.company == "GSK Properties" && (
+                      <li>
+                        <Link to="/calendar-reports">Management Reports</Link>
+                      </li>
+                    )}  
                   </ul>
                 </li>
 

@@ -33,6 +33,7 @@ const Calender_events = require("../Database/calender_events");
 const Property = require("../Database/Property");
 const insertEvents = require("../utils/GoogleCalendar");
 const CalendarReasonTypes = require("../Database/CalendarReasonTypes");
+const PropertyManager = require("../Database/PropertyManager");
 const ObjectId = require("mongodb").ObjectId;
 
 const eventUpdate = (eventId, event) => {
@@ -55,6 +56,157 @@ const eventUpdate = (eventId, event) => {
     }
   );
 };
+
+function authToken(req, res, next) {
+  const authHeader = req.headers["authorization"];
+  const token = authHeader && authHeader.split(" ")[1];
+  if (token == null) return res.sendStatus(401);
+  jwt.verify(token, process.env.ACCESS_TOKEN_KEY, (err, user) => {
+    if (err) return res.sendStatus(403);
+    req.user = user;
+    next();
+  });
+}
+
+router.post("/report", authToken, async (req, res) => {
+  try {
+    const { companyDomain } = req.body;
+
+    console.log({ companyDomain });
+
+    const managerAvailabilities = await PropertyManager.aggregate([
+      {
+        $match: {
+          companyAssigned: companyDomain,
+        },
+      },
+      {
+        $lookup: {
+          from: "properties",
+          let: { propertyIds: "$properties" },
+          pipeline: [
+            {
+              $match: {
+                $expr: {
+                  $in: ["$_id", "$$propertyIds"],
+                },
+              },
+            },
+          ],
+          as: "propertiesData",
+        },
+      },
+      {
+        $lookup: {
+          from: "manager_availabilities",
+          let: { managerId: "$_id" },
+          pipeline: [
+            {
+              $match: {
+                $expr: { $eq: ["$eventAssignedTo", "$$managerId"] },
+              },
+            },
+          ],
+          as: "managerAvailabilities",
+        },
+      },
+      {
+        $lookup: {
+          from: "user_appointments",
+          let: { managerId: "$_id" },
+          pipeline: [
+            {
+              $match: {
+                $expr: { $eq: ["$eventAssignedTo", "$$managerId"] },
+              },
+            },
+          ],
+          as: "userAppointments",
+        },
+      },
+      {
+        $project: {
+          managerId: "$_id",
+          managerName: { $concat: ["$firstname", " ", "$lastname"] },
+          email: 1,
+          mobile: 1,
+          managerAvailabilities: {
+            $map: {
+              input: "$managerAvailabilities",
+              as: "managerAvailability",
+              in: {
+                daysOfWeekAvailability:
+                  "$$managerAvailability.daysOfWeekAvailability",
+              },
+            },
+          },
+          propertiesData: {
+            $map: {
+              input: "$propertiesData",
+              as: "property",
+              in: {
+                propertyId: "$$property._id",
+                name: "$$property.title",
+              },
+            },
+          },
+          userAppointments: {
+            $map: {
+              input: "$userAppointments",
+              as: "userAppointment",
+              in: {
+                date: "$$userAppointment.date",
+                propertyId: "$$userAppointment.propertyId",
+                reasonId: "$$userAppointment.reasonId",
+                status: "$$userAppointment.status",
+              },
+            },
+          },
+        },
+      },
+      {
+        $addFields: {
+          totalAppointments: { $ifNull: [{ $size: "$userAppointments" }, 0] },
+        },
+      },
+      {
+        $unwind: {
+          path: "$userAppointments",
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+
+      // {
+      //   $unwind: {
+      //     path: "$userAppointments",
+      //     preserveNullAndEmptyArrays: true,
+      //   },
+      // },
+      // {
+      //   $unwind: "$propertiesData",
+      // },
+      // {
+      //   $group: {
+      //     _id: "$propertiesData.propertyId",
+      //     propertyId: { $first: "$propertiesData.propertyId" },
+      //     propertyName: { $first: "$propertiesData.name" },
+      //     totalUserAppointments: { $sum: 1 }, // Assuming each userAppointment contributes 1 to the count
+      //   },
+      // },
+    ]);
+
+    res.status(200).json({
+      status: 200,
+      message: "The resources have been fetched",
+      appointments: managerAvailabilities,
+    });
+  } catch (error) {
+    console.error(error);
+    res
+      .status(500)
+      .json({ status: 500, message: "Something Went Wrong", appointments: [] });
+  }
+});
 
 router.post("/auth", async (req, res) => {
   const existingEvent = await Events.findOne({ event_id: req.body.event_id });

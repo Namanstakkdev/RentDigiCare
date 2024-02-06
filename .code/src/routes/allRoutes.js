@@ -200,7 +200,8 @@ import BlogDetail from "../pages/blog/BlogDetail";
 
 // Newsletter module
 import Newsletters from "../pages/Newsletter/Newsletters";
-import ManagementReports from "../pages/Calendar/ManagementReports";
+import ManagementReports from "../pages/ManagerReports/ManagementReports";
+import WorkScheduling from "../pages/ManagerReports/WorkScheduling";
 
 const userRoutes = [
   //dashboard
@@ -211,9 +212,6 @@ const userRoutes = [
 
   //Calendar
   { path: "/apps-calendar", component: Calendar },
-
-  //Calendar Reports
-  { path: "/calendar-reports", component: ManagementReports },
 
   //Chat
   { path: "/apps-chat", component: Chat },
@@ -361,6 +359,10 @@ const userRoutes = [
 
   // Rentdigicare newsletter route
   { path: "/newsletters", component: Newsletters },
+
+  //Manager Reports
+  { path: "/work-scheduling", component: WorkScheduling },
+  { path: "/calendar-reports", component: ManagementReports },
 
   // this route should be at the end of all other routes
   { path: "/", exact: true, component: () => <Redirect to="/dashboard" /> },
