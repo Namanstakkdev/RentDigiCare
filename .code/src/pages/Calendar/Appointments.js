@@ -187,95 +187,95 @@ const Appointment = () => {
     // console.log(data, "data");
   };
 
-  const bookedAndSyncWithGoogleCalendar = async (id, status, authEmail) => {
-    const update = {
-      method: "POST",
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ slot_id: id, status, reason }),
-    };
+  // const bookedAndSyncWithGoogleCalendar = async (id, status, authEmail) => {
+  //   const update = {
+  //     method: "POST",
+  //     headers: {
+  //       Accept: "application/json",
+  //       "Content-Type": "application/json",
+  //     },
+  //     body: JSON.stringify({ slot_id: id, status, reason }),
+  //   };
 
-    try {
-      const res = await fetch(
-        SERVER_URL + `/user_appointment/update-event-status`,
-        update
-      );
-      const data = await res.json();
-      if (data.status === 200) {
-        getAppointments();
-        if (status === "booked") {
-          const event = data.event;
+  //   try {
+  //     const res = await fetch(
+  //       SERVER_URL + `/user_appointment/update-event-status`,
+  //       update
+  //     );
+  //     const data = await res.json();
+  //     if (data.status === 200) {
+  //       getAppointments();
+  //       if (status === "booked") {
+  //         const event = data.event;
 
-          toggle_one();
-          toast("Appointment moved to calendar.");
+  //         toggle_one();
+  //         toast("Appointment moved to calendar.");
 
-          let role = decode2.role;
+  //         let role = decode2.role;
 
-          if (role == "manager" || role == "company") {
-            role = "PropertyManager";
-          } else if (role == "technical staff") {
-            role = "technicalStaff";
-          }
+  //         if (role == "manager" || role == "company") {
+  //           role = "PropertyManager";
+  //         } else if (role == "technical staff") {
+  //           role = "technicalStaff";
+  //         }
 
-          const filteredEvent = filteredBooked.find(
-            (event) => event._id === id
-          );
+  //         const filteredEvent = filteredBooked.find(
+  //           (event) => event._id === id
+  //         );
 
-          const reqData = {
-            authEmail: authEmail ?? decode2.email,
-            manager_id: decode2.id,
-            day: moment(event.date).format("ddd"),
-            eventDate: event.date,
-            StartTime: event.startTime,
-            endTime: event.endTime,
-            createdBy: decode2.id,
-            type: filteredEvent.reasonType[0].reasonType,
-            propertyId: filteredEvent.properties[0].title,
-            companyDomain: decode2?.managerOf
-              ? decode2?.managerOf
-              : decode2?.domain,
-            title: event.name,
-            description: event.description,
-            event_id: id,
-            role: role,
-            available: true,
-          };
+  //         const reqData = {
+  //           authEmail: authEmail ?? decode2.email,
+  //           manager_id: decode2.id,
+  //           day: moment(event.date).format("ddd"),
+  //           eventDate: event.date,
+  //           StartTime: event.startTime,
+  //           endTime: event.endTime,
+  //           createdBy: decode2.id,
+  //           type: filteredEvent.reasonType[0].reasonType,
+  //           propertyId: filteredEvent.properties[0].title,
+  //           companyDomain: decode2?.managerOf
+  //             ? decode2?.managerOf
+  //             : decode2?.domain,
+  //           title: event.name,
+  //           description: event.description,
+  //           event_id: id,
+  //           role: role,
+  //           available: true,
+  //         };
 
-          setTimeout(async () => {
-            toast("Sync with calendar process start");
+  //         setTimeout(async () => {
+  //           toast("Sync with calendar process start");
 
-            try {
-              const ADD_EVENT = "/calender/auth";
-              const response = await axios.post(ADD_EVENT, reqData);
+  //           try {
+  //             const ADD_EVENT = "/calender/auth";
+  //             const response = await axios.post(ADD_EVENT, reqData);
 
-              if (response.status === 200) {
-                console.log("Response:", response.data);
-                window.location.href = response.data;
+  //             if (response.status === 200) {
+  //               console.log("Response:", response.data);
+  //               window.location.href = response.data;
 
-                const urlParams = new URLSearchParams(window.location.search);
-                const encodedResponse = urlParams.get("response");
+  //               const urlParams = new URLSearchParams(window.location.search);
+  //               const encodedResponse = urlParams.get("response");
 
-                if (encodedResponse) {
-                  const decodedResponse = JSON.stringify(
-                    decodeURIComponent(encodedResponse)
-                  );
-                  console.log(decodedResponse);
-                } else {
-                  console.error("Response data not found in the URL");
-                }
-              }
-            } catch (error) {
-              console.log(error);
-            }
-          }, 2000);
-        }
-      }
-    } catch (error) {
-      console.error("Error updating event status:", error);
-    }
-  };
+  //               if (encodedResponse) {
+  //                 const decodedResponse = JSON.stringify(
+  //                   decodeURIComponent(encodedResponse)
+  //                 );
+  //                 console.log(decodedResponse);
+  //               } else {
+  //                 console.error("Response data not found in the URL");
+  //               }
+  //             }
+  //           } catch (error) {
+  //             console.log(error);
+  //           }
+  //         }, 2000);
+  //       }
+  //     }
+  //   } catch (error) {
+  //     console.error("Error updating event status:", error);
+  //   }
+  // };
 
   const deleteAppoitnment = async () => {
     let update = {
@@ -801,7 +801,7 @@ const Appointment = () => {
                     <ModalHeader style={{ border: "none" }} toggle={toggle_one}>
                       Are you Sure?
                     </ModalHeader>
-                    <ModalBody>
+                    {/* <ModalBody>
                       <label htmlFor="authEmail">Auth Email:</label>
                       <input
                         type="email"
@@ -809,7 +809,7 @@ const Appointment = () => {
                         value={authEmail}
                         onChange={(e) => setAuthEmail(e.target.value)}
                       />
-                    </ModalBody>
+                    </ModalBody> */}
                     <ModalFooter style={{ border: "none" }}>
                       <Button
                         color="primary"
@@ -819,7 +819,7 @@ const Appointment = () => {
                       >
                         Yes
                       </Button>
-                      <Button
+                      {/* <Button
                         style={{ backgroundColor: "#4285f4", border: "none" }}
                         onClick={() => {
                           bookedAndSyncWithGoogleCalendar(
@@ -830,7 +830,7 @@ const Appointment = () => {
                         }}
                       >
                         Sync with Google Calendar
-                      </Button>
+                      </Button> */}
                       <Button color="secondary" onClick={toggle_one}>
                         No
                       </Button>

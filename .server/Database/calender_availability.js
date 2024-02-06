@@ -1,4 +1,12 @@
 const mongoose = require("mongoose");
+const moment = require("moment");
+
+const convertToUTC = (localTime) => {
+  const localMoment = moment(localTime, "h:mm A");
+  const utcTime = localMoment.toISOString();
+
+  return utcTime;
+};
 
 const ManagerAvailability = mongoose.Schema({
   eventAssignedTo: {
@@ -22,8 +30,8 @@ const ManagerAvailability = mongoose.Schema({
         available: false,
         slots: [
           {
-            startTime: "9:00 AM",
-            endTime: "5:00 PM",
+            startTime: convertToUTC("9:00 AM"),
+            endTime: convertToUTC("5:00 PM"),
           },
         ],
       },
@@ -32,8 +40,8 @@ const ManagerAvailability = mongoose.Schema({
         available: true,
         slots: [
           {
-            startTime: "9:00 AM",
-            endTime: "5:00 PM",
+            startTime: convertToUTC("9:00 AM"),
+            endTime: convertToUTC("5:00 PM"),
           },
         ],
       },
@@ -42,8 +50,8 @@ const ManagerAvailability = mongoose.Schema({
         available: true,
         slots: [
           {
-            startTime: "9:00 AM",
-            endTime: "5:00 PM",
+            startTime: convertToUTC("9:00 AM"),
+            endTime: convertToUTC("5:00 PM"),
           },
         ],
       },
@@ -52,8 +60,8 @@ const ManagerAvailability = mongoose.Schema({
         available: true,
         slots: [
           {
-            startTime: "9:00 AM",
-            endTime: "5:00 PM",
+            startTime: convertToUTC("9:00 AM"),
+            endTime: convertToUTC("5:00 PM"),
           },
         ],
       },
@@ -62,8 +70,8 @@ const ManagerAvailability = mongoose.Schema({
         available: true,
         slots: [
           {
-            startTime: "9:00 AM",
-            endTime: "5:00 PM",
+            startTime: convertToUTC("9:00 AM"),
+            endTime: convertToUTC("5:00 PM"),
           },
         ],
       },
@@ -72,8 +80,8 @@ const ManagerAvailability = mongoose.Schema({
         available: true,
         slots: [
           {
-            startTime: "9:00 AM",
-            endTime: "5:00 PM",
+            startTime: convertToUTC("9:00 AM"),
+            endTime: convertToUTC("5:00 PM"),
           },
         ],
       },
@@ -82,8 +90,8 @@ const ManagerAvailability = mongoose.Schema({
         available: true,
         slots: [
           {
-            startTime: "9:00 AM",
-            endTime: "5:00 PM",
+            startTime: convertToUTC("9:00 AM"),
+            endTime: convertToUTC("5:00 PM"),
           },
         ],
       },
