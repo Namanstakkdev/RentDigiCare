@@ -711,9 +711,9 @@ const SidebarContent = (props) => {
                       <span>Manager Reports</span>
                     </Link>
                     <ul className="sub-menu">
-                      <li>
+                      {/* <li>
                         <Link to="/work-scheduling">Work Schedule</Link>
-                      </li>
+                      </li> */}
 
                       <li>
                         <Link to="/calendar-reports">Management Reports</Link>
