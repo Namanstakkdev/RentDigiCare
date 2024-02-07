@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Accordion, AccordionItem } from "react-bootstrap";
+import Modal from "react-bootstrap/Modal";
+import Button from "react-bootstrap/Button";
 import { Table, Row, Col, Card, CardBody, CardHeader, Label } from "reactstrap";
 import Select from "react-select";
 import jwt_decode from "jwt-decode";
@@ -11,10 +13,30 @@ const ManagementReports = () => {
   const [filterPropertyManager, setFilterPropertyManager] = useState("");
   const [propertyManagerList, setPropertyManagerList] = useState([]);
   const [tickets, setTickets] = useState([]);
+  const [appointments, setAppointments] = useState([]);
+  const [availabilities, setAvailability] = useState([]);
   const [applicants, setApplicants] = useState([]);
+
+  const [showModal, setShowModal] = useState(false);
 
   const decode = jwt_decode(window.localStorage.getItem("accessToken"));
   const userRole = JSON.parse(window.localStorage.getItem("authUser")).role;
+
+  const handleShowModal = () => setShowModal(true);
+  const handleCloseModal = () => setShowModal(false);
+
+  const convertToLocalTime = (utcTime) => {
+    const utcDate = new Date(`1970-01-01T${utcTime}`);
+
+    const localTime = utcDate.toLocaleTimeString(undefined, {
+      hour: "numeric",
+      minute: "numeric",
+      hour12: true,
+      timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+    });
+
+    return localTime;
+  };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -49,10 +71,7 @@ const ManagementReports = () => {
                     pageNumber: 1,
                   }
                 );
-                console.log(
-                  "Appointment Response:",
-                  appointmentResponse.data.appointments
-                );
+                setAppointments(appointmentResponse.data.appointmentsReport);
               } catch (error) {
                 console.error("Error fetching appointments:", error.message);
               }
@@ -155,14 +174,168 @@ const ManagementReports = () => {
                             <tr>
                               <th scope="col">#</th>
                               <th scope="col">Manager Name</th>
-                              <th scope="col">Properties</th>
-                              <th scope="col">Reason Types</th>
+                              <th scope="col">Property Name</th>
                               <th scope="col">Availabilities</th>
-                              <th scope="col">Status</th>
+                              <th scope="col">Total</th>
+                              <th scope="col">Pending</th>
+                              <th scope="col">Booked</th>
+                              <th scope="col">Canceled</th>
                             </tr>
                           </thead>
-                          <tbody></tbody>
+                          <tbody>
+                            {appointments.map((appointment, index) =>
+                              appointment.propertiesData.map(
+                                (property, propertyIndex) => {
+                                  const propertyId = property.propertyId;
+                                  const appointmentData =
+                                    appointment.appointmentsData.find(
+                                      (data) => data.propertyId === propertyId
+                                    );
+
+                                  return (
+                                    <tr>
+                                      {propertyIndex === 0 && (
+                                        <td
+                                          rowSpan={
+                                            appointment.propertiesData.length
+                                          }
+                                        >
+                                          {propertyIndex === 0
+                                            ? index + 1
+                                            : null}
+                                        </td>
+                                      )}
+                                      {propertyIndex === 0 && (
+                                        <td
+                                          rowSpan={
+                                            appointment.propertiesData.length
+                                          }
+                                        >
+                                          {appointment.managerName}
+                                        </td>
+                                      )}
+                                      <td>{property.name}</td>
+                                      {propertyIndex === 0 && (
+                                        <td
+                                          rowSpan={
+                                            appointment.propertiesData.length
+                                          }
+                                          style={{
+                                            verticalAlign: "middle",
+                                            textAlign: "center",
+                                          }}
+                                        >
+                                          {appointment.managerAvailabilities
+                                            .length === 0 ? (
+                                            <button
+                                              className="btn btn-secondary btn-sm"
+                                              disabled
+                                            >
+                                              No Availabilities
+                                            </button>
+                                          ) : (
+                                            <button
+                                              className="btn btn-primary btn-sm"
+                                              onClick={() => {
+                                                handleShowModal();
+                                                setAvailability(
+                                                  appointment
+                                                    .managerAvailabilities[0]
+                                                    .daysOfWeekAvailability
+                                                );
+                                              }}
+                                            >
+                                              Show Availabilities
+                                            </button>
+                                          )}
+                                        </td>
+                                      )}
+                                      <td>
+                                        {appointmentData
+                                          ? appointmentData.appointments
+                                          : 0}
+                                      </td>
+                                      <td>
+                                        {appointmentData
+                                          ? appointmentData.totalPending
+                                          : 0}
+                                      </td>
+                                      <td>
+                                        {appointmentData
+                                          ? appointmentData.totalBooked
+                                          : 0}
+                                      </td>
+                                      <td>
+                                        {appointmentData
+                                          ? appointmentData.totalCanceled
+                                          : 0}
+                                      </td>
+                                    </tr>
+                                  );
+                                }
+                              )
+                            )}
+                          </tbody>
                         </Table>
+                        <Modal
+                          show={showModal}
+                          onHide={handleCloseModal}
+                          centered
+                        >
+                          <Modal.Header closeButton>
+                            <Modal.Title>Availabilities</Modal.Title>
+                          </Modal.Header>
+                          <Modal.Body>
+                            <table className="table table-bordered">
+                              <thead>
+                                <tr>
+                                  <th>Day</th>
+                                  <th>Available</th>
+                                  <th>Time Slots</th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                {availabilities.map((availability, index) => (
+                                  <tr key={index}>
+                                    <td>{availability.day}</td>
+                                    <td>
+                                      {availability.available ? "Yes" : "No"}
+                                    </td>
+                                    <td>
+                                      {availability.slots.length > 0 ? (
+                                        <ul className="list-unstyled">
+                                          {availability.slots.map(
+                                            (slot, slotIndex) => (
+                                              <li key={slotIndex}>
+                                                {convertToLocalTime(
+                                                  slot.startTime
+                                                )}{" "}
+                                                -{" "}
+                                                {convertToLocalTime(
+                                                  slot.endTime
+                                                )}
+                                              </li>
+                                            )
+                                          )}
+                                        </ul>
+                                      ) : (
+                                        <p>No time slots available</p>
+                                      )}
+                                    </td>
+                                  </tr>
+                                ))}
+                              </tbody>
+                            </table>
+                          </Modal.Body>
+                          <Modal.Footer>
+                            <Button
+                              variant="secondary"
+                              onClick={handleCloseModal}
+                            >
+                              Close
+                            </Button>
+                          </Modal.Footer>
+                        </Modal>
                       </div>
                     </Accordion.Body>
                   </AccordionItem>
