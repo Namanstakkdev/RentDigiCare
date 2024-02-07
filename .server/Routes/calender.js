@@ -72,9 +72,7 @@ router.post("/report", authToken, async (req, res) => {
   try {
     const { companyDomain } = req.body;
 
-    console.log({ companyDomain });
-
-    const managerAvailabilities = await PropertyManager.aggregate([
+    const appointmentsReport = await PropertyManager.aggregate([
       {
         $match: {
           companyAssigned: companyDomain,
@@ -175,30 +173,99 @@ router.post("/report", authToken, async (req, res) => {
           preserveNullAndEmptyArrays: true,
         },
       },
-
-      // {
-      //   $unwind: {
-      //     path: "$userAppointments",
-      //     preserveNullAndEmptyArrays: true,
-      //   },
-      // },
-      // {
-      //   $unwind: "$propertiesData",
-      // },
-      // {
-      //   $group: {
-      //     _id: "$propertiesData.propertyId",
-      //     propertyId: { $first: "$propertiesData.propertyId" },
-      //     propertyName: { $first: "$propertiesData.name" },
-      //     totalUserAppointments: { $sum: 1 }, // Assuming each userAppointment contributes 1 to the count
-      //   },
-      // },
+      {
+        $group: {
+          _id: {
+            managerId: "$managerId",
+            propertyId: "$userAppointments.propertyId",
+          },
+          managerName: { $first: "$managerName" },
+          email: { $first: "$email" },
+          mobile: { $first: "$mobile" },
+          managerAvailabilities: { $first: "$managerAvailabilities" },
+          propertiesData: { $first: "$propertiesData" },
+          appointments: { $sum: 1 },
+          totalBooked: {
+            $sum: {
+              $cond: [{ $eq: ["$userAppointments.status", "booked"] }, 1, 0],
+            },
+          },
+          totalPending: {
+            $sum: {
+              $cond: [{ $eq: ["$userAppointments.status", "pending"] }, 1, 0],
+            },
+          },
+          totalCanceled: {
+            $sum: {
+              $cond: [{ $eq: ["$userAppointments.status", "canceled"] }, 1, 0],
+            },
+          },
+          userAppointments: {
+            $push: "$userAppointments",
+          },
+        },
+      },
+      {
+        $group: {
+          _id: "$_id.managerId",
+          managerName: { $first: "$managerName" },
+          email: { $first: "$email" },
+          mobile: { $first: "$mobile" },
+          managerAvailabilities: { $first: "$managerAvailabilities" },
+          propertiesData: { $first: "$propertiesData" },
+          appointmentsData: {
+            $push: {
+              propertyId: "$_id.propertyId",
+              appointments: "$appointments",
+              totalBooked: "$totalBooked",
+              totalPending: "$totalPending",
+              totalCanceled: "$totalCanceled",
+              userAppointments: "$userAppointments",
+            },
+          },
+          totalAppointments: { $sum: "$appointments" },
+        },
+      },
+      {
+        $project: {
+          _id: 0,
+          managerId: "$_id",
+          managerName: 1,
+          email: 1,
+          mobile: 1,
+          managerAvailabilities: 1,
+          propertiesData: 1,
+          appointmentsData: {
+            $map: {
+              input: "$appointmentsData",
+              as: "appointment",
+              in: {
+                propertyId: "$$appointment.propertyId",
+                appointments: {
+                  $cond: [
+                    {
+                      $eq: [{ $ifNull: ["$$appointment.propertyId", []] }, []],
+                    },
+                    0,
+                    "$$appointment.appointments",
+                  ],
+                },
+                totalBooked: "$$appointment.totalBooked",
+                totalPending: "$$appointment.totalPending",
+                totalCanceled: "$$appointment.totalCanceled",
+                userAppointments: "$$appointment.userAppointments",
+              },
+            },
+          },
+          totalAppointments: 1,
+        },
+      },
     ]);
 
     res.status(200).json({
       status: 200,
       message: "The resources have been fetched",
-      appointments: managerAvailabilities,
+      appointmentsReport,
     });
   } catch (error) {
     console.error(error);
