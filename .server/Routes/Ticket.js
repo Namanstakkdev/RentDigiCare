@@ -938,6 +938,7 @@ router.post("/report", authToken, async (req, res) => {
           },
           totalTickets: { $sum: 1 },
           statusCounts: { $push: "$status" },
+          assignedToTypes: { $push: "$assignedToType" },
         },
       },
       {
@@ -951,6 +952,7 @@ router.post("/report", authToken, async (req, res) => {
             status: "$statusCounts",
           },
           count: { $sum: 1 },
+          assignedToTypes: { $first: "$assignedToTypes" },
         },
       },
       {
@@ -966,6 +968,39 @@ router.post("/report", authToken, async (req, res) => {
               count: "$count",
             },
           },
+          assignedToTypes: { $first: "$assignedToTypes" },
+        },
+      },
+      {
+        $unwind: "$assignedToTypes",
+      },
+      {
+        $group: {
+          _id: {
+            managerName: "$_id.managerName",
+            property: "$_id.property",
+            assignedToType: "$assignedToTypes",
+          },
+          count: { $sum: 1 },
+          totalTickets: { $first: "$totalTickets" },
+          statusCounts: { $first: "$statusCounts" },
+        },
+      },
+      {
+        $group: {
+          _id: {
+            managerName: "$_id.managerName",
+            property: "$_id.property",
+          },
+          totalTickets: { $first: "$totalTickets" },
+          statusCounts: { $first: "$statusCounts" },
+          assignedToTypes: {
+            $push: {
+              assignedToType: "$_id.assignedToType",
+              assignedStatus: "$_id.status",
+              count: "$count",
+            },
+          },
         },
       },
       {
@@ -976,6 +1011,7 @@ router.post("/report", authToken, async (req, res) => {
               name: "$_id.property",
               totalTickets: "$totalTickets",
               statusCounts: "$statusCounts",
+              assignedToTypes: "$assignedToTypes",
             },
           },
         },
@@ -999,6 +1035,118 @@ router.post("/report", authToken, async (req, res) => {
     res
       .status(500)
       .json({ status: 500, message: "Something Went Wrong", tickets: [] });
+  }
+});
+
+router.post("/report2", authToken, async (req, res) => {
+  try {
+    const { companyDomain } = req.body;
+
+    if (!companyDomain) {
+      return res.status(400).json({
+        status: 400,
+        message: "Please provide Company Domain",
+        tickets: [],
+      });
+    }
+
+    const aggregationPipeline = [
+      {
+        $match: { companyDomain },
+      },
+      {
+        $lookup: {
+          from: "technicalstaffs",
+          let: { assignedToId: "$assignedTo" },
+          pipeline: [
+            {
+              $match: {
+                $expr: { $eq: ["$_id", "$$assignedToId"] },
+              },
+            },
+          ],
+          as: "technicalStaff",
+        },
+      },
+      {
+        $match: {
+          technicalStaff: { $ne: [] },
+        },
+      },
+      {
+        $unwind: "$technicalStaff",
+      },
+      {
+        $group: {
+          _id: {
+            vendorName: {
+              $concat: [
+                "$technicalStaff.first_name",
+                " ",
+                "$technicalStaff.last_name",
+              ],
+            },
+            property: "$property",
+          },
+          totalTickets: { $sum: 1 },
+          statusCounts: { $push: "$status" },
+        },
+      },
+      {
+        $unwind: "$statusCounts",
+      },
+      {
+        $group: {
+          _id: {
+            vendorName: "$_id.vendorName",
+            property: "$_id.property",
+            status: "$statusCounts",
+          },
+          count: { $sum: 1 },
+        },
+      },
+      {
+        $group: {
+          _id: {
+            vendorName: "$_id.vendorName",
+            property: "$_id.property",
+          },
+          totalTickets: { $sum: "$count" },
+          statusCounts: {
+            $push: {
+              status: "$_id.status",
+              count: "$count",
+            },
+          },
+        },
+      },
+      {
+        $group: {
+          _id: "$_id.vendorName",
+          properties: {
+            $push: {
+              name: "$_id.property",
+              totalTickets: "$totalTickets",
+              statusCounts: "$statusCounts",
+            },
+          },
+        },
+      },
+      {
+        $sort: { _id: 1 },
+      },
+    ];
+
+    const vendorsTicketReport = await Ticket.aggregate(aggregationPipeline);
+
+    res.status(200).json({
+      status: 200,
+      message: "The resources have been fetched",
+      vendorsTicketReport,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ status: 500, message: "Something Went Wrong" });
   }
 });
 

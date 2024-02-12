@@ -16,6 +16,7 @@ const ManagementReports = () => {
   const [appointments, setAppointments] = useState([]);
   const [availabilities, setAvailability] = useState([]);
   const [applicants, setApplicants] = useState([]);
+  const [technicalStaffReports, setTechnicalStaffReport] = useState([]);
 
   const [showModal, setShowModal] = useState(false);
 
@@ -56,6 +57,8 @@ const ManagementReports = () => {
                   pageNumber: 1,
                 });
 
+                console.log("TicketResponse:", ticketResponse.data.tickets);
+
                 setTickets(ticketResponse.data.tickets);
               } catch (error) {
                 console.error("Error fetching tickets:", error.message);
@@ -92,10 +95,30 @@ const ManagementReports = () => {
               }
             };
 
+            const getVendorsTicket = async () => {
+              try {
+                const vendorResponse = await axios.post("/ticket/report2", {
+                  companyDomain: decode.domain,
+                });
+
+                console.log(
+                  "Vendors Response:",
+                  vendorResponse.data.vendorsTicketReport
+                );
+
+                setTechnicalStaffReport(
+                  vendorResponse.data.vendorsTicketReport
+                );
+              } catch (error) {
+                console.error("Error fetching Applicants:", error.message);
+              }
+            };
+
             // Fetch tickets and appointments sequentially
             await getTickets();
             await getAppointments();
             await getApplicants();
+            await getVendorsTicket();
           }
         }
       } catch (error) {
@@ -276,6 +299,55 @@ const ManagementReports = () => {
                               )
                             )}
                           </tbody>
+                          <tfoot>
+                            <tr>
+                              <td colSpan="4">Total</td>
+                              <td>
+                                {appointments.reduce(
+                                  (acc, curr) =>
+                                    acc +
+                                    curr.appointmentsData.reduce(
+                                      (a, c) => a + c.appointments,
+                                      0
+                                    ),
+                                  0
+                                )}
+                              </td>
+                              <td>
+                                {appointments.reduce(
+                                  (acc, curr) =>
+                                    acc +
+                                    curr.appointmentsData.reduce(
+                                      (a, c) => a + c.totalPending,
+                                      0
+                                    ),
+                                  0
+                                )}
+                              </td>
+                              <td>
+                                {appointments.reduce(
+                                  (acc, curr) =>
+                                    acc +
+                                    curr.appointmentsData.reduce(
+                                      (a, c) => a + c.totalBooked,
+                                      0
+                                    ),
+                                  0
+                                )}
+                              </td>
+                              <td>
+                                {appointments.reduce(
+                                  (acc, curr) =>
+                                    acc +
+                                    curr.appointmentsData.reduce(
+                                      (a, c) => a + c.totalCanceled,
+                                      0
+                                    ),
+                                  0
+                                )}
+                              </td>
+                            </tr>
+                          </tfoot>
                         </Table>
                         <Modal
                           show={showModal}
@@ -360,6 +432,7 @@ const ManagementReports = () => {
                               <th scope="col">Open</th>
                               <th scope="col">Inprogress</th>
                               <th scope="col">Completed</th>
+                              <th scope="col">Assign To TechnicalStaff</th>
                             </tr>
                           </thead>
                           <tbody>
@@ -390,6 +463,17 @@ const ManagementReports = () => {
                                         </td>
                                       )
                                     )}
+                                    {["technicalStaff"].map(
+                                      (assignedToType, assignTypeIndex) => (
+                                        <td>
+                                          {property.assignedToTypes.find(
+                                            (count) =>
+                                              count.assignedToType ===
+                                              assignedToType
+                                          )?.count || 0}
+                                        </td>
+                                      )
+                                    )}
                                   </tr>
                                 )
                               )
@@ -397,7 +481,20 @@ const ManagementReports = () => {
                           </tbody>
                           <tfoot>
                             <tr>
-                              <td colSpan="4">Total</td>
+                              <td colSpan="3">Total</td>
+                              <td>
+                                {tickets.reduce((total, ticket) => {
+                                  return (
+                                    total +
+                                    ticket.properties.reduce(
+                                      (acc, property) => {
+                                        return acc + property.totalTickets;
+                                      },
+                                      0
+                                    )
+                                  );
+                                }, 0)}
+                              </td>
                               <td>
                                 {tickets.reduce((total, ticket) => {
                                   return (
@@ -453,6 +550,165 @@ const ManagementReports = () => {
                                     )
                                   );
                                 }, 0)}
+                              </td>
+                            </tr>
+                          </tfoot>
+                        </Table>
+                      </div>
+                    </Accordion.Body>
+                  </AccordionItem>
+                </Accordion>
+
+                {/* Vendors Report */}
+                <Accordion>
+                  <AccordionItem>
+                    <Accordion.Header className="accordion-header">
+                      Maintenance Requests under Technical Staff Report
+                    </Accordion.Header>
+                    <Accordion.Body>
+                      <div className="table-responsive">
+                        {renderSortingDropdown()}
+                        <Table className="table table-striped table-bordered mb-0">
+                          <thead>
+                            <tr>
+                              <th scope="col">#</th>
+                              <th scope="col">Vendor Name</th>
+                              <th scope="col">Property Name</th>
+                              <th scope="col">Total</th>
+                              <th scope="col">Open</th>
+                              <th scope="col">Inprogress</th>
+                              <th scope="col">Completed</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {technicalStaffReports.map(
+                              (technicalStaffReport, index) =>
+                                technicalStaffReport.properties.map(
+                                  (property, propertyIndex) => (
+                                    <tr>
+                                      {propertyIndex === 0 && (
+                                        <td
+                                          rowSpan={
+                                            technicalStaffReport.properties
+                                              .length
+                                          }
+                                        >
+                                          {propertyIndex === 0
+                                            ? index + 1
+                                            : null}
+                                        </td>
+                                      )}
+                                      {propertyIndex === 0 && (
+                                        <td
+                                          rowSpan={
+                                            technicalStaffReport.properties
+                                              .length
+                                          }
+                                        >
+                                          {technicalStaffReport._id}
+                                        </td>
+                                      )}
+                                      <td>{property.name}</td>
+                                      <td>{property.totalTickets}</td>
+                                      {["Open", "Inprogress", "Completed"].map(
+                                        (status, statusIndex) => (
+                                          <td
+                                            key={`${index}-${propertyIndex}-${statusIndex}`}
+                                          >
+                                            {property.statusCounts.find(
+                                              (count) => count.status === status
+                                            )?.count || 0}
+                                          </td>
+                                        )
+                                      )}
+                                    </tr>
+                                  )
+                                )
+                            )}
+                          </tbody>
+                          <tfoot>
+                            <tr>
+                              <td colSpan="3">Total</td>
+                              <td>
+                                {technicalStaffReports.reduce(
+                                  (total, technicalStaffReport) => {
+                                    return (
+                                      total +
+                                      technicalStaffReport.properties.reduce(
+                                        (acc, property) => {
+                                          return acc + property.totalTickets;
+                                        },
+                                        0
+                                      )
+                                    );
+                                  },
+                                  0
+                                )}
+                              </td>
+                              <td>
+                                {technicalStaffReports.reduce(
+                                  (total, technicalStaffReport) => {
+                                    return (
+                                      total +
+                                      technicalStaffReport.properties.reduce(
+                                        (acc, property) => {
+                                          return (
+                                            acc +
+                                            (property.statusCounts.find(
+                                              (count) => count.status === "Open"
+                                            )?.count || 0)
+                                          );
+                                        },
+                                        0
+                                      )
+                                    );
+                                  },
+                                  0
+                                )}
+                              </td>
+                              <td>
+                                {technicalStaffReports.reduce(
+                                  (total, technicalStaffReport) => {
+                                    return (
+                                      total +
+                                      technicalStaffReport.properties.reduce(
+                                        (acc, property) => {
+                                          return (
+                                            acc +
+                                            (property.statusCounts.find(
+                                              (count) =>
+                                                count.status === "Inprogress"
+                                            )?.count || 0)
+                                          );
+                                        },
+                                        0
+                                      )
+                                    );
+                                  },
+                                  0
+                                )}
+                              </td>
+                              <td>
+                                {technicalStaffReports.reduce(
+                                  (total, technicalStaffReport) => {
+                                    return (
+                                      total +
+                                      technicalStaffReport.properties.reduce(
+                                        (acc, property) => {
+                                          return (
+                                            acc +
+                                            (property.statusCounts.find(
+                                              (count) =>
+                                                count.status === "Completed"
+                                            )?.count || 0)
+                                          );
+                                        },
+                                        0
+                                      )
+                                    );
+                                  },
+                                  0
+                                )}
                               </td>
                             </tr>
                           </tfoot>
@@ -518,7 +774,21 @@ const ManagementReports = () => {
                           </tbody>
                           <tfoot>
                             <tr>
-                              <td colSpan="4">Total</td>
+                              <td colSpan="3">Total</td>
+                              <td>
+                                {/* Calculate and display the sum of Total */}
+                                {applicants.reduce((total, applicant) => {
+                                  return (
+                                    total +
+                                    applicant.properties.reduce(
+                                      (acc, property) => {
+                                        return acc + property.totalApplicants;
+                                      },
+                                      0
+                                    )
+                                  );
+                                }, 0)}
+                              </td>
                               <td>
                                 {applicants.reduce((total, applicant) => {
                                   return (
