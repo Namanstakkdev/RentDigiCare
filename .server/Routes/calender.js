@@ -260,6 +260,11 @@ router.post("/report", authToken, async (req, res) => {
           totalAppointments: 1,
         },
       },
+      {
+        $sort: {
+          managerName: 1,
+        },
+      },
     ]);
 
     res.status(200).json({
