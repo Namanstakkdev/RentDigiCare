@@ -938,6 +938,7 @@ router.post("/report", authToken, async (req, res) => {
           },
           totalTickets: { $sum: 1 },
           statusCounts: { $push: "$status" },
+          assignedToTypes: { $push: "$assignedToType" },
         },
       },
       {
@@ -951,6 +952,7 @@ router.post("/report", authToken, async (req, res) => {
             status: "$statusCounts",
           },
           count: { $sum: 1 },
+          assignedToTypes: { $first: "$assignedToTypes" },
         },
       },
       {
@@ -966,6 +968,39 @@ router.post("/report", authToken, async (req, res) => {
               count: "$count",
             },
           },
+          assignedToTypes: { $first: "$assignedToTypes" },
+        },
+      },
+      {
+        $unwind: "$assignedToTypes",
+      },
+      {
+        $group: {
+          _id: {
+            managerName: "$_id.managerName",
+            property: "$_id.property",
+            assignedToType: "$assignedToTypes",
+          },
+          count: { $sum: 1 },
+          totalTickets: { $first: "$totalTickets" },
+          statusCounts: { $first: "$statusCounts" },
+        },
+      },
+      {
+        $group: {
+          _id: {
+            managerName: "$_id.managerName",
+            property: "$_id.property",
+          },
+          totalTickets: { $first: "$totalTickets" },
+          statusCounts: { $first: "$statusCounts" },
+          assignedToTypes: {
+            $push: {
+              assignedToType: "$_id.assignedToType",
+              assignedStatus: "$_id.status",
+              count: "$count",
+            },
+          },
         },
       },
       {
@@ -976,6 +1011,7 @@ router.post("/report", authToken, async (req, res) => {
               name: "$_id.property",
               totalTickets: "$totalTickets",
               statusCounts: "$statusCounts",
+              assignedToTypes: "$assignedToTypes",
             },
           },
         },
@@ -1001,6 +1037,8 @@ router.post("/report", authToken, async (req, res) => {
       .json({ status: 500, message: "Something Went Wrong", tickets: [] });
   }
 });
+
+
 
 router.post("/filter_tickets_vendor", async (req, res) => {
   if (req.body.vendorId !== undefined) {
