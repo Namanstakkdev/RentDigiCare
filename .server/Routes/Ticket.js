@@ -3280,8 +3280,21 @@ router.post("/update_status", authToken, async (req, res) => {
             : req.body.status,
           isMovedToVendorPortal: false,
           assignSpecificVendors: [],
-          $unset: { assignedTo: "" },
+          $unset: { assignedTo: "", timeTaken: "", comment: "" },
           assignedToType: "",
+          $push: { history: historyValue },
+        }
+      );
+    } else if (req.body.status == "Completed") {
+      await Ticket.updateOne(
+        { _id: req.body.ticketID },
+        {
+          status: req.body.status,
+          internalStatus: req.body.internalStatus
+            ? req.body.internalStatus
+            : req.body.status,
+          timeTaken: req.body.timeTaken,
+          comment: req.body.comment,
           $push: { history: historyValue },
         }
       );
@@ -3293,6 +3306,7 @@ router.post("/update_status", authToken, async (req, res) => {
           internalStatus: req.body.internalStatus
             ? req.body.internalStatus
             : req.body.status,
+          $unset: { timeTaken: "", comment: "" },
           $push: { history: historyValue },
         }
       );
