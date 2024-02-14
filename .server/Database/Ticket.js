@@ -137,6 +137,14 @@ const ticketSchema = mongoose.Schema(
       type: [mongoose.Schema.ObjectId],
       ref: "PropertyManager",
     },
+    timeTaken: {
+      type: Number,
+      default: null,
+    },
+    comment: {
+      type: String,
+      default: "",
+    },
   },
   { timestamps: true }
 );

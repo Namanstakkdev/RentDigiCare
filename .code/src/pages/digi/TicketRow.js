@@ -118,6 +118,18 @@ export default function TicketRow(props) {
   const [showNotes, setShowNotes] = useState([]);
 
   const [checkboxes, setCheckboxes] = useState({ yes: false, no: false });
+
+  const [timeTaken, setTimeTaken] = useState(null);
+  const [comment, setComment] = useState(null);
+
+  const handleTimeChange = (event) => {
+    setTimeTaken(event.target.value);
+  };
+
+  const handleCommentChange = (event) => {
+    setComment(event.target.value);
+  };
+
   function removeBodyCss() {
     document.body.classList.add("no_padding");
   }
@@ -425,6 +437,8 @@ export default function TicketRow(props) {
       const response = await axios.post(CHANGE_STATUS, {
         ticketID: ticketID,
         status: ticketStatus,
+        timeTaken,
+        comment,
       });
       setLoading(false);
       if (response.data.success) {
@@ -932,6 +946,31 @@ export default function TicketRow(props) {
                     <div className="col-md-4">
                       <div className="mb-3">
                         <Label
+                          className="form-Label"
+                          htmlFor="formrow-room-input"
+                        >
+                          Assigned To
+                        </Label>
+                        <Input
+                          type="text"
+                          value={
+                            assignedVendor
+                              ? assignedVendor + " ( " + assignedRole + " ) "
+                              : "No AssignedTo"
+                          }
+                          onChange={(e) => {
+                            setAssignedVendor(e.target.value);
+                          }}
+                          className="form-control"
+                          id="formrow-room-input"
+                          readOnly={true}
+                        />
+                      </div>
+                    </div>
+
+                    <div className="col-md-4">
+                      <div className="mb-3">
+                        <Label
                           className="form-label"
                           htmlFor="formrow-phone-input"
                         >
@@ -966,23 +1005,48 @@ export default function TicketRow(props) {
                         ></textarea>
                       </div>
                     </div>
-                    <div className="col-md-12">
-                      <div className="mb-3">
-                        <label
-                          htmlFor="basicpill-address-input"
-                          className="form-label"
-                        >
-                          Customer Feedback
-                        </label>
-                        <textarea
-                          id="basicpill-address-input"
-                          className="form-control"
-                          rows="3"
-                          readOnly
-                          placeholder={props?.ticket?.reviews}
-                        ></textarea>
-                      </div>
-                    </div>
+                    {props.status === "Completed" && (
+                      <>
+                        <div className="col-md-12">
+                          <div className="mb-3">
+                            <label
+                              htmlFor="basicpill-address-input"
+                              className="form-label"
+                            >
+                              Time Taken (in hours)
+                            </label>
+                            <input
+                              id="basicpill-address-input"
+                              className="form-control"
+                              type="text"
+                              rows="3"
+                              readOnly
+                              value={
+                                props?.ticket?.timeTaken || "No Time Taken"
+                              }
+                            />
+                          </div>
+                        </div>
+
+                        <div className="col-md-12">
+                          <div className="mb-3">
+                            <label
+                              htmlFor="basicpill-address-input"
+                              className="form-label"
+                            >
+                              Comment
+                            </label>
+                            <textarea
+                              id="basicpill-address-input"
+                              className="form-control"
+                              rows="3"
+                              readOnly
+                              value={props?.ticket?.comment || "No Comment"}
+                            ></textarea>
+                          </div>
+                        </div>
+                      </>
+                    )}
                   </div>
                 </Form>
               </TabPane>
@@ -1237,8 +1301,35 @@ export default function TicketRow(props) {
           {/* </div> */}
           <ModalBody>
             <div className="modal-body">
-              {/* <h3>Are You Sure !</h3> */}
               <h5>Are You Sure?</h5>
+              {ticketStatus === "Completed" && (
+                <div>
+                  <div className="mb-3">
+                    <label htmlFor="timeTaken" className="form-label">
+                      Time Taken (in hours)
+                    </label>
+                    <input
+                      type="number"
+                      className="form-control"
+                      id="timeTaken"
+                      value={timeTaken}
+                      onChange={handleTimeChange}
+                    />
+                  </div>
+                  <div className="mb-3">
+                    <label htmlFor="comment" className="form-label">
+                      Comment
+                    </label>
+                    <textarea
+                      className="form-control"
+                      id="comment"
+                      rows="3"
+                      value={comment}
+                      onChange={handleCommentChange}
+                    ></textarea>
+                  </div>
+                </div>
+              )}
             </div>
           </ModalBody>
           <ModalFooter>
