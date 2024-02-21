@@ -70,6 +70,10 @@ const newsletterRouter = require("./Routes/RentdigicareNewsletters");
 
 //user appointment
 const userAppointment = require("./Routes/user_appointment");
+
+// Work Scheduling
+const workScheduling = require("./Routes/WorkScheduling.js");
+
 // Test Router
 const testRouter = require("./Routes/Test");
 
@@ -120,6 +124,8 @@ app.use("/vendor", Vendor);
 app.use("/technicalStaff", TechnicalStaff);
 app.use("/requesttype", companyRequestType);
 app.use("/permissiontype", CompanyPermissionType);
+
+app.use("/workScheduling", workScheduling);
 
 app.get("/operation", (req, res) => {
   try {
