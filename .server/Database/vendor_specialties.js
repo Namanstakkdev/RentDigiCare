@@ -22,6 +22,4 @@ const vendorSpecialtiesSchema = new mongoose.Schema({
 
 })
 
-
-
 module.exports = mongoose.model("vendorSpecialties", vendorSpecialtiesSchema);
