@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useParams } from "react-router";
 import "./style.css";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import MetaTags from "react-meta-tags";
 import moment from "moment";
@@ -27,6 +27,8 @@ import { SERVER_URL } from "../ServerLink";
 import Select from "react-select";
 import favicon from "../../assets/favicon.ico";
 function Calendarurl() {
+  const location = useLocation();
+
   // const [value, onChange] = useState(new Date());
   const [dateFromAPi, setdateFromAPi] = useState([]);
   const [date, setDate] = useState(new Date());
@@ -62,6 +64,7 @@ function Calendarurl() {
   const [reasonType, setReasonType] = useState([]);
   const [reason, setReason] = useState("");
   const formRef = useRef();
+  const [filteredProperties, setFilteredProperties] = useState([]);
   const [propertyName, setPropertyName] = useState("");
   const [contact, setContact] = useState("");
   const [logoo, setlogoo] = useState("");
@@ -69,6 +72,7 @@ function Calendarurl() {
   const GET_CUSTOMER_TICKETS = "/calender/customer_tickets";
   const GET_EVENTS_OF_DATE = "/user_appointment/get-todays-event";
   const moment = require("moment");
+  const [queryPropertyName, setQueryPropertyName] = useState("");
 
   let addMoment;
   let splitedTime = [];
@@ -80,6 +84,25 @@ function Calendarurl() {
 
     getManagerid(id);
   }, []);
+
+  useEffect(() => {
+    const searchParams = new URLSearchParams(location.search);
+    const propertyName = searchParams.get("propertyName");
+    setQueryPropertyName(propertyName);
+  }, [location]);
+
+  useEffect(() => {
+    if (queryPropertyName) {
+      // If propertyName is received, filter the properties based on it
+      const filteredProperty = properties.find(
+        (item) => item.title === queryPropertyName
+      );
+      setFilteredProperties(filteredProperty ? [filteredProperty] : []);
+    } else {
+      setFilteredProperties(properties);
+    }
+  }, [propertyName, properties]);
+
   const getManagerid = async (managerID) => {
     let res = await fetch(
       SERVER_URL + `/user_appointment/get-id/?id=${managerID}`
@@ -511,9 +534,9 @@ function Calendarurl() {
                       }}
                     >
                       <option>Select Property</option>
-                      {properties.length > 0 ? (
+                      {filteredProperties.length > 0 ? (
                         <>
-                          {properties?.map((item) => {
+                          {filteredProperties?.map((item) => {
                             return (
                               <option value={item._id}>{item.title}</option>
                             );
