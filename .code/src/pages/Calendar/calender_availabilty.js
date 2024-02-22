@@ -11,6 +11,7 @@ import moment, { utc } from "moment";
 //Import Breadcrumb
 import Breadcrumbs from "../../components/Common/Breadcrumb";
 
+import Select from "react-select";
 import jwt_decode from "jwt-decode";
 import axios from "../api/axios";
 
@@ -326,6 +327,11 @@ const Calender_availabilty = () => {
     setDayAvailability(changedData);
   };
 
+const options = splitTime.map((startTime) => ({
+  value: startTime.toLowerCase().trim(),
+  label: startTime,
+}));
+
   return (
     <React.Fragment>
       <div className="page-content">
@@ -382,52 +388,50 @@ const Calender_availabilty = () => {
                             {dayRow.slots.map((slot, j) => {
                               return (
                                 <div className="row align-items-center mb-3">
-                                  {/* <Label htmlFor="example-time-input" className="form-Label">Start Time</Label> */}
                                   <div className="col-md-4">
-                                    <select
-                                      className="form-select"
-                                      value={slot.startTime}
-                                      onChange={(e) => {
+                                    <Select
+                                      className=""
+                                      name="Start Time"
+                                      value={{
+                                        value: slot.startTime
+                                          .toLowerCase()
+                                          .trim(),
+                                        label: slot.startTime,
+                                      }}
+                                      onChange={(selectedOption) => {
                                         changeAvailability(
                                           i,
                                           "startTime",
-                                          e.target.value,
+                                          selectedOption.value,
                                           j
                                         );
                                       }}
-                                    >
-                                      {splitTime.map((newTime) => {
-                                        return (
-                                          <option value={newTime}>
-                                            {newTime}
-                                          </option>
-                                        );
-                                      })}
-                                    </select>
+                                      options={options}
+                                    />
                                   </div>
+
                                   <div className="col-md-4">
-                                    {/* <Label htmlFor="example-time-input" className="form-Label">Start Time</Label> */}
-                                    <select
-                                      className="form-select"
-                                      value={slot.endTime}
-                                      onChange={(e) => {
+                                    <Select
+                                      className=""
+                                      name="End Time"
+                                      value={{
+                                        value: slot.endTime
+                                          .toLowerCase()
+                                          .trim(),
+                                        label: slot.endTime,
+                                      }}
+                                      onChange={(selectedOption) => {
                                         changeAvailability(
                                           i,
                                           "endTime",
-                                          e.target.value,
+                                          selectedOption.value,
                                           j
                                         );
                                       }}
-                                    >
-                                      {splitTime.map((newTime) => {
-                                        return (
-                                          <option value={newTime}>
-                                            {newTime}
-                                          </option>
-                                        );
-                                      })}
-                                    </select>
+                                      options={options}
+                                    />
                                   </div>
+
                                   <div className="col-md-4">
                                     {j == 0 ? (
                                       <button

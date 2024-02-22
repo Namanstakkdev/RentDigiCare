@@ -182,6 +182,7 @@ exports.sendMailforAppointment_twelve_hour = async () => {
     console.log(error);
   }
 };
+
 exports.SentApplicationsReminder = async () => {
   try {
     //categories the applications 

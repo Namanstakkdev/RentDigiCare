@@ -202,6 +202,8 @@ import BlogDetail from "../pages/blog/BlogDetail";
 import Newsletters from "../pages/Newsletter/Newsletters";
 import ManagementReports from "../pages/ManagerReports/ManagementReports";
 import WorkScheduling from "../pages/ManagerReports/WorkScheduling";
+import Reminders from "../components/Reminders";
+import ReminderTemplate from "../components/ReminderTemplates";
 
 const userRoutes = [
   //dashboard
@@ -345,6 +347,9 @@ const userRoutes = [
   { path: "/request_type", component: AddRequestType },
   { path: "/permissions", component: AddPermission },
   { path: "/emailnotification", component: EmailNotification },
+
+  { path: "/scheduled-jobs", component: Reminders },
+  { path: "/scheduler-templates", component: ReminderTemplate },
 
   { path: "/vendor_tickets", component: VendorTickets },
   { path: "/calendar_reasons", component: ReasonType },

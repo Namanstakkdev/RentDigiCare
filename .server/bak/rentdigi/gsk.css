@@ -1,0 +1,89 @@
+.button {
+    background-color: #231F1F; 
+    color: #fff; 
+    border: none; 
+    border-radius: 30px;
+    font-family: sans-serif;
+    /* padding: 8px 15px; */
+    width: 190px;
+    height: 50px; 
+    cursor: pointer; 
+  }
+  .main-container {
+    background-color: #28ABFF;
+    border-bottom-left-radius: 40px;
+    border-bottom-right-radius: 40px;
+    position: relative;
+    height: 762px; 
+  }
+.text{
+    text-align: center;
+    border-radius: 9px;
+    margin: 0px 352px;
+    background-color: #f2f1f1;
+    height: 700px;
+    width: 800px;
+    position: relative;
+    z-index: 1;
+  }
+  .logo1{
+    text-align: center;
+    padding: 40px 0px;
+    position: relative;
+    z-index: 1;
+  }
+  .heading{
+    color: #28ABFF;
+    font-family: sans-serif;
+    padding-top: 55px;
+  }
+  .detail{
+    font-family: sans-serif;
+  }
+  .logo{
+    text-align: center;
+    margin: 145px 0px;
+  }
+  .container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color:#FFFFFF;
+    font-family: sans-serif;
+    background-color: #28ABFF;
+    padding: 70px 150px; 
+  }
+  .message{
+    margin-left: 85px;
+  }
+  .contact-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color:#FFFFFF;
+    font-family: sans-serif;
+    background-color: #231F1F;
+    padding: 0px 60px; 
+  }
+  .contact-details img {
+    margin-right: 5px;
+  }
+  .contact-details{
+    display: flex;
+    align-items: center;
+  }
+  .options {
+    display: flex;
+    align-items: center;
+  }
+  
+  .vertical-line {
+    height: 20px;
+    border-left: 2px solid #FFFFFF;
+    margin: 0 10px;
+  }
+  .footer{
+    text-align: center;
+    margin: 30px 0px;
+    font-family: sans-serif;
+  }
