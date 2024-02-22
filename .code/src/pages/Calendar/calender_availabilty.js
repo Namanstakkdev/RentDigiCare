@@ -382,7 +382,6 @@ const Calender_availabilty = () => {
                             {dayRow.slots.map((slot, j) => {
                               return (
                                 <div className="row align-items-center mb-3">
-                                  {/* <Label htmlFor="example-time-input" className="form-Label">Start Time</Label> */}
                                   <div className="col-md-4">
                                     <select
                                       className="form-select"
@@ -397,14 +396,27 @@ const Calender_availabilty = () => {
                                       }}
                                     >
                                       {splitTime.map((newTime) => {
+                                        const isSelected =
+                                          newTime.toLowerCase().trim() ===
+                                          slot.startTime.toLowerCase().trim();
+
+                                        console.log(
+                                          { isSelected },
+                                          newTime.toLowerCase().trim(),
+                                          slot.startTime.toLowerCase().trim()
+                                        );
                                         return (
-                                          <option value={newTime}>
+                                          <option
+                                            value={newTime.toLowerCase().trim()}
+                                            selected={isSelected}
+                                          >
                                             {newTime}
                                           </option>
                                         );
                                       })}
                                     </select>
                                   </div>
+
                                   <div className="col-md-4">
                                     {/* <Label htmlFor="example-time-input" className="form-Label">Start Time</Label> */}
                                     <select
@@ -420,8 +432,19 @@ const Calender_availabilty = () => {
                                       }}
                                     >
                                       {splitTime.map((newTime) => {
+                                        const newTimeLower =
+                                          newTime.toLowerCase();
+                                        const newTimeTrimmed =
+                                          newTimeLower.trim();
                                         return (
-                                          <option value={newTime}>
+                                          <option
+                                            key={newTimeTrimmed}
+                                            value={newTimeTrimmed}
+                                            selected={
+                                              newTimeTrimmed ===
+                                              slot.endTime.toLowerCase().trim()
+                                            }
+                                          >
                                             {newTime}
                                           </option>
                                         );
