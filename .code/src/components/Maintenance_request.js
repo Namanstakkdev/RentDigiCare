@@ -465,6 +465,22 @@ class Maintenance_request extends Component {
                 <Col lg={12}>
                   <Card id="ticketStepForm">
                     <CardBody>
+                      {/* Add the small image button link here */}
+                      <div className="text-end">
+                        <Link
+                          to="/maintenance-fyi"
+                          className="btn btn-light"
+                          style={{ padding: "5px" }}
+                        >
+                          <img
+                            src="/images/do_you_know.png"
+                            alt="Info"
+                            style={{ width: "50px", height: "50px" }}
+                          />
+                        </Link>
+                      </div>
+                      {/* End of small image button link */}
+
                       <Row className="tickt-frm-hd justify-content-center mt-3">
                         {/* <Link className="tckt-frm-bck" to="/">
                           <i className="bx bx-left-arrow-alt"></i>
