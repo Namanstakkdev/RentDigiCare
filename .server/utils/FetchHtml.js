@@ -1,8 +1,10 @@
 exports.get = (emailFor, data) => {
   const domain = process.env.DOMAIN;
-  const rentdigicareDomain = process.env.RENTDIGICARE_DOMAIN + ":" + process.env.PORT
+  const rentdigicareDomain =
+    process.env.RENTDIGICARE_DOMAIN + ":" + process.env.PORT;
 
-  const serverAddress = process.env.RENTDIGICARE_DOMAIN + ":" + process.env.PORT;
+  const serverAddress =
+    process.env.RENTDIGICARE_DOMAIN + ":" + process.env.PORT;
   const gskLogo = `${rentdigicareDomain}/images/gsklogo.png`;
   const gskLogo1 = `${rentdigicareDomain}/images/gsklogo1.jpg`;
   const rentdigicareLogo = `${rentdigicareDomain}/images/rentdigicarelogo.png`;
@@ -346,7 +348,9 @@ a[x-apple-data-detectors] {
                   <td valign="top" align="center" style="padding:0;Margin:0;width:520px"> 
                    <table width="100%" cellspacing="0" cellpadding="0" role="presentation" style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse;border-spacing:0px"> 
                      <tr style="border-collapse:collapse"> 
-                      <td align="center" style="padding:0;Margin:0;font-size:0; "><a href="${gskDomain}" target="_blank" style="-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;text-decoration:underline;color:#FFFFFF;font-size:14px"><img src="${data.logo}" alt style="display:block;border:0;outline:none;text-decoration:none;-ms-interpolation-mode:bicubic; height:76px;weight:150px" ></a></td> 
+                      <td align="center" style="padding:0;Margin:0;font-size:0; "><a href="${gskDomain}" target="_blank" style="-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;text-decoration:underline;color:#FFFFFF;font-size:14px"><img src="${
+      data.logo
+    }" alt style="display:block;border:0;outline:none;text-decoration:none;-ms-interpolation-mode:bicubic; height:76px;weight:150px" ></a></td> 
                      </tr> 
                    </table></td> 
                  </tr> 
@@ -369,8 +373,9 @@ a[x-apple-data-detectors] {
                       <td align="center" style="padding:0;Margin:0;padding-bottom:10px;padding-top:40px"><h1 style="Margin:0;line-height:36px;mso-line-height-rule:exactly;font-family:lato, 'helvetica neue', helvetica, arial, sans-serif;font-size:30px;font-style:normal;font-weight:bold;color:#ffffff">WELCOME!</h1></td> 
                      </tr> 
                      <tr style="border-collapse:collapse"> 
-                      <td esdev-links-color="#757575" align="center" style="Margin:0;padding-top:10px;padding-bottom:20px;padding-left:30px;padding-right:30px"><p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:helvetica, 'helvetica neue', arial, verdana, sans-serif;line-height:23px;color:#fffbfb;font-size:15px">A new account has been created for you at '${data.companyName
-      }'
+                      <td esdev-links-color="#757575" align="center" style="Margin:0;padding-top:10px;padding-bottom:20px;padding-left:30px;padding-right:30px"><p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:helvetica, 'helvetica neue', arial, verdana, sans-serif;line-height:23px;color:#fffbfb;font-size:15px">A new account has been created for you at '${
+                        data.companyName
+                      }'
                         and you have been issued with a temporary password.</p></td> 
                      </tr> 
                      <tr style="border-collapse:collapse"> 
@@ -394,8 +399,9 @@ a[x-apple-data-detectors] {
                   <td valign="top" align="center" style="padding:0;Margin:0;width:520px"> 
                    <table width="100%" cellspacing="0" cellpadding="0" role="presentation" style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse;border-spacing:0px">
                     <tr style="border-collapse:collapse"> 
-                      <td align="left" style="padding:0;Margin:0;padding-bottom:10px; padding-top:15px;"><p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:helvetica, 'helvetica neue', arial, verdana, sans-serif;line-height:23px;color:#000000;font-size:15px">Dear, ${data.managerName
-      }</p></td>                       
+                      <td align="left" style="padding:0;Margin:0;padding-bottom:10px; padding-top:15px;"><p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:helvetica, 'helvetica neue', arial, verdana, sans-serif;line-height:23px;color:#000000;font-size:15px">Dear, ${
+                        data.managerName
+                      }</p></td>                       
                      </tr> 
                      <tr style="border-collapse:collapse"> 
 
@@ -413,9 +419,11 @@ a[x-apple-data-detectors] {
                       <td class="es-m-txt-c" align="left" style="padding:0;margin-top:15px; margin-bottom:15px; height: 1px; background: #ddd; "></td> 
                      </tr> 
                      <tr style="border-collapse:collapse"> 
-                      <td align="left" style="padding:0;Margin:0;padding-bottom:10px; padding-top:15px;"><p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:helvetica, 'helvetica neue', arial, verdana, sans-serif;line-height:23px;color:#555555;font-size:15px"><strong>Email:</strong> ${data.email
-      }<br><strong>Password:</strong> ${data.password
-      } <br>(Kindly change your passowrd after you login the first time.)</p></td>                       
+                      <td align="left" style="padding:0;Margin:0;padding-bottom:10px; padding-top:15px;"><p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:helvetica, 'helvetica neue', arial, verdana, sans-serif;line-height:23px;color:#555555;font-size:15px"><strong>Email:</strong> ${
+                        data.email
+                      }<br><strong>Password:</strong> ${
+      data.password
+    } <br>(Kindly change your passowrd after you login the first time.)</p></td>                       
                      </tr> 
                      <!-- <tr style="border-collapse:collapse"> 
                       <td align="left" style="padding:0;Margin:0;padding-bottom:10px; "><p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:helvetica, 'helvetica neue', arial, verdana, sans-serif;line-height:23px;color:#555555;font-size:15px"><strong>Password:</strong> password@123 <br>(Kindly change your passowrd after you login the first time.)</p></td> 
@@ -426,14 +434,16 @@ a[x-apple-data-detectors] {
                      <tr>
                      <td align="left" style="padding:0;Margin:0;padding-top:10px;padding-bottom:10px"><p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:helvetica, 'helvetica neue', arial, verdana, sans-serif;line-height:23px;color:#555555;font-size:15px"><strong>You have been given following privileges:</strong><br>
                      
-                     ${data.privileges.ticketPrivilege
-        ? "Maintenance Request"
-        : ""
-      }<br>
-                      ${data.privileges.applicationPrivilege
-        ? "Applications"
-        : ""
-      }<br>
+                     ${
+                       data.privileges.ticketPrivilege
+                         ? "Maintenance Request"
+                         : ""
+                     }<br>
+                      ${
+                        data.privileges.applicationPrivilege
+                          ? "Applications"
+                          : ""
+                      }<br>
                       ${data.privileges.calendarPrivilege ? "Calendar" : ""}
                       
                       </p>   
@@ -445,8 +455,9 @@ a[x-apple-data-detectors] {
                       <td align="left" style="padding:0;Margin:0;padding-top:10px;padding-bottom:10px"><p href="${domain}/login" style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:helvetica, 'helvetica neue', arial, verdana, sans-serif;line-height:23px;color:#555555;font-size:15px">${domain}/login<br></p></td> 
                      </tr>\t\t\t\t\t  -->
                      <tr style="border-collapse:collapse"> 
-                      <td align="left" style="padding:0;Margin:0;padding-top:10px;padding-bottom:10px"><p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:helvetica, 'helvetica neue', arial, verdana, sans-serif;line-height:23px;color:#555555;font-size:15px">Cheers,<br><strong>Team ${data.companyName
-      }</strong></p></td> 
+                      <td align="left" style="padding:0;Margin:0;padding-top:10px;padding-bottom:10px"><p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:helvetica, 'helvetica neue', arial, verdana, sans-serif;line-height:23px;color:#555555;font-size:15px">Cheers,<br><strong>Team ${
+                        data.companyName
+                      }</strong></p></td> 
                      </tr> 
                      <!-- <tr style="border-collapse:collapse margin-top: 20px"> 
                       <td align="left" style="padding:0;Margin:0;padding-top:10px;padding-bottom:10px"><p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:helvetica, 'helvetica neue', arial, verdana, sans-serif;line-height:23px;color:#555555;font-size:15px"><strong>Rentdigicare</strong></p></td> 
@@ -616,7 +627,9 @@ a[x-apple-data-detectors] {
                   <td valign="top" align="center" style="padding:0;Margin:0;width:520px"> 
                    <table width="100%" cellspacing="0" cellpadding="0" role="presentation" style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse;border-spacing:0px"> 
                      <tr style="border-collapse:collapse"> 
-                      <td align="center" style="padding:0;Margin:0;font-size:0; "><a href="${gskDomain}" target="_blank" style="-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;text-decoration:underline;color:#FFFFFF;font-size:14px"><img src="${data.logo}" alt style="display:block;border:0;outline:none;text-decoration:none;-ms-interpolation-mode:bicubic; height:76px;weight:150px" ></a></td> 
+                      <td align="center" style="padding:0;Margin:0;font-size:0; "><a href="${gskDomain}" target="_blank" style="-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;text-decoration:underline;color:#FFFFFF;font-size:14px"><img src="${
+      data.logo
+    }" alt style="display:block;border:0;outline:none;text-decoration:none;-ms-interpolation-mode:bicubic; height:76px;weight:150px" ></a></td> 
                      </tr> 
                    </table></td> 
                  </tr> 
@@ -639,8 +652,9 @@ a[x-apple-data-detectors] {
                       <td align="center" style="padding:0;Margin:0;padding-bottom:10px;padding-top:40px"><h1 style="Margin:0;line-height:36px;mso-line-height-rule:exactly;font-family:lato, 'helvetica neue', helvetica, arial, sans-serif;font-size:30px;font-style:normal;font-weight:bold;color:#ffffff">Update!</h1></td> 
                      </tr> 
                      <tr style="border-collapse:collapse"> 
-                      <td esdev-links-color="#757575" align="center" style="Margin:0;padding-top:10px;padding-bottom:20px;padding-left:30px;padding-right:30px"><p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:helvetica, 'helvetica neue', arial, verdana, sans-serif;line-height:23px;color:#fffbfb;font-size:15px">Your Company '${data.companyName
-      }' has update your privileges.  
+                      <td esdev-links-color="#757575" align="center" style="Margin:0;padding-top:10px;padding-bottom:20px;padding-left:30px;padding-right:30px"><p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:helvetica, 'helvetica neue', arial, verdana, sans-serif;line-height:23px;color:#fffbfb;font-size:15px">Your Company '${
+                        data.companyName
+                      }' has update your privileges.  
                        </p></td> 
                      </tr> 
                      <tr style="border-collapse:collapse"> 
@@ -664,44 +678,51 @@ a[x-apple-data-detectors] {
                   <td valign="top" align="center" style="padding:0;Margin:0;width:520px"> 
                    <table width="100%" cellspacing="0" cellpadding="0" role="presentation" style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse;border-spacing:0px">
                     <tr style="border-collapse:collapse"> 
-                      <td align="left" style="padding:0;Margin:0;padding-bottom:10px; padding-top:15px;"><p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:helvetica, 'helvetica neue', arial, verdana, sans-serif;line-height:23px;color:#000000;font-size:15px">Dear, ${data.managerName
-      }</p></td>                       
+                      <td align="left" style="padding:0;Margin:0;padding-bottom:10px; padding-top:15px;"><p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:helvetica, 'helvetica neue', arial, verdana, sans-serif;line-height:23px;color:#000000;font-size:15px">Dear, ${
+                        data.managerName
+                      }</p></td>                       
                      </tr> 
                
                   
 
                      <tr>
                      <td align="left" style="padding:0;Margin:0;padding-top:10px;padding-bottom:10px"><p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:helvetica, 'helvetica neue', arial, verdana, sans-serif;line-height:23px;color:#555555;font-size:15px"><strong>Following privileges have been removed :</strong>  <br>                
-                     ${data.privileges.newPrivileges?.ticketPrivilege
-        ? ""
-        : "Maintenance Request <br>"
-      }
-                      ${data.privileges.newPrivileges?.applicationPrivilege
-        ? ""
-        : "Applications <br>"
-      }<br>
-                      ${data.privileges.newPrivileges?.calendarPrivilege
-        ? ""
-        : "Calendar"
-      }
+                     ${
+                       data.privileges.newPrivileges?.ticketPrivilege
+                         ? ""
+                         : "Maintenance Request <br>"
+                     }
+                      ${
+                        data.privileges.newPrivileges?.applicationPrivilege
+                          ? ""
+                          : "Applications <br>"
+                      }<br>
+                      ${
+                        data.privileges.newPrivileges?.calendarPrivilege
+                          ? ""
+                          : "Calendar"
+                      }
                       
                       </p>   
                      </tr>
                      </tr>
                      <tr>
                      <td align="left" style="padding:0;Margin:0;padding-top:10px;padding-bottom:10px"><p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:helvetica, 'helvetica neue', arial, verdana, sans-serif;line-height:23px;color:#555555;font-size:15px"><strong>Following privileges have been added :</strong><br>                   
-                     ${data.privileges.newPrivileges?.ticketPrivilege
-        ? "Maintenance Request <br>"
-        : ""
-      }
-                      ${data.privileges.newPrivileges?.applicationPrivilege
-        ? "Applications <br>"
-        : ""
-      }
-                      ${data.privileges.newPrivileges?.calendarPrivilege
-        ? "Calendar"
-        : ""
-      }
+                     ${
+                       data.privileges.newPrivileges?.ticketPrivilege
+                         ? "Maintenance Request <br>"
+                         : ""
+                     }
+                      ${
+                        data.privileges.newPrivileges?.applicationPrivilege
+                          ? "Applications <br>"
+                          : ""
+                      }
+                      ${
+                        data.privileges.newPrivileges?.calendarPrivilege
+                          ? "Calendar"
+                          : ""
+                      }
                       
                       </p>   
                      </tr>
@@ -721,8 +742,9 @@ a[x-apple-data-detectors] {
                      <tr style="border-collapse:collapse"> 
 
 
-                      <td align="left" style="padding:0;Margin:0;padding-top:10px;padding-bottom:10px"><p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:helvetica, 'helvetica neue', arial, verdana, sans-serif;line-height:23px;color:#555555;font-size:15px">Cheers,<br><strong>Team ${data.companyName
-      }</strong></p></td> 
+                      <td align="left" style="padding:0;Margin:0;padding-top:10px;padding-bottom:10px"><p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:helvetica, 'helvetica neue', arial, verdana, sans-serif;line-height:23px;color:#555555;font-size:15px">Cheers,<br><strong>Team ${
+                        data.companyName
+                      }</strong></p></td> 
                      </tr> 
                      <!-- <tr style="border-collapse:collapse margin-top: 20px"> 
                       <td align="left" style="padding:0;Margin:0;padding-top:10px;padding-bottom:10px"><p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:helvetica, 'helvetica neue', arial, verdana, sans-serif;line-height:23px;color:#555555;font-size:15px"><strong>Rentdigicare</strong></p></td> 
@@ -796,10 +818,7 @@ a[x-apple-data-detectors] {
 </html>
     `;
   }
-  if (
-    emailFor === "ADD_PROPERTY_VENDOR" ||
-    emailFor === "ADD_CUSTOMER"
-  ) {
+  if (emailFor === "ADD_PROPERTY_VENDOR" || emailFor === "ADD_CUSTOMER") {
     return `
     <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
     <html xmlns="http://www.w3.org/1999/xhtml" xmlns:o="urn:schemas-microsoft-com:office:office" style="width:100%;font-family:helvetica, 'helvetica neue', arial, verdana, sans-serif;-webkit-text-size-adjust:100%;-ms-text-size-adjust:100%;padding:0;Margin:0"> 
@@ -894,7 +913,9 @@ a[x-apple-data-detectors] {
               <td valign="top" align="center" style="padding:0;Margin:0;width:520px"> 
                <table width="100%" cellspacing="0" cellpadding="0" role="presentation" style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse;border-spacing:0px"> 
                  <tr style="border-collapse:collapse"> 
-                  <td align="center" style="padding:0;Margin:0;font-size:0; "><a href="${gskDomain}" target="_blank" style="-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;text-decoration:underline;color:#FFFFFF;font-size:14px"><img src="${data.logo}" alt style="display:block;border:0;outline:none;text-decoration:none;-ms-interpolation-mode:bicubic; height:76px;weight:150px" ></a></td> 
+                  <td align="center" style="padding:0;Margin:0;font-size:0; "><a href="${gskDomain}" target="_blank" style="-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;text-decoration:underline;color:#FFFFFF;font-size:14px"><img src="${
+      data.logo
+    }" alt style="display:block;border:0;outline:none;text-decoration:none;-ms-interpolation-mode:bicubic; height:76px;weight:150px" ></a></td> 
                  </tr> 
                </table></td> 
              </tr> 
@@ -917,7 +938,9 @@ a[x-apple-data-detectors] {
                   <td align="center" style="padding:0;Margin:0;padding-bottom:10px;padding-top:40px"><h1 style="Margin:0;line-height:36px;mso-line-height-rule:exactly;font-family:lato, 'helvetica neue', helvetica, arial, sans-serif;font-size:30px;font-style:normal;font-weight:bold;color:#ffffff">WELCOME!</h1></td> 
                  </tr> 
                  <tr style="border-collapse:collapse"> 
-                  <td esdev-links-color="#757575" align="center" style="Margin:0;padding-top:10px;padding-bottom:20px;padding-left:30px;padding-right:30px"><p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:helvetica, 'helvetica neue', arial, verdana, sans-serif;line-height:23px;color:#fffbfb;font-size:15px">A new account has been created for you at '${data?.companyName}'
+                  <td esdev-links-color="#757575" align="center" style="Margin:0;padding-top:10px;padding-bottom:20px;padding-left:30px;padding-right:30px"><p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:helvetica, 'helvetica neue', arial, verdana, sans-serif;line-height:23px;color:#fffbfb;font-size:15px">A new account has been created for you at '${
+                    data?.companyName
+                  }'
                     and you have been issued with a temporary password.</p></td> 
                  </tr> 
                  <tr style="border-collapse:collapse"> 
@@ -941,7 +964,9 @@ a[x-apple-data-detectors] {
               <td valign="top" align="center" style="padding:0;Margin:0;width:520px"> 
                <table width="100%" cellspacing="0" cellpadding="0" role="presentation" style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse;border-spacing:0px">
                 <tr style="border-collapse:collapse"> 
-                  <td align="left" style="padding:0;Margin:0;padding-bottom:10px; padding-top:15px;"><p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:helvetica, 'helvetica neue', arial, verdana, sans-serif;line-height:23px;color:#000000;font-size:15px">Dear, ${data?.managerName || ""}</p></td>                       
+                  <td align="left" style="padding:0;Margin:0;padding-bottom:10px; padding-top:15px;"><p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:helvetica, 'helvetica neue', arial, verdana, sans-serif;line-height:23px;color:#000000;font-size:15px">Dear, ${
+                    data?.managerName || ""
+                  }</p></td>                       
                  </tr> 
                  <tr style="border-collapse:collapse"> 
                   <td class="es-m-txt-c" align="left" style="padding:0;Margin:0;padding-top:5px;padding-bottom:15px"><h2 style="Margin:0;line-height:24px;mso-line-height-rule:exactly;font-family:lato, 'helvetica neue', helvetica, arial, sans-serif;font-size:20px;font-style:normal;font-weight:bold;color:#333333">Your current login information is:</h2></td> 
@@ -950,7 +975,11 @@ a[x-apple-data-detectors] {
                   <td class="es-m-txt-c" align="left" style="padding:0;margin-top:15px; margin-bottom:15px; height: 1px; background: #ddd; "></td> 
                  </tr> 
                  <tr style="border-collapse:collapse"> 
-                  <td align="left" style="padding:0;Margin:0;padding-bottom:10px; padding-top:15px;"><p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:helvetica, 'helvetica neue', arial, verdana, sans-serif;line-height:23px;color:#555555;font-size:15px"><strong>Email:</strong> ${data?.email || ""}<br><strong>Password:</strong> ${data?.password || ""} <br>(Kindly change your passowrd after you login the first time.)</p></td>                       
+                  <td align="left" style="padding:0;Margin:0;padding-bottom:10px; padding-top:15px;"><p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:helvetica, 'helvetica neue', arial, verdana, sans-serif;line-height:23px;color:#555555;font-size:15px"><strong>Email:</strong> ${
+                    data?.email || ""
+                  }<br><strong>Password:</strong> ${
+      data?.password || ""
+    } <br>(Kindly change your passowrd after you login the first time.)</p></td>                       
                  </tr> 
                  <!-- <tr style="border-collapse:collapse"> 
                   <td align="left" style="padding:0;Margin:0;padding-bottom:10px; "><p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:helvetica, 'helvetica neue', arial, verdana, sans-serif;line-height:23px;color:#555555;font-size:15px"><strong>Password:</strong> password@123 <br>(Kindly change your passowrd after you login the first time.)</p></td> 
@@ -965,7 +994,9 @@ a[x-apple-data-detectors] {
                   <td align="left" style="padding:0;Margin:0;padding-top:10px;padding-bottom:10px"><p href="${domain}/login" style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:helvetica, 'helvetica neue', arial, verdana, sans-serif;line-height:23px;color:#555555;font-size:15px">${domain}/login<br></p></td> 
                  </tr>\t\t\t\t\t  -->
                  <tr style="border-collapse:collapse"> 
-                  <td align="left" style="padding:0;Margin:0;padding-top:10px;padding-bottom:10px"><p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:helvetica, 'helvetica neue', arial, verdana, sans-serif;line-height:23px;color:#555555;font-size:15px">Cheers,<br><strong>Team ${data?.companyName || ""}</strong></p></td> 
+                  <td align="left" style="padding:0;Margin:0;padding-top:10px;padding-bottom:10px"><p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:helvetica, 'helvetica neue', arial, verdana, sans-serif;line-height:23px;color:#555555;font-size:15px">Cheers,<br><strong>Team ${
+                    data?.companyName || ""
+                  }</strong></p></td> 
                  </tr> 
                  <!-- <tr style="border-collapse:collapse margin-top: 20px"> 
                   <td align="left" style="padding:0;Margin:0;padding-top:10px;padding-bottom:10px"><p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:helvetica, 'helvetica neue', arial, verdana, sans-serif;line-height:23px;color:#555555;font-size:15px"><strong>Rentdigicare</strong></p></td> 
@@ -1039,9 +1070,7 @@ a[x-apple-data-detectors] {
 </html>
 `;
   }
-  if (
-    emailFor === "ADD_TECHNICAL_STAFF" 
-  ) {
+  if (emailFor === "ADD_TECHNICAL_STAFF") {
     return `
     <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
     <html xmlns="http://www.w3.org/1999/xhtml" xmlns:o="urn:schemas-microsoft-com:office:office" style="width:100%;font-family:helvetica, 'helvetica neue', arial, verdana, sans-serif;-webkit-text-size-adjust:100%;-ms-text-size-adjust:100%;padding:0;Margin:0"> 
@@ -1136,7 +1165,9 @@ a[x-apple-data-detectors] {
               <td valign="top" align="center" style="padding:0;Margin:0;width:520px"> 
                <table width="100%" cellspacing="0" cellpadding="0" role="presentation" style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse;border-spacing:0px"> 
                  <tr style="border-collapse:collapse"> 
-                  <td align="center" style="padding:0;Margin:0;font-size:0; "><a href="${gskDomain}" target="_blank" style="-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;text-decoration:underline;color:#FFFFFF;font-size:14px"><img src="${data.logo}" alt style="display:block;border:0;outline:none;text-decoration:none;-ms-interpolation-mode:bicubic; height:76px;weight:150px" ></a></td> 
+                  <td align="center" style="padding:0;Margin:0;font-size:0; "><a href="${gskDomain}" target="_blank" style="-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;text-decoration:underline;color:#FFFFFF;font-size:14px"><img src="${
+      data.logo
+    }" alt style="display:block;border:0;outline:none;text-decoration:none;-ms-interpolation-mode:bicubic; height:76px;weight:150px" ></a></td> 
                  </tr> 
                </table></td> 
              </tr> 
@@ -1159,7 +1190,9 @@ a[x-apple-data-detectors] {
                   <td align="center" style="padding:0;Margin:0;padding-bottom:10px;padding-top:40px"><h1 style="Margin:0;line-height:36px;mso-line-height-rule:exactly;font-family:lato, 'helvetica neue', helvetica, arial, sans-serif;font-size:30px;font-style:normal;font-weight:bold;color:#ffffff">WELCOME!</h1></td> 
                  </tr> 
                  <tr style="border-collapse:collapse"> 
-                  <td esdev-links-color="#757575" align="center" style="Margin:0;padding-top:10px;padding-bottom:20px;padding-left:30px;padding-right:30px"><p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:helvetica, 'helvetica neue', arial, verdana, sans-serif;line-height:23px;color:#fffbfb;font-size:15px">A new account has been created for you at '${data?.companyName}' for maintenance
+                  <td esdev-links-color="#757575" align="center" style="Margin:0;padding-top:10px;padding-bottom:20px;padding-left:30px;padding-right:30px"><p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:helvetica, 'helvetica neue', arial, verdana, sans-serif;line-height:23px;color:#fffbfb;font-size:15px">A new account has been created for you at '${
+                    data?.companyName
+                  }' for maintenance
                     and you have been issued with a temporary password.</p></td> 
                  </tr> 
                  <tr style="border-collapse:collapse"> 
@@ -1183,7 +1216,9 @@ a[x-apple-data-detectors] {
               <td valign="top" align="center" style="padding:0;Margin:0;width:520px"> 
                <table width="100%" cellspacing="0" cellpadding="0" role="presentation" style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse;border-spacing:0px">
                 <tr style="border-collapse:collapse"> 
-                  <td align="left" style="padding:0;Margin:0;padding-bottom:10px; padding-top:15px;"><p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:helvetica, 'helvetica neue', arial, verdana, sans-serif;line-height:23px;color:#000000;font-size:15px">Dear, ${data?.managerName || ""}</p></td>                       
+                  <td align="left" style="padding:0;Margin:0;padding-bottom:10px; padding-top:15px;"><p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:helvetica, 'helvetica neue', arial, verdana, sans-serif;line-height:23px;color:#000000;font-size:15px">Dear, ${
+                    data?.managerName || ""
+                  }</p></td>                       
                  </tr> 
                  <tr style="border-collapse:collapse"> 
                   <td class="es-m-txt-c" align="left" style="padding:0;Margin:0;padding-top:5px;padding-bottom:15px"><h2 style="Margin:0;line-height:24px;mso-line-height-rule:exactly;font-family:lato, 'helvetica neue', helvetica, arial, sans-serif;font-size:20px;font-style:normal;font-weight:bold;color:#333333">Your current login information is:</h2></td> 
@@ -1192,7 +1227,11 @@ a[x-apple-data-detectors] {
                   <td class="es-m-txt-c" align="left" style="padding:0;margin-top:15px; margin-bottom:15px; height: 1px; background: #ddd; "></td> 
                  </tr> 
                  <tr style="border-collapse:collapse"> 
-                  <td align="left" style="padding:0;Margin:0;padding-bottom:10px; padding-top:15px;"><p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:helvetica, 'helvetica neue', arial, verdana, sans-serif;line-height:23px;color:#555555;font-size:15px"><strong>Email:</strong> ${data?.email || ""}<br><strong>Password:</strong> ${data?.password || ""} <br>(Kindly change your passowrd after you login the first time.)</p></td>                       
+                  <td align="left" style="padding:0;Margin:0;padding-bottom:10px; padding-top:15px;"><p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:helvetica, 'helvetica neue', arial, verdana, sans-serif;line-height:23px;color:#555555;font-size:15px"><strong>Email:</strong> ${
+                    data?.email || ""
+                  }<br><strong>Password:</strong> ${
+      data?.password || ""
+    } <br>(Kindly change your passowrd after you login the first time.)</p></td>                       
                  </tr> 
                  <!-- <tr style="border-collapse:collapse"> 
                   <td align="left" style="padding:0;Margin:0;padding-bottom:10px; "><p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:helvetica, 'helvetica neue', arial, verdana, sans-serif;line-height:23px;color:#555555;font-size:15px"><strong>Password:</strong> password@123 <br>(Kindly change your passowrd after you login the first time.)</p></td> 
@@ -1207,7 +1246,9 @@ a[x-apple-data-detectors] {
                   <td align="left" style="padding:0;Margin:0;padding-top:10px;padding-bottom:10px"><p href="${domain}/login" style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:helvetica, 'helvetica neue', arial, verdana, sans-serif;line-height:23px;color:#555555;font-size:15px">${domain}/login<br></p></td> 
                  </tr>\t\t\t\t\t  -->
                  <tr style="border-collapse:collapse"> 
-                  <td align="left" style="padding:0;Margin:0;padding-top:10px;padding-bottom:10px"><p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:helvetica, 'helvetica neue', arial, verdana, sans-serif;line-height:23px;color:#555555;font-size:15px">Cheers,<br><strong>Team ${data?.companyName || ""}</strong></p></td> 
+                  <td align="left" style="padding:0;Margin:0;padding-top:10px;padding-bottom:10px"><p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:helvetica, 'helvetica neue', arial, verdana, sans-serif;line-height:23px;color:#555555;font-size:15px">Cheers,<br><strong>Team ${
+                    data?.companyName || ""
+                  }</strong></p></td> 
                  </tr> 
                  <!-- <tr style="border-collapse:collapse margin-top: 20px"> 
                   <td align="left" style="padding:0;Margin:0;padding-top:10px;padding-bottom:10px"><p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:helvetica, 'helvetica neue', arial, verdana, sans-serif;line-height:23px;color:#555555;font-size:15px"><strong>Rentdigicare</strong></p></td> 
@@ -4577,8 +4618,7 @@ a[x-apple-data-detectors] {
                       <td align="center" style="padding:0;Margin:0;padding-bottom:10px;padding-top:40px"><h1 style="Margin:0;line-height:36px;mso-line-height-rule:exactly;font-family:lato, 'helvetica neue', helvetica, arial, sans-serif;font-size:30px;font-style:normal;font-weight:bold;color:#ffffff">Update!</h1></td> 
                      </tr> 
                      <tr style="border-collapse:collapse"> 
-                      <td esdev-links-color="#757575" align="center" style="Margin:0;padding-top:10px;padding-bottom:20px;padding-left:30px;padding-right:30px"><p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:helvetica, 'helvetica neue', arial, verdana, sans-serif;line-height:23px;color:#fffbfb;font-size:15px">Your Company '${data.companyName
-      }' has update your properties.  
+                      <td esdev-links-color="#757575" align="center" style="Margin:0;padding-top:10px;padding-bottom:20px;padding-left:30px;padding-right:30px"><p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:helvetica, 'helvetica neue', arial, verdana, sans-serif;line-height:23px;color:#fffbfb;font-size:15px">Your Company '${data.companyName}' has update your properties.  
                        </p></td> 
                      </tr> 
                      <tr style="border-collapse:collapse"> 
@@ -4602,8 +4642,7 @@ a[x-apple-data-detectors] {
                   <td valign="top" align="center" style="padding:0;Margin:0;width:520px"> 
                    <table width="100%" cellspacing="0" cellpadding="0" role="presentation" style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse;border-spacing:0px">
                     <tr style="border-collapse:collapse"> 
-                      <td align="left" style="padding:0;Margin:0;padding-bottom:10px; padding-top:15px;"><p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:helvetica, 'helvetica neue', arial, verdana, sans-serif;line-height:23px;color:#000000;font-size:15px">Dear, ${data.managerName
-      }</p></td>                       
+                      <td align="left" style="padding:0;Margin:0;padding-bottom:10px; padding-top:15px;"><p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:helvetica, 'helvetica neue', arial, verdana, sans-serif;line-height:23px;color:#000000;font-size:15px">Dear, ${data.managerName}</p></td>                       
                      </tr> 
                
                   
@@ -4630,8 +4669,7 @@ a[x-apple-data-detectors] {
                      <tr style="border-collapse:collapse"> 
 
 
-                      <td align="left" style="padding:0;Margin:0;padding-top:10px;padding-bottom:10px"><p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:helvetica, 'helvetica neue', arial, verdana, sans-serif;line-height:23px;color:#555555;font-size:15px">Cheers,<br><strong>Team ${data.companyName
-      }</strong></p></td> 
+                      <td align="left" style="padding:0;Margin:0;padding-top:10px;padding-bottom:10px"><p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:helvetica, 'helvetica neue', arial, verdana, sans-serif;line-height:23px;color:#555555;font-size:15px">Cheers,<br><strong>Team ${data.companyName}</strong></p></td> 
                      </tr> 
                      <!-- <tr style="border-collapse:collapse margin-top: 20px"> 
                       <td align="left" style="padding:0;Margin:0;padding-top:10px;padding-bottom:10px"><p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:helvetica, 'helvetica neue', arial, verdana, sans-serif;line-height:23px;color:#555555;font-size:15px"><strong>Rentdigicare</strong></p></td> 
@@ -4705,8 +4743,6 @@ a[x-apple-data-detectors] {
 </html>
     `;
   }
-
-
 
   if (emailFor === "PROPERTY_MANAGER_PROFILE_UPDATE") {
     return `
@@ -6498,7 +6534,9 @@ a[x-apple-data-detectors] {
                                         display: inline-block;
                                         border-radius: 50px;
                                         width: auto;
-                                      "><a href="${data.companyDomain}" class="es-button" target="_blank" style="
+                                      "><a href="${
+                                        data.companyDomain
+                                      }" class="es-button" target="_blank" style="
                                           mso-style-priority: 100 !important;
                                           text-decoration: none;
                                           transition: all 100ms ease-in;
@@ -6617,19 +6655,29 @@ a[x-apple-data-detectors] {
                                        Thank you for submitting an appointment request. Once your appointment is received by property manager you will get an update. If you need a faster response please contact property manager directly.
                                       <br>
                                       <br>
-                                      Property manager : ${data.managerName} <br>
-                                      Property manager contact : ${data.managerEmail} <br>
-                                      Property manager phone : ${data.managerPhone} <br>
+                                      Property manager : ${
+                                        data.managerName
+                                      } <br>
+                                      Property manager contact : ${
+                                        data.managerEmail
+                                      } <br>
+                                      Property manager phone : ${
+                                        data.managerPhone
+                                      } <br>
                                       <br>
                                       
                                       Property Name : ${data.property} <br>
-                                      ${data.layout !== undefined ? `Property Layout : ${data.layout} ` : ""} <br>
+                                      ${
+                                        data.layout !== undefined
+                                          ? `Property Layout : ${data.layout} `
+                                          : ""
+                                      } <br>
                                       <br>
                                       Time requested : <br>
                                       Date : ${data.date}
                                       <br>
-                                      Start Time : ${data.startTime} <br>
-                                      End Time : ${data.endTime} <br>
+                                      Start Time : ${data.startTime} (MST)<br>
+                                      End Time : ${data.endTime} (MST)<br>
                                       <br>
                                       <p style="
                                         margin: 0;
@@ -6699,7 +6747,9 @@ a[x-apple-data-detectors] {
                                         color: #555555;
                                         font-size: 15px;
                                       ">
-                                      Cheers,<br><strong>Team ${data.companyName}</strong>
+                                      Cheers,<br><strong>Team ${
+                                        data.companyName
+                                      }</strong>
                                     </p>
                                   </td>
                                 </tr>
@@ -7096,7 +7146,9 @@ a[x-apple-data-detectors] {
                                         display: inline-block;
                                         border-radius: 50px;
                                         width: auto;
-                                      "><a href="${data.companyDomain}" class="es-button" target="_blank" style="
+                                      "><a href="${
+                                        data.companyDomain
+                                      }" class="es-button" target="_blank" style="
                                           mso-style-priority: 100 !important;
                                           text-decoration: none;
                                           transition: all 100ms ease-in;
@@ -7202,7 +7254,9 @@ a[x-apple-data-detectors] {
                                         color: #555555;
                                         font-size: 15px;
                                       ">
-                                                                                            Dear, ${data.managerName}
+                                                                                            Dear, ${
+                                                                                              data.managerName
+                                                                                            }
                                                                                         </p>
                                                                                     </td>
                                                                                 </tr>
@@ -7227,30 +7281,52 @@ a[x-apple-data-detectors] {
                                                                                             appointment request from:
                                                                                             <br>
                                                                                             Name:
-                                                                                            ${data.applicantName}
+                                                                                            ${
+                                                                                              data.applicantName
+                                                                                            }
                                                                                             Email :
-                                                                                            ${data.applicantEmail} <br>
+                                                                                            ${
+                                                                                              data.applicantEmail
+                                                                                            } <br>
                                                                                             Phone :
-                                                                                            ${data.applicantPhone} <br>
-                                                                                            ${data.applicantDescription
-        !== "" ? `Comment :
+                                                                                            ${
+                                                                                              data.applicantPhone
+                                                                                            } <br>
+                                                                                            ${
+                                                                                              data.applicantDescription !==
+                                                                                              ""
+                                                                                                ? `Comment :
                                                                                             ${data.applicantDescription}
                                                                                             <br>
 
                                                                                             <br>
-                                                                                            <br>` : ""}
+                                                                                            <br>`
+                                                                                                : ""
+                                                                                            }
                                                                                             Property Name :
-                                                                                            ${data.property} <br>
-                                                                                            ${data.layout !== undefined
-        ? `Property Layout :
-                                                                                            ${data.layout} ` : ""} <br>
+                                                                                            ${
+                                                                                              data.property
+                                                                                            } <br>
+                                                                                            ${
+                                                                                              data.layout !==
+                                                                                              undefined
+                                                                                                ? `Property Layout :
+                                                                                            ${data.layout} `
+                                                                                                : ""
+                                                                                            } <br>
                                                                                             <br>
                                                                                             Time requested is : <br>
-                                                                                            Date : ${data.date}
+                                                                                            Date : ${
+                                                                                              data.date
+                                                                                            }
                                                                                             <br>
                                                                                             Start Time :
-                                                                                            ${data.startTime} <br>
-                                                                                            End Time : ${data.endTime}
+                                                                                            ${
+                                                                                              data.startTime
+                                                                                            } <br>
+                                                                                            End Time : ${
+                                                                                              data.endTime
+                                                                                            }
                                                                                             <br>
                                                                                             <br>
                                                                                             Please click here to approve or reject this appointment.
@@ -7315,7 +7391,9 @@ a[x-apple-data-detectors] {
                                         font-size: 15px;
                                       ">
                                                                                             Cheers,<br><strong>Team
-                                                                                                ${data.companyName}</strong>
+                                                                                                ${
+                                                                                                  data.companyName
+                                                                                                }</strong>
                                                                                         </p>
                                                                                     </td>
                                                                                 </tr>
@@ -7541,7 +7619,7 @@ a[x-apple-data-detectors] {
 </body>
 
 </html>
-    `
+    `;
   }
   //SLOT_BOOKING_REJECTED
   if (emailFor === "SLOT_BOOKING_APPROVED") {
@@ -7735,7 +7813,9 @@ a[x-apple-data-detectors] {
                                         display: inline-block;
                                         border-radius: 50px;
                                         width: auto;
-                                      "><a href="${data.companyDomain}" class="es-button" target="_blank" style="
+                                      "><a href="${
+                                        data.companyDomain
+                                      }" class="es-button" target="_blank" style="
                                           mso-style-priority: 100 !important;
                                           text-decoration: none;
                                           transition: all 100ms ease-in;
@@ -7856,12 +7936,16 @@ a[x-apple-data-detectors] {
                                       <br>
                                       Date : ${data.date}
                                       <br>
-                                      Start Time : ${data.startTime} <br>
-                                      End Time : ${data.endTime} <br>
+                                      Start Time : ${data.startTime} (MST)<br>
+                                      End Time : ${data.endTime} (MST)<br>
                                       <br>
 
                                       Property Name : ${data.property} <br>
-                                      Property Layout : ${data.layout === undefined ? "NA" : data.layout} <br>
+                                      Property Layout : ${
+                                        data.layout === undefined
+                                          ? "NA"
+                                          : data.layout
+                                      } <br>
                                       <br>
                                 
                                       <p style="
@@ -7936,7 +8020,9 @@ a[x-apple-data-detectors] {
                                         color: #555555;
                                         font-size: 15px;
                                       ">
-                                      Cheers,<br><strong>Team ${data.companyName}</strong>
+                                      Cheers,<br><strong>Team ${
+                                        data.companyName
+                                      }</strong>
                                     </p>
                                   </td>
                                 </tr>
@@ -8319,7 +8405,9 @@ a[x-apple-data-detectors] {
                                         display: inline-block;
                                         border-radius: 50px;
                                         width: auto;
-                                      "><a href="${data.companyDomain}" class="es-button" target="_blank" style="
+                                      "><a href="${
+                                        data.companyDomain
+                                      }" class="es-button" target="_blank" style="
                                           mso-style-priority: 100 !important;
                                           text-decoration: none;
                                           transition: all 100ms ease-in;
@@ -8440,12 +8528,16 @@ a[x-apple-data-detectors] {
                                       <br>
                                       Date : ${data.date}
                                       <br>
-                                      Start Time : ${data.startTime} <br>
-                                      End Time : ${data.endTime} <br>
+                                      Start Time : ${data.startTime} (MST)<br>
+                                      End Time : ${data.endTime} (MST)<br>
                                       <br>
 
                                       Property Name : ${data.property} <br>
-                                      Property Layout : ${data.layout === undefined ? "NA" : data.layout} <br>
+                                      Property Layout : ${
+                                        data.layout === undefined
+                                          ? "NA"
+                                          : data.layout
+                                      } <br>
                                       Phone : ${data.managerPhone} <br>
                                       Email : ${data.managerEmail} <br>
                                       <br>
@@ -8468,10 +8560,16 @@ a[x-apple-data-detectors] {
                                   </td>
                                 </tr>
                                 <tr style="border-collapse:collapse"> 
-                                    <td align="center" style="padding:0;Margin:0;padding-top:10px;"><span class="es-button-border" style="border-style:solid;border-color:#4287f5;background:none 0% 0% repeat scroll #4287f5;border-width:0px;display:inline-block;border-radius:50px;width:auto"><a href="${domain}/cancel-appointment/${data.id}" class="es-button" target="_blank" style="mso-style-priority:100 !important;text-decoration:none;transition:all 100ms ease-in;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;color:#FFFFFF;font-size:14px;border-style:solid;border-color:#4287f5;border-width:15px 30px 15px 30px;display:inline-block;background:#4287f5;border-radius:50px;font-family:arial, 'helvetica neue', helvetica, sans-serif;font-weight:bold;font-style:normal;line-height:17px;width:auto;text-align:center">Cancel Appointment</a></span></td> 
+                                    <td align="center" style="padding:0;Margin:0;padding-top:10px;"><span class="es-button-border" style="border-style:solid;border-color:#4287f5;background:none 0% 0% repeat scroll #4287f5;border-width:0px;display:inline-block;border-radius:50px;width:auto"><a href="${domain}/cancel-appointment/${
+      data.id
+    }" class="es-button" target="_blank" style="mso-style-priority:100 !important;text-decoration:none;transition:all 100ms ease-in;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;color:#FFFFFF;font-size:14px;border-style:solid;border-color:#4287f5;border-width:15px 30px 15px 30px;display:inline-block;background:#4287f5;border-radius:50px;font-family:arial, 'helvetica neue', helvetica, sans-serif;font-weight:bold;font-style:normal;line-height:17px;width:auto;text-align:center">Cancel Appointment</a></span></td> 
                                    </tr> 
                                    <tr style="border-collapse:collapse"> 
-                                    <td align="center" style="padding:0;Margin:0;padding-top:10px;padding-bottom:20px"><span class="es-button-border" style="border-style:solid;border-color:#009919;background:none 0% 0% repeat scroll#009919;border-width:0px;display:inline-block;border-radius:50px;width:auto"><a href="${domain}/reschedule-appoinment/${data.id}/${data.calendarId}" class="es-button" target="_blank" style="mso-style-priority:100 !important;text-decoration:none;transition:all 100ms ease-in;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;color:#FFFFFF;font-size:14px;border-style:solid;border-color:#009919;border-width:15px 30px 15px 30px;display:inline-block;background:#009919;border-radius:50px;font-family:arial, 'helvetica neue', helvetica, sans-serif;font-weight:bold;font-style:normal;line-height:17px;width:auto;text-align:center">Reschedule Appointment</a></span></td> 
+                                    <td align="center" style="padding:0;Margin:0;padding-top:10px;padding-bottom:20px"><span class="es-button-border" style="border-style:solid;border-color:#009919;background:none 0% 0% repeat scroll#009919;border-width:0px;display:inline-block;border-radius:50px;width:auto"><a href="${domain}/reschedule-appoinment/${
+      data.id
+    }/${
+      data.calendarId
+    }" class="es-button" target="_blank" style="mso-style-priority:100 !important;text-decoration:none;transition:all 100ms ease-in;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;color:#FFFFFF;font-size:14px;border-style:solid;border-color:#009919;border-width:15px 30px 15px 30px;display:inline-block;background:#009919;border-radius:50px;font-family:arial, 'helvetica neue', helvetica, sans-serif;font-weight:bold;font-style:normal;line-height:17px;width:auto;text-align:center">Reschedule Appointment</a></span></td> 
                                    </tr>
                                 <tr style="border-collapse: collapse">
                                   <td align="left" style="
@@ -8519,7 +8617,9 @@ a[x-apple-data-detectors] {
                                         color: #555555;
                                         font-size: 15px;
                                       ">
-                                      Cheers,<br><strong>Team ${data.companyName}</strong>
+                                      Cheers,<br><strong>Team ${
+                                        data.companyName
+                                      }</strong>
                                     </p>
                                   </td>
                                 </tr>
@@ -8708,7 +8808,7 @@ a[x-apple-data-detectors] {
     </div>
   
 </body>
-      </html>`
+      </html>`;
   }
   if (emailFor === "SLOT_BOOKING_CANCELED") {
     return `
@@ -8902,7 +9002,9 @@ margin: 0;
                                 display: inline-block;
                                 border-radius: 50px;
                                 width: auto;
-                              "><a href="${data.companyDomain}" class="es-button" target="_blank" style="
+                              "><a href="${
+                                data.companyDomain
+                              }" class="es-button" target="_blank" style="
                                   mso-style-priority: 100 !important;
                                   text-decoration: none;
                                   transition: all 100ms ease-in;
@@ -9023,13 +9125,15 @@ margin: 0;
                               <br>
                               Date : ${data.date}
                               <br>
-                              Start Time : ${data.startTime} <br>
-                              End Time : ${data.endTime} <br>
+                              Start Time : ${data.startTime} (MST)<br>
+                              End Time : ${data.endTime} (MST)<br>
                               <br>
-                              ${data?.reason ? 'Reason: ' + data.reason : ''}
+                              ${data?.reason ? "Reason: " + data.reason : ""}
                               <br>
                               Property Name : ${data.property} <br>
-                              Property Layout : ${data.layout === undefined ? "NA" : data.layout} <br>
+                              Property Layout : ${
+                                data.layout === undefined ? "NA" : data.layout
+                              } <br>
                               <br>
                         
                               <p style="
@@ -9093,7 +9197,9 @@ margin: 0;
                                 color: #555555;
                                 font-size: 15px;
                               ">
-                              Cheers,<br><strong>Team ${data.companyName}</strong>
+                              Cheers,<br><strong>Team ${
+                                data.companyName
+                              }</strong>
                             </p>
                           </td>
                         </tr>
@@ -9283,7 +9389,7 @@ margin: 0;
 
 </body>
 </html>
-    `
+    `;
   }
   if (emailFor === "SLOT_BOOKING_REJECTED") {
     return `
@@ -9477,7 +9583,9 @@ margin: 0;
                                 display: inline-block;
                                 border-radius: 50px;
                                 width: auto;
-                              "><a href="${data.companyDomain}" class="es-button" target="_blank" style="
+                              "><a href="${
+                                data.companyDomain
+                              }" class="es-button" target="_blank" style="
                                   mso-style-priority: 100 !important;
                                   text-decoration: none;
                                   transition: all 100ms ease-in;
@@ -9598,14 +9706,18 @@ margin: 0;
                               <br>
                               Date : ${data.date}
                               <br>
-                              Start Time : ${data.startTime} <br>
-                              End Time : ${data.endTime} <br>
+                              Start Time : ${data.startTime} (MST)<br>
+                              End Time : ${data.endTime} (MST)<br>
                               <br>
                               Reason: ${data.reason}
                               <br>
                               Property Name : ${data.property} <br>
-                              Property Layout : ${data.layout === undefined ? "NA" : data.layout} <br>
-                              Reason : ${data.reason === undefined ? "NA" : data.reason} <br>
+                              Property Layout : ${
+                                data.layout === undefined ? "NA" : data.layout
+                              } <br>
+                              Reason : ${
+                                data.reason === undefined ? "NA" : data.reason
+                              } <br>
                               <br>
                         
                               <p style="
@@ -9669,7 +9781,9 @@ margin: 0;
                                 color: #555555;
                                 font-size: 15px;
                               ">
-                              Cheers,<br><strong>Team ${data.companyName}</strong>
+                              Cheers,<br><strong>Team ${
+                                data.companyName
+                              }</strong>
                             </p>
                           </td>
                         </tr>
@@ -9859,7 +9973,7 @@ margin: 0;
 
 </body>
 </html>
-    `
+    `;
   }
   if (emailFor === "REMINDER_APPOINTMENT_30_MINUTES") {
     return `
@@ -10453,7 +10567,7 @@ margin: 0;
     `;
   }
   if (emailFor === "REMINDER_APPOINTMENT_30_MINUTES_TO_USER") {
-   return ` 
+    return ` 
 <!DOCTYPE html>
 <html>
 <head>
@@ -11035,7 +11149,7 @@ margin: 0;
 
 </body>
   </html>
-   ` 
+   `;
   }
   if (emailFor === "REMINDER_APPOINTMENT_12_HOURS") {
     return `
@@ -12211,7 +12325,7 @@ margin: 0;
 
 </body>
   </html>
-    `
+    `;
   }
   if (emailFor === "SEND_MAIL_TO_ALL_ASSIGNED_VENDORS") {
     return `
@@ -13306,7 +13420,9 @@ a[x-apple-data-detectors] {
                 <td valign="top" align="center" style="padding:0;Margin:0;width:520px"> 
                  <table width="100%" cellspacing="0" cellpadding="0" role="presentation" style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse;border-spacing:0px"> 
                    <tr style="border-collapse:collapse"> 
-                    <td align="center" style="padding:0;Margin:0;font-size:0; "><a href="${gskDomain}" target="_blank" style="-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;text-decoration:underline;color:#ffffff;font-size:14px"><img src="${data.logo}" alt style="display:block;border:0;outline:none;text-decoration:none;-ms-interpolation-mode:bicubic; height:76px;weight:150px" ></a></td> 
+                    <td align="center" style="padding:0;Margin:0;font-size:0; "><a href="${gskDomain}" target="_blank" style="-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;text-decoration:underline;color:#ffffff;font-size:14px"><img src="${
+      data.logo
+    }" alt style="display:block;border:0;outline:none;text-decoration:none;-ms-interpolation-mode:bicubic; height:76px;weight:150px" ></a></td> 
                    </tr> 
                  </table></td> 
                </tr> 
@@ -13326,7 +13442,9 @@ a[x-apple-data-detectors] {
                 <td valign="top" align="center" style="padding:0;Margin:0;width:520px"> 
                  <table width="100%" cellspacing="0" cellpadding="0" role="presentation" style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse;border-spacing:0px"> 
                    <tr style="border-collapse:collapse"> 
-                    <td align="center" style="padding:0;Margin:0;padding-bottom:10px;padding-top:40px"><h1 style="Margin:0;line-height:36px;mso-line-height-rule:exactly;font-family:lato, 'helvetica neue', helvetica, arial, sans-serif;font-size:30px;font-style:normal;font-weight:bold;color:#ffffff"> ${data?.toStatus || ""} Status!</h1></td> 
+                    <td align="center" style="padding:0;Margin:0;padding-bottom:10px;padding-top:40px"><h1 style="Margin:0;line-height:36px;mso-line-height-rule:exactly;font-family:lato, 'helvetica neue', helvetica, arial, sans-serif;font-size:30px;font-style:normal;font-weight:bold;color:#ffffff"> ${
+                      data?.toStatus || ""
+                    } Status!</h1></td> 
                    </tr> 
                    <tr style="border-collapse:collapse"> 
                     <td align="center" style="padding:0;Margin:0;padding-top:10px;padding-bottom:20px"><span class="es-button-border" style="border-style:solid;border-color:#26a4d3;background:none 0% 0% repeat scroll #26a4d3;border-width:0px;display:inline-block;border-radius:50px;width:auto"><a href="${domain}/login" class="es-button" target="_blank" style="mso-style-priority:100 !important;text-decoration:none;transition:all 100ms ease-in;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;color:#FFFFFF;font-size:14px;border-style:solid;border-color:#26a4d3;border-width:15px 30px 15px 30px;display:inline-block;background:#26a4d3;border-radius:50px;font-family:arial, 'helvetica neue', helvetica, sans-serif;font-weight:bold;font-style:normal;line-height:17px;width:auto;text-align:center">ACCESS ACCOUNT</a></span></td> 
@@ -13353,10 +13471,14 @@ a[x-apple-data-detectors] {
                  <table width="100%" cellspacing="0" cellpadding="0" role="presentation" style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse;border-spacing:0px"> 
                    
                    <tr style="border-collapse:collapse"> 
-                    <td align="left" style="padding:0;Margin:0;padding-bottom:10px; "><p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:helvetica, 'helvetica neue', arial, verdana, sans-serif;line-height:23px;color:#555555;font-size:15px">Dear, ${data?.propertyManager || ""}</p></td> 
+                    <td align="left" style="padding:0;Margin:0;padding-bottom:10px; "><p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:helvetica, 'helvetica neue', arial, verdana, sans-serif;line-height:23px;color:#555555;font-size:15px">Dear, ${
+                      data?.propertyManager || ""
+                    }</p></td> 
                    </tr> 
                    <tr style="border-collapse:collapse"> 
-                    <td align="left" style="padding:0;Margin:0;padding-bottom:10px; "><p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:helvetica, 'helvetica neue', arial, verdana, sans-serif;line-height:23px;color:#555555;font-size:15px">Maintenance request status changed to ${data?.toStatus || ""}.<br></br>
+                    <td align="left" style="padding:0;Margin:0;padding-bottom:10px; "><p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:helvetica, 'helvetica neue', arial, verdana, sans-serif;line-height:23px;color:#555555;font-size:15px">Maintenance request status changed to ${
+                      data?.toStatus || ""
+                    }.<br></br>
 
 Details:
 </br>
@@ -13373,7 +13495,9 @@ Description: ${data?.details || ""}
 
 
 
-                      Please feel free to contact the Customer/${data?.vendorType || ""}.</p></td> 
+                      Please feel free to contact the Customer/${
+                        data?.vendorType || ""
+                      }.</p></td> 
                    </tr>
                    <tr style="border-collapse:collapse"> 
                     <td align="left" style="padding:0;Margin:0;padding-bottom:10px; "><p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:helvetica, 'helvetica neue', arial, verdana, sans-serif;line-height:23px;text-align: justify;color:#555555;font-size:15px">If the above "ACCESS ACCOUNT" button does not work then click on link below:<br><a href="${domain}/Login">${domain}/Login</a></p></td> 
@@ -13385,7 +13509,9 @@ Description: ${data?.details || ""}
                     <td align="left" style="padding:0;Margin:0;padding-top:10px;padding-bottom:10px"><p href="${domain}/login" style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:helvetica, 'helvetica neue', arial, verdana, sans-serif;line-height:23px;color:#555555;font-size:15px">${domain}/login<br></p></td> 
                    </tr>\t\t\t\t\t  -->
                    <tr style="border-collapse:collapse"> 
-                    <td align="left" style="padding:0;Margin:0;padding-top:10px;padding-bottom:10px"><p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:helvetica, 'helvetica neue', arial, verdana, sans-serif;line-height:23px;color:#555555;font-size:15px">Cheers,<br><strong>Team ${data?.companyName || ""}</strong></p></td> 
+                    <td align="left" style="padding:0;Margin:0;padding-top:10px;padding-bottom:10px"><p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:helvetica, 'helvetica neue', arial, verdana, sans-serif;line-height:23px;color:#555555;font-size:15px">Cheers,<br><strong>Team ${
+                      data?.companyName || ""
+                    }</strong></p></td> 
                    </tr> 
                    <!-- <tr style="border-collapse:collapse margin-top: 20px"> 
                     <td align="left" style="padding:0;Margin:0;padding-top:10px;padding-bottom:10px"><p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:helvetica, 'helvetica neue', arial, verdana, sans-serif;line-height:23px;color:#555555;font-size:15px"><strong>Rentdigicare</strong></p></td> 

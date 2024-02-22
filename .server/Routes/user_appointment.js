@@ -694,6 +694,19 @@ router.get("/get-id", async (req, res) => {
   }
 });
 
+const convertToMST = (utcTime) => {
+  const time = new Date(utcTime);
+
+  const formattedTime = time.toLocaleTimeString(undefined, {
+    hour: "numeric",
+    minute: "numeric",
+    hour12: true,
+    timeZone: "America/Denver",
+  });
+
+  return formattedTime;
+};
+
 router.post("/add_slot", async (req, res) => {
   try {
     const managerAvailability = await ManagerAvailability.findOne({
@@ -854,8 +867,8 @@ router.post("/add_slot", async (req, res) => {
             applicantEmail: req.body.email,
             applicantDescription: req.body.description,
             date: req.body.date,
-            startTime: req.body.StartTime,
-            endTime: req.body.endTime,
+            startTime: convertToMST(req.body.StartTime),
+            endTime: convertToMST(req.body.endTime),
             email: req.body.email,
             companyDomain: req.body.companyDomain,
             companyName: property?.company,
@@ -886,8 +899,8 @@ router.post("/add_slot", async (req, res) => {
               applicantEmail: req.body.email,
               applicantDescription: req.body.description,
               date: req.body.date,
-              startTime: req.body.StartTime,
-              endTime: req.body.endTime,
+              startTime: convertToMST(req.body.StartTime),
+              endTime: convertToMST(req.body.endTime),
               email: req.body.email,
               companyDomain: req.body.companyDomain,
               companyName: property?.company,
@@ -1012,8 +1025,8 @@ router.post("/add_slot", async (req, res) => {
                     applicantDescription: req.body.description,
                     logo: company?.logo,
                     date: req.body.date,
-                    startTime: req.body.StartTime,
-                    endTime: req.body.endTime,
+                    startTime: convertToMST(req.body.StartTime),
+                    endTime: convertToMST(req.body.endTime),
                     email: req.body.email,
                     companyDomain: req.body.companyDomain,
                     companyName: property?.company,
@@ -1043,8 +1056,8 @@ router.post("/add_slot", async (req, res) => {
                       applicantEmail: req.body.email,
                       applicantDescription: req.body.description,
                       date: req.body.date,
-                      startTime: req.body.StartTime,
-                      endTime: req.body.endTime,
+                      startTime: convertToMST(req.body.StartTime),
+                      endTime: convertToMST(req.body.endTime),
                       email: req.body.email,
                       companyDomain: req.body.companyDomain,
                       companyName: property?.company,
@@ -1129,8 +1142,8 @@ router.post("/update-event-status", async (req, res) => {
         let EmailData = {
           applicantName: updatedEvent.name,
           date: moment(updatedEvent.date).format("DD-MM-YYYY"),
-          startTime: updatedEvent.startTime,
-          endTime: updatedEvent.endTime,
+          startTime: convertToMST(updatedEvent.startTime),
+          endTime: convertToMST(updatedEvent.endTime),
           companyDomain: updatedEvent.companyDomain,
           companyName: property?.company,
           property: property?.title,
@@ -1159,8 +1172,8 @@ router.post("/update-event-status", async (req, res) => {
           let EmailData = {
             applicantName: userData[0].firstname || userData[0].ownerFirstName,
             date: moment(updatedEvent.date).format("DD-MM-YYYY"),
-            startTime: updatedEvent.startTime,
-            endTime: updatedEvent.endTime,
+            startTime: convertToMST(updatedEvent.startTime),
+            endTime: convertToMST(updatedEvent.endTime),
             companyDomain: updatedEvent.companyDomain,
             companyName: property?.company,
             property: property?.title,
@@ -1331,8 +1344,8 @@ router.patch("/cancel-appointment", async (req, res) => {
     let EmailData = {
       applicantName: appointment.name,
       date: moment(appointment.date).format("DD-MM-YYYY"),
-      startTime: appointment.startTime,
-      endTime: appointment.endTime,
+      startTime: convertToMST(appointment.startTime),
+      endTime: convertToMST(appointment.endTime),
       companyDomain: appointment.companyDomain,
       companyName: property?.company,
       property: property?.title,

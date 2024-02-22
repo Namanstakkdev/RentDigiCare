@@ -576,7 +576,6 @@ const Appointment = () => {
                                     </div>
                                   </td>
                                   <td>
-                                    Cancel
                                     {item.reasonType?.length > 0
                                       ? item.reasonType[0].reasonType
                                       : " N/A"}
