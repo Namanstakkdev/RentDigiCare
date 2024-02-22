@@ -722,7 +722,7 @@ const SidebarContent = (props) => {
                       </ul>
                     </li>
 
-                    <li>
+                    {/* <li>
                       <Link to="/#" className="has-arrow ">
                         <FeatherIcon icon="file-text" />
                         <span>Email Reminders</span>
@@ -732,7 +732,7 @@ const SidebarContent = (props) => {
                           <Link to="/scheduled-jobs">Scheduled Jobs</Link>
                         </li>
                       </ul>
-                    </li>
+                    </li> */}
                   </>
                 )}
 
