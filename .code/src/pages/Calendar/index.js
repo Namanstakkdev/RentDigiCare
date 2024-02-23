@@ -622,21 +622,21 @@ const Calender = (props) => {
     setAddEventError("");
     const [startTime, endTime] = values.time.split(" - ");
 
-    const [utcStartTime, utcEndTime] = [startTime, endTime].map((time) => {
-      const dateTimeString = `${values.date} ${time}`;
-      const dateTimeObject = new Date(dateTimeString);
+    // const [utcStartTime, utcEndTime] = [startTime, endTime].map((time) => {
+    //   const dateTimeString = `${values.date} ${time}`;
+    //   const dateTimeObject = new Date(dateTimeString);
 
-      // Check if the date-time is valid
-      if (!isNaN(dateTimeObject)) {
-        const utcStringDateTimeObject = new Date(dateTimeObject.toISOString());
-        const utcString = utcStringDateTimeObject.toISOString();
-        const utcDateTimeObject = new Date(utcString);
+    //   // Check if the date-time is valid
+    //   if (!isNaN(dateTimeObject)) {
+    //     const utcStringDateTimeObject = new Date(dateTimeObject.toISOString());
+    //     const utcString = utcStringDateTimeObject.toISOString();
+    //     const utcDateTimeObject = new Date(utcString);
 
-        return { utcString, timeInMilliseconds: utcDateTimeObject.getTime() };
-      }
+    //     return { utcString, timeInMilliseconds: utcDateTimeObject.getTime() };
+    //   }
 
-      return { utcString: null, timeInMilliseconds: null };
-    });
+    //   return { utcString: null, timeInMilliseconds: null };
+    // });
 
     let role = decode.role;
 
@@ -651,8 +651,8 @@ const Calender = (props) => {
       manager_id: values.manager ? values.manager : decode.id,
       day: moment(values.date).format("ddd"),
       eventDate: values.date,
-      StartTime: utcStartTime.utcString,
-      endTime: utcEndTime.utcString,
+      StartTime: startTime,
+      endTime: endTime,
       createdBy: decode.id,
       type: values.reasonType,
       propertyId: values.property,
