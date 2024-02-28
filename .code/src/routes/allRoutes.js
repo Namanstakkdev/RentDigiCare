@@ -204,6 +204,7 @@ import ManagementReports from "../pages/ManagerReports/ManagementReports";
 import WorkScheduling from "../pages/ManagerReports/WorkScheduling";
 import Reminders from "../components/Reminders";
 import ReminderTemplate from "../components/ReminderTemplates";
+import AppointmentStatus from "../pages/Calendar/AppointmentStatus";
 
 const userRoutes = [
   //dashboard
@@ -345,6 +346,7 @@ const userRoutes = [
   { path: "/add_specialities", component: AddSpecialities },
   { path: "/technical_staff_tickets", component: TechnicalStaffTickets },
   { path: "/request_type", component: AddRequestType },
+  { path: "/calendar-appointment-status", component: AppointmentStatus },
   { path: "/permissions", component: AddPermission },
   { path: "/emailnotification", component: EmailNotification },
 

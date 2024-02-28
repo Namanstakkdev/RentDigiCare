@@ -327,10 +327,12 @@ const Calender_availabilty = () => {
     setDayAvailability(changedData);
   };
 
-const options = splitTime.map((startTime) => ({
-  value: startTime.toLowerCase().trim(),
-  label: startTime,
-}));
+  const options = splitTime.map((startTime) => ({
+    value: startTime.toLowerCase().trim(),
+    label: startTime,
+  }));
+
+  console.log({ options });
 
   return (
     <React.Fragment>

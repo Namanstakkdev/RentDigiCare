@@ -53,6 +53,7 @@ const Vendor = require("./Routes/vendor");
 const TechnicalStaff = require("./Routes/technical_staff");
 
 const companyRequestType = require("./Routes/companyRequestType");
+const appointmentStatusType = require("./Routes/appointmentStatusType.js");
 
 //Dashboard
 const Dashboard = require("./Routes/Dashboard");
@@ -119,6 +120,7 @@ app.use("/vendorspeciality", Vendor_specialties);
 app.use("/vendor", Vendor);
 app.use("/technicalStaff", TechnicalStaff);
 app.use("/requesttype", companyRequestType);
+app.use("/appointmentStatus", appointmentStatusType);
 app.use("/permissiontype", CompanyPermissionType);
 
 app.get("/operation", (req, res) => {

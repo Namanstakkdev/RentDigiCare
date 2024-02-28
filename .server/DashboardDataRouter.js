@@ -1,6 +1,7 @@
 const router = require("express").Router();
 const Ticket = require("./Database/Ticket");
 const Applicant = require("./Database/Applicant");
+const Manager = require("./Database/PropertyManager");
 
 // checking email services
 router.post("/", async (req, res) => {
@@ -122,13 +123,17 @@ async function generateFilter(role, data) {
     const manager = await Manager.findOne({ _id: data.managerID }).select({
       properties: 1,
     });
-    const stringProperties = manager.properties.map((property) =>
-      property.toString()
-    );
-    return {
-      "main.propertyID": { $in: stringProperties },
-      ...evaluateFilters(data),
-    };
+    if (manager !== null && manager !== undefined) {
+      const stringProperties = manager.properties.map((property) =>
+        property.toString()
+      );
+      return {
+        "main.propertyID": { $in: stringProperties },
+        ...evaluateFilters(data),
+      };
+    } else {
+      return {};
+    }
   }
 }
 

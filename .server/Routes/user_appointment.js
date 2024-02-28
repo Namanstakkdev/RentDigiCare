@@ -15,6 +15,8 @@ const Email = require("../utils/Email");
 
 const moment = require("moment");
 const { ObjectID } = require("bson");
+const { ObjectId } = require("mongodb");
+
 // importing database models
 const ManagerAvailability = require("../Database/calender_availability");
 const User_appointment = require("../Database/user_appointment");
@@ -24,6 +26,37 @@ const Property = require("../Database/Property");
 const Layout = require("../Database/Layout");
 const Reason_types = require("../Database/CalendarReasonTypes");
 const user_appointment = require("../Database/user_appointment");
+
+
+router.post("/update_status", async (req, res) => {
+  try {
+    const { apptId, status } = req.body;
+
+    console.log({ apptId, status });
+
+    if (!ObjectId.isValid(apptId)) {
+      return res.status(400).json({ message: "Invalid appointment ID format" });
+    }
+
+    const appointment = await user_appointment.findOneAndUpdate(
+      { _id: ObjectId(apptId) },
+      { $set: { statusUpdate: status } },
+      { new: true }
+    );
+
+    if (!appointment) {
+      return res.status(404).json({ message: "Appointment not found" });
+    }
+
+    return res
+      .status(200)
+      .json({ message: "Appointment status updated successfully" });
+  } catch (error) {
+    console.error("Error updating appointment status:", error);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+});
+
 
 router.post("/set-availability", async (req, res) => {
   try {

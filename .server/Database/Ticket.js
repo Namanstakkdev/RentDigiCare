@@ -6,7 +6,6 @@ const ticketSchema = mongoose.Schema(
     email: String,
     phone: Number,
     details: String,
-
     requestType: String,
     permission: String,
     property: String,
