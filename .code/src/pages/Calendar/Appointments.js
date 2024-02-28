@@ -65,6 +65,26 @@ const Appointment = () => {
     rejected: 0,
     pending: 0,
   });
+  const [statusTypeList, setStatusTypeList] = useState([]);
+  const decode = jwt_decode(window.localStorage.accessToken);
+  useEffect(() => {
+    const getAppointmentStatusTypes = async () => {
+      try {
+        const response = await axios.post("appointmentStatus/getStatus", {
+          company_id: decode.id,
+        });
+        if (response.data.appointmentStatus) {
+          const Data = response.data.appointmentStatus.reverse();
+          setStatusTypeList(Data);
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
+    getAppointmentStatusTypes();
+  }, [pageNumber]);
+
   const pageTotal = Math.ceil(stats.total / pageLimit);
 
   const [authEmail, setAuthEmail] = useState("");
@@ -186,7 +206,35 @@ const Appointment = () => {
     }
     // console.log(data, "data");
   };
+  const [Confirm_model, setConfirm_model] = useState(false);
+  const [apptId, setApptId] = useState("");
+  const [apptStatus, setApptStatus] = useState("");
 
+  const Confirm_view = (id, status) => {
+    console.log(id, status);
+    setApptId(id);
+    setApptStatus(status);
+    setConfirm_model(!Confirm_model);
+  };
+
+  const ChangeStatus = async (id, status) => {
+    try {
+      console.log({
+        id,
+        status: status,
+      });
+      const response = await axios.post("/user_appointment/update_status", {
+        apptId: apptId,
+        status: apptStatus,
+      });
+      console.log({ response });
+      if (response.data.success) {
+        getAppointments();
+      }
+    } catch (error) {
+      console.log("Unable to fetch");
+    }
+  };
   // const bookedAndSyncWithGoogleCalendar = async (id, status, authEmail) => {
   //   const update = {
   //     method: "POST",
@@ -344,7 +392,18 @@ const Appointment = () => {
     t_col5();
     getAppointments("clear");
   };
-
+  const getColor = (val) => {
+    switch (val) {
+      case "Completed":
+        return "btn btn-success";
+      case "Unresolved":
+        return "btn btn-danger";
+      case "Inprogress":
+        return "btn btn-warning";
+      default:
+        return "btn btn-primary";
+    }
+  };
   return (
     <React.Fragment>
       <div className="page-content">
@@ -540,6 +599,7 @@ const Appointment = () => {
                           <th scope="col">Property</th>
                           <th scope="col">Reason Type</th>
                           <th scope="col">Comment</th>
+                          <th scope="col">Updates</th>
                           <th scope="col">Time Slot</th>
                           <th scope="col">Date</th>
 
@@ -549,6 +609,9 @@ const Appointment = () => {
                       <tbody>
                         {filteredBooked &&
                           filteredBooked.map((item, index) => {
+                            console.log({
+                              item: item?.statusUpdate,
+                            });
                             return (
                               <>
                                 <tr>
@@ -581,7 +644,35 @@ const Appointment = () => {
                                       : " N/A"}
                                   </td>
                                   <td>{item.description}</td>
-
+                                  <td>
+                                    <select
+                                      className={`form-select applicant-status btn-sm ${getColor(
+                                        item?.statusUpdate
+                                      )}`}
+                                      style={{ width: "120px" }}
+                                      onChange={(event) => {
+                                        Confirm_view(
+                                          item._id,
+                                          event.target.value
+                                        );
+                                        ChangeStatus(
+                                          item._id,
+                                          event.target.value
+                                        );
+                                      }}
+                                      defaultValue={item?.statusUpdate}
+                                    >
+                                      {statusTypeList.map((status) => (
+                                        <option
+                                          key={status._id}
+                                          className={`btn btn-light`}
+                                          value={status.status}
+                                        >
+                                          {status.status}
+                                        </option>
+                                      ))}
+                                    </select>
+                                  </td>
                                   <td>
                                     {convertToLocalTime(item.startTime)} -{" "}
                                     {convertToLocalTime(item.endTime)}
@@ -690,6 +781,64 @@ const Appointment = () => {
                       </tbody>
                     </Table>
                   </div>
+                  <Modal
+                    isOpen={Confirm_model}
+                    toggle={() => {
+                      Confirm_view();
+                    }}
+                    aria-labelledby="contained-modal-title-vcenter"
+                    centered
+                  >
+                    <ModalHeader
+                      toggle={() => {
+                        Confirm_view();
+                      }}
+                    >
+                      <h3> Change Status!</h3>
+                    </ModalHeader>
+                    {/* <div className="modal-header"> */}
+                    <button
+                      onClick={() => {
+                        Confirm_view();
+                        // setmodal_large2(false)
+                      }}
+                      type="button"
+                      className="close"
+                      data-dismiss="modal"
+                      aria-label="Close"
+                    >
+                      <span aria-hidden="true">&times;</span>
+                    </button>
+                    {/* </div> */}
+                    <ModalBody>
+                      <div className="modal-body">
+                        <h5>Are You Sure?</h5>
+                      </div>
+                    </ModalBody>
+                    <ModalFooter>
+                      <button
+                        onClick={() => {
+                          ChangeStatus();
+                          Confirm_view();
+                          setConfirm_model(false);
+                        }}
+                        className="btn btn-primary mr-10"
+                        type="button"
+                      >
+                        <span aria-hidden="true">Yes</span>
+                      </button>
+                      <button
+                        onClick={() => {
+                          Confirm_view();
+                          // setmodal_large2(false)
+                        }}
+                        className="btn btn-light"
+                        type="button"
+                      >
+                        <span aria-hidden="true">No</span>
+                      </button>
+                    </ModalFooter>
+                  </Modal>
                   <Row className="proress-style mt-3">
                     <Col xl={3}></Col>
                     <Col xl={9}>

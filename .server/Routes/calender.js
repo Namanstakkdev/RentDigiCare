@@ -9,19 +9,42 @@ const {
 } = require("../config.js");
 require("dotenv").config();
 
+
+const CREDENTIALS_JSON = {
+  web: {
+    client_id:
+      "1049702539701-75o0mkbkh647bret6dn7lsh65g60n00m.apps.googleusercontent.com",
+    project_id: "weighty-smoke-412317",
+    auth_uri: "https://accounts.google.com/o/oauth2/auth",
+    token_uri: "https://oauth2.googleapis.com/token",
+    auth_provider_x509_cert_url: "https://www.googleapis.com/oauth2/v1/certs",
+    client_secret: "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",
+    redirect_uris: [
+      "http://localhost:3000/dashboard",
+      "https://accounts.google.com/o/oauth2",
+      "http://localhost:9000/calender/add-event",
+      "https://app.rentdigicare.com/calender/add-event",
+      "https://www.rentdigicare.com:9000/calender/add-event",
+    ],
+    javascript_origins: [
+      "http://localhost:3000",
+      "https://accounts.google.com",
+      "https://app.rentdigicare.com",
+      "https://www.app.rentdigicare.com",
+    ],
+  },
+};
+
+
 const SCOPES = [
   "https://www.googleapis.com/auth/calendar",
   "https://www.googleapis.com/auth/userinfo.email",
 ];
-const CLIENT_ID =
-  "254361738607-fg17gedpionksf6gbgb85b05hfngub10.apps.googleusercontent.com";
-const CLIENT_SECRET = "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";
-const REDIRECT_URL = "http://localhost:9000/calender/add-event";
 
 const auth2Client = new google.auth.OAuth2(
-  CLIENT_ID,
-  CLIENT_SECRET,
-  REDIRECT_URL
+  CREDENTIALS_JSON.web.client_id,
+  CREDENTIALS_JSON.web.client_secret,
+  CREDENTIALS_JSON.web.redirect_uris[4]
 );
 
 // importing database models
@@ -757,7 +780,7 @@ router.get("/add-event", async (req, res) => {
             dateTime: moment(event.eventDate + "T" + event.endTime, [
               "YYYY-MM-DDTHH:mm",
             ]).toISOString(),
-            timeZone: "Asia/Kolkata",
+            timeZone: "America/Denver",
           },
           attendees: event.authEmail,
           reminders: {

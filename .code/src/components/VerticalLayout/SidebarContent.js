@@ -157,7 +157,8 @@ const SidebarContent = (props) => {
 
         response = await axios.post("/ticket/filter_tickets_manager", query);
       }
-      if (response.status === 200) {
+      console.log({response})
+      if (response?.status === 200) {
         setMaintenanceRequestInfo((prev) => ({
           ...prev,
           total: response.data.total?.Total || 0,
@@ -510,6 +511,11 @@ const SidebarContent = (props) => {
                     <li>
                       <Link to="/apps-calendar">
                         {props.t("Calendar View")}
+                      </Link>
+                    </li>
+                    <li>
+                      <Link to="/calendar-appointment-status">
+                        {props.t("Calendar Status Types")}
                       </Link>
                     </li>
                   </ul>
