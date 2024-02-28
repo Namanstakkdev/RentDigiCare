@@ -10289,8 +10289,8 @@ margin: 0;
                                       <br>
                                       Date : ${data.date}
                                       <br>
-                                      Start Time : ${data.startTime} <br>
-                                      End Time : ${data.endTime} <br>
+                                      Start Time : ${data.startTime} (MST) <br>
+                                      End Time : ${data.endTime} (MST) <br>
                                       <br>
 
                                       Property Name : ${data.property} <br>
@@ -10880,8 +10880,8 @@ margin: 0;
                                   <br>
                                   Date : ${data.date}
                                   <br>
-                                  Start Time : ${data.startTime} <br>
-                                  End Time : ${data.endTime} <br>
+                                  Start Time : ${data.startTime} (MST) <br>
+                                  End Time : ${data.endTime} (MST) <br>
                                   <br>
 
                                   Property Name : ${data.property} <br>
@@ -11465,8 +11465,8 @@ margin: 0;
                                       <br>
                                       Date : ${data.date}
                                       <br>
-                                      Start Time : ${data.startTime} <br>
-                                      End Time : ${data.endTime} <br>
+                                      Start Time : ${data.startTime} (MST) <br>
+                                      End Time : ${data.endTime} (MST) <br>
                                       <br>
 
                                       Property Name : ${data.property} <br>
@@ -12056,8 +12056,8 @@ margin: 0;
                                   <br>
                                   Date : ${data.date}
                                   <br>
-                                  Start Time : ${data.startTime} <br>
-                                  End Time : ${data.endTime} <br>
+                                  Start Time : ${data.startTime} (MST) <br>
+                                  End Time : ${data.endTime} (MST) <br>
                                   <br>
 
                                   Property Name : ${data.property} <br>

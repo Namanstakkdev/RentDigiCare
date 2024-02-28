@@ -16,6 +16,19 @@ exports.send = async (options) => {
   }
 };
 
+const convertToMST = (utcTime) => {
+  const time = new Date(utcTime);
+
+  const formattedTime = time.toLocaleTimeString(undefined, {
+    hour: "numeric",
+    minute: "numeric",
+    hour12: true,
+    timeZone: "America/Denver",
+  });
+
+  return formattedTime;
+};
+
 exports.sendMailforAppointment_half_hour = async () => {
   try {
     const currentTimestamp = Math.ceil(
@@ -55,8 +68,8 @@ exports.sendMailforAppointment_half_hour = async () => {
         let EmailData = {
           // applicantName: slot.name,
           date: moment(slot.date).format("DD-MM-YYYY"),
-          startTime: slot.startTime,
-          endTime: slot.endTime,
+          startTime: convertToMST(slot.startTime),
+          endTime: convertToMST(slot.endTime),
           companyDomain: slot.companyDomain,
           companyName: property?.company,
           property: property?.title,
@@ -71,8 +84,8 @@ exports.sendMailforAppointment_half_hour = async () => {
         let EmailDatauser = {
           applicantName: slot.name,
           date: moment(slot.date).format("DD-MM-YYYY"),
-          startTime: slot.startTime,
-          endTime: slot.endTime,
+          startTime: convertToMST(slot.startTime),
+          endTime: convertToMST(slot.endTime),
           companyDomain: slot.companyDomain,
           companyName: property?.company,
           property: property?.title,
@@ -137,8 +150,8 @@ exports.sendMailforAppointment_twelve_hour = async () => {
         let EmailData = {
           // applicantName: slot.name,
           date: moment(slot.date).format("DD-MM-YYYY"),
-          startTime: slot.startTime,
-          endTime: slot.endTime,
+          startTime: convertToMST(slot.startTime),
+          endTime: convertToMST(slot.endTime),
           companyDomain: slot.companyDomain,
           companyName: property?.company,
           property: property?.title,
@@ -158,8 +171,8 @@ exports.sendMailforAppointment_twelve_hour = async () => {
         let EmailDataUser = {
           applicantName: slot.name,
           date: moment(slot.date).format("DD-MM-YYYY"),
-          startTime: slot.startTime,
-          endTime: slot.endTime,
+          startTime: convertToMST(slot.startTime),
+          endTime: convertToMST(slot.endTime),
           companyDomain: slot.companyDomain,
           companyName: property?.company,
           property: property?.title,

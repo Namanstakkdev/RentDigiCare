@@ -751,13 +751,13 @@ router.get("/add-event", async (req, res) => {
             dateTime: moment(event.eventDate + "T" + event.StartTime, [
               "YYYY-MM-DDTHH:mm",
             ]).toISOString(),
-            timeZone: "Asia/Kolkata",
+            timeZone: "America/Denver",
           },
           end: {
             dateTime: moment(event.eventDate + "T" + event.endTime, [
               "YYYY-MM-DDTHH:mm",
             ]).toISOString(),
-            timeZone: "Asia/Kolkata",
+            timeZone: "America/Denver",
           },
           attendees: event.authEmail,
           reminders: {
