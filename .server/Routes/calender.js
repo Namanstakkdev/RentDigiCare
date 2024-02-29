@@ -9,7 +9,6 @@ const {
 } = require("../config.js");
 require("dotenv").config();
 
-
 const CREDENTIALS_JSON = {
   web: {
     client_id:
@@ -35,7 +34,6 @@ const CREDENTIALS_JSON = {
   },
 };
 
-
 const SCOPES = [
   "https://www.googleapis.com/auth/calendar",
   "https://www.googleapis.com/auth/userinfo.email",
@@ -44,7 +42,7 @@ const SCOPES = [
 const auth2Client = new google.auth.OAuth2(
   CREDENTIALS_JSON.web.client_id,
   CREDENTIALS_JSON.web.client_secret,
-  CREDENTIALS_JSON.web.redirect_uris[4]
+  CREDENTIALS_JSON.web.redirect_uris[2]
 );
 
 // importing database models

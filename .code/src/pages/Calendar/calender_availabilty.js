@@ -93,7 +93,7 @@ const Calender_availabilty = () => {
       ],
     },
   ]);
-
+  
   const [splitTime, setSplitTime] = useState([]);
 
   const [availableError, setAvailableError] = useState("");
@@ -104,17 +104,32 @@ const Calender_availabilty = () => {
 
   let addMoment;
 
+  // const calculateTime = async (i) => {
+  //   return new Promise(function (resolve, reject) {
+  //     if (time.length > 0) {
+  //       addMoment = moment(addMoment).add(30, "m");
+
+  //       time.push(addMoment.format("LT"));
+
+  //       resolve();
+  //     } else {
+  //       addMoment = moment("6.30");
+  //       time.push(moment("6.30").format("LT"));
+  //       resolve();
+  //     }
+  //   });
+  // };
+
   const calculateTime = async (i) => {
     return new Promise(function (resolve, reject) {
       if (time.length > 0) {
         addMoment = moment(addMoment).add(30, "m");
-
         time.push(addMoment.format("LT"));
-
         resolve();
       } else {
-        addMoment = moment("6.30");
-        time.push(moment("6.30").format("LT"));
+        // Initialize addMoment to a valid time format
+        addMoment = moment("12:00", "HH:mm"); // Assuming "6.30" means 06:30 AM
+        time.push(addMoment.format("LT"));
         resolve();
       }
     });
@@ -326,6 +341,8 @@ const Calender_availabilty = () => {
 
     setDayAvailability(changedData);
   };
+
+  console.log("SplitTime:", splitTime);
 
   const options = splitTime.map((startTime) => ({
     value: startTime.toLowerCase().trim(),
