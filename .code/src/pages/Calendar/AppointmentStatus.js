@@ -77,28 +77,28 @@ const AppointmentStatus = () => {
   async function editAppointmentStatusType(event) {
     event.preventDefault();
 
-    if (newRequestType == "") {
-      setshowError(true);
-    } else {
-      setshowError(false);
-    }
-    if (newRequestType != "") {
-      try {
-        const response = await axios.post("requesttype/editrequesttype", {
-          id: selectedId,
-          request_type: newRequestType?.value,
-        });
+    // if (newRequestType == "") {
+    //   setshowError(true);
+    // } else {
+    //   setshowError(false);
+    // }
+    // if (newRequestType != "") {
+      // try {
+        // const response = await axios.post("requesttype/editrequesttype", {
+        //   id: selectedId,
+        //   request_type: newRequestType?.value,
+        // });
 
-        if (response.data.status === 200) {
-          getRequestTypes();
-          setIsEdit(false);
-          setNewRequestType("");
-          tog_large();
-        }
-      } catch (error) {
-        console.log(error);
-      }
-    }
+        // if (response.data.status === 200) {
+        //   getRequestTypes();
+        //   setIsEdit(false);
+        //   setNewRequestType("");
+        //   tog_large();
+        // }
+    //   } catch (error) {
+    //     console.log(error);
+    //   }
+    // }
   }
 
   const [modal_large, setmodal_large] = useState(false);

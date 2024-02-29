@@ -27,6 +27,7 @@
     "chart.js": "^2.9.4",
     "ckeditor5": "^39.0.2",
     "classnames": "^2.3.1",
+    "datejs": "*",
     "dompurify": "^3.0.5",
     "draft-js": "^0.11.7",
     "echarts": "^4.9.0",
@@ -138,8 +139,10 @@
     ]
   },
   "devDependencies": {
+    "@types/datejs": "^0.0.36",
     "@types/react": "^17.0.69",
     "@types/react-dom": "^17.0.22",
+    "@types/react-router-dom": "^5.3.3",
     "typescript": "^5.3.3"
   }
 }
