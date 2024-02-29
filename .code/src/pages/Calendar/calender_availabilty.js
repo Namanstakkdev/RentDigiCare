@@ -93,7 +93,7 @@ const Calender_availabilty = () => {
       ],
     },
   ]);
-  
+
   const [splitTime, setSplitTime] = useState([]);
 
   const [availableError, setAvailableError] = useState("");
@@ -127,8 +127,7 @@ const Calender_availabilty = () => {
         time.push(addMoment.format("LT"));
         resolve();
       } else {
-        // Initialize addMoment to a valid time format
-        addMoment = moment("12:00", "HH:mm"); // Assuming "6.30" means 06:30 AM
+        addMoment = moment("00:00", "HH:mm");
         time.push(addMoment.format("LT"));
         resolve();
       }
@@ -138,21 +137,26 @@ const Calender_availabilty = () => {
   const convertToLocalTime = (utcTime) => {
     const utcDate = new Date(`1970-01-01T${utcTime}`);
 
+    console.log({ utcDate, utcTime });
     const localTime = utcDate.toLocaleTimeString(undefined, {
       hour: "numeric",
       minute: "numeric",
       hour12: true,
       timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
     });
-
-    return localTime;
+    console.log({ localTime });
+    return localTime.toUpperCase().trim();
   };
+
+  console.log({ splitTime });
 
   const getManagerAvailability = async () => {
     try {
       const response = await axios.get(
         `${GET_AVAILABILITY}/?manager_id=${decode.id}`
       );
+
+      console.log({ response });
 
       if (response.data.status == 200) {
         const convertedAvailability =
@@ -213,8 +217,9 @@ const Calender_availabilty = () => {
     const currentDate = new Date();
     const formattedDate = currentDate.toISOString().split("T")[0];
     const dateTimeString = `${formattedDate} ${localTime}`;
+    const dateFOrmat = dateTimeString.replace(/-/g, "/");
 
-    const dateTimeObject = new Date(dateTimeString);
+    const dateTimeObject = new Date(dateFOrmat);
 
     return !isNaN(dateTimeObject)
       ? dateTimeObject.toISOString().split("T")[1]
@@ -226,17 +231,28 @@ const Calender_availabilty = () => {
     let err = true;
     daysAvailability.forEach((dat) => {
       dat.slots.forEach((data) => {
-        const startTimeUtc = convertToUTC(data.startTime);
-        const endTimeUtc = convertToUTC(data.endTime);
+        var startDateTime = new Date("1970/01/01 " + data.startTime);
+        var endDateTime = new Date("1970/01/01 " + data.endTime);
 
-        console.log("StartTimeUtc:", startTimeUtc);
-        console.log("EndTimeUtc:", endTimeUtc);
+        // const startTimeUtc = convertToUTC(data.startTime);
+        // const endTimeUtc = convertToUTC(data.endTime);
 
+        // const dateStart = new Date(`1970-01-01T${startTimeUtc}`).getTime();
+        // const dateEnd = new Date(`1970-01-01T${endTimeUtc}`).getTime();
+
+        console.log({ startDateTime });
+        console.log({ endDateTime });
         // Perform time zone-aware validations
-        if (moment(endTimeUtc).isSameOrBefore(startTimeUtc)) {
+        if ( endDateTime <= startDateTime ) {
           err = false;
           toast(`End time should be greater than start time for ${dat.day}`);
         }
+
+        // Perform time zone-aware validations
+        // if (moment(dateEnd).isSameOrBefore(dateStart)) {
+        //   err = false;
+        //   toast(`End time should be greater than start time for ${dat.day}`);
+        // }
       });
     });
 
@@ -345,11 +361,11 @@ const Calender_availabilty = () => {
   console.log("SplitTime:", splitTime);
 
   const options = splitTime.map((startTime) => ({
-    value: startTime.toLowerCase().trim(),
+    value: startTime,
     label: startTime,
   }));
 
-  console.log({ options });
+  console.log(options);
 
   return (
     <React.Fragment>
@@ -413,7 +429,7 @@ const Calender_availabilty = () => {
                                       name="Start Time"
                                       value={{
                                         value: slot.startTime
-                                          .toLowerCase()
+                                          .toUpperCase()
                                           .trim(),
                                         label: slot.startTime,
                                       }}
@@ -435,7 +451,7 @@ const Calender_availabilty = () => {
                                       name="End Time"
                                       value={{
                                         value: slot.endTime
-                                          .toLowerCase()
+                                          .toUpperCase()
                                           .trim(),
                                         label: slot.endTime,
                                       }}
