@@ -104,35 +104,36 @@ const Calender_availabilty = () => {
 
   let addMoment;
 
-  // const calculateTime = async (i) => {
-  //   return new Promise(function (resolve, reject) {
-  //     if (time.length > 0) {
-  //       addMoment = moment(addMoment).add(30, "m");
-
-  //       time.push(addMoment.format("LT"));
-
-  //       resolve();
-  //     } else {
-  //       addMoment = moment("6.30");
-  //       time.push(moment("6.30").format("LT"));
-  //       resolve();
-  //     }
-  //   });
-  // };
-
   const calculateTime = async (i) => {
     return new Promise(function (resolve, reject) {
       if (time.length > 0) {
         addMoment = moment(addMoment).add(30, "m");
+
+
         time.push(addMoment.format("LT"));
+
         resolve();
       } else {
-        addMoment = moment("00:00", "HH:mm");
-        time.push(addMoment.format("LT"));
+        addMoment = moment("6.30");
+        time.push(moment("6.30").format("LT"));
         resolve();
       }
     });
   };
+
+  // const calculateTime = async (i) => {
+  //   return new Promise(function (resolve, reject) {
+  //     if (time.length > 0) {
+  //       addMoment = moment(addMoment).add(30, "m");
+  //       time.push(addMoment.format("LT"));
+  //       resolve();
+  //     } else {
+  //       addMoment = moment("00:00", "HH:mm");
+  //       time.push(addMoment.format("LT"));
+  //       resolve();
+  //     }
+  //   });
+  // };
 
   const convertToLocalTime = (utcTime) => {
     const utcDate = new Date(`1970-01-01T${utcTime}`);
