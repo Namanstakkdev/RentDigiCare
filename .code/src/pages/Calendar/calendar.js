@@ -61,9 +61,6 @@ function Calendarurl() {
   const [daysAvailability, setDayAvailability] = useState([]);
   const [utcDaysAvailability, setUtcDaysAvailability] = useState([]);
   const [splitTimes, setSplitTimes] = useState([]);
-
-  console.log("SplitTimes:", splitTimes);
-
   const [selectedDate, setSelectedDate] = useState("");
   const [reasonType, setReasonType] = useState([]);
   
@@ -80,11 +77,7 @@ function Calendarurl() {
 
   let addMoment;
 
-  console.log({ addMoment });
-
   let splitedTime = [];
-
-  console.log("SplitedTime:", splitedTime);
 
   let newSlot = false;
   console.log(decode, ">>SDDDDDDDDDD");
@@ -272,22 +265,14 @@ function Calendarurl() {
     setday(dayAvailability.day);
     // console.log(day, "dayAvailability");
     const timeRecurresive = (slot, index) => {
-      console.log(slot, "slot");
       return new Promise(function (myResolve, myReject) {
         const repeatFunc = (slot, index) => {
-          console.log("Repeat Function called.");
           calculateTime(
             bookedEvents,
             slot.startTime.replace(/am|pm/i, (match) => match.toUpperCase()),
             slot.endTime.replace(/am|pm/i, (match) => match.toUpperCase()),
             index
           ).then(() => {
-            console.log({
-              addMoment,
-              endTime: slot.endTime.replace(/am|pm/i, (match) =>
-                match.toUpperCase()
-              ),
-            });
             if (
               addMoment !==
               slot.endTime.replace(/am|pm/i, (match) => match.toUpperCase())
@@ -306,7 +291,6 @@ function Calendarurl() {
     splitedTime = [];
 
     const NextSlots = (m) => {
-      console.log("DayAvailability:", dayAvailability);
       timeRecurresive(dayAvailability.slots[m], m).then(() => {
         m++;
         if (m < dayAvailability.slots.length) {
@@ -332,14 +316,11 @@ function Calendarurl() {
   };
 
   const calculateTime = async (BookedEvents, startTime, endTime, index) => {
-    console.log({ BookedEvents , startTime, endTime, index});
     return new Promise(function (resolve, reject) {
       if (!newSlot) {
         let oldMoment = addMoment;
         addMoment = moment(addMoment, ["h:mm A"]).add(30, "m").format("LT");
         let slot = `${oldMoment} - ${addMoment}`;
-
-        console.log({ slot });
 
         if (!BookedEvents.includes(oldMoment)) {
           splitedTime.push({ slot, index });

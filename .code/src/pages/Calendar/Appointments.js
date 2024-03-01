@@ -36,9 +36,6 @@ import { FormGroup } from "react-bootstrap";
 
 const Appointment = () => {
   const decode2 = jwt_decode(window.localStorage.getItem("accessToken"));
-
-  console.log("Decode2:", decode2);
-
   const [booked, setbooked] = useState([]);
   const [modal, setModal] = useState(false);
   const [modalOne, setModalOne] = useState(false);
@@ -93,13 +90,10 @@ const Appointment = () => {
 
   const [authEmail, setAuthEmail] = useState("");
 
-  // Get the current date
-  const currentDate = new Date();
+  const currentDateUTC = new Date().toISOString();
 
   const filteredBooked = booked.map((item) => {
-    const appointmentDate = new Date(item.date);
-
-    if (currentDate.getTime() >= appointmentDate.getTime()) {
+    if (currentDateUTC >= item.endTime) {
       return {
         ...item,
         status: "Appointment expired",
@@ -108,8 +102,6 @@ const Appointment = () => {
       return item;
     }
   });
-
-  console.log("FilteredBooked:", filteredBooked);
 
   useEffect(() => {
     getAppointments();
@@ -164,7 +156,6 @@ const Appointment = () => {
       data?.reasons.map((r) => ({ label: r.reasonType, value: r._id }))
     );
     setSelectedId("");
-    console.log(data, "data");
   };
 
   const [col5, setcol5] = useState(false);
