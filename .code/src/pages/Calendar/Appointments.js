@@ -88,6 +88,7 @@ const Appointment = () => {
   const pageTotal = Math.ceil(stats.total / pageLimit);
 
   const [authEmail, setAuthEmail] = useState("");
+  const [showAuthEmailField, setShowAuthEmailField] = useState(false);
 
   const currentDateUTC = new Date().toISOString();
 
@@ -319,6 +320,16 @@ const Appointment = () => {
     } catch (error) {
       console.error("Error updating event status:", error);
     }
+  };
+
+  const updateAppointmentAndSubmit = () => {
+    if (showAuthEmailField) {
+      bookedAndSyncWithGoogleCalendar(selectedId, "booked", authEmail);
+    } else {
+      updateAppoitnment(selectedId, "booked");
+    }
+
+    toggle_one();
   };
 
   const deleteAppoitnment = async () => {
@@ -943,38 +954,51 @@ const Appointment = () => {
                   </Modal>
                   <Modal isOpen={modalOne} toggle={toggle_one}>
                     <ModalHeader style={{ border: "none" }} toggle={toggle_one}>
-                      Are you Sure?
+                      Are you sure you want to schedule the current appointment?
                     </ModalHeader>
                     <ModalBody>
-                      <label htmlFor="authEmail">Auth Email:</label>
-                      <input
-                        type="email"
-                        id="authEmail"
-                        value={authEmail}
-                        onChange={(e) => setAuthEmail(e.target.value)}
-                      />
+                      {showAuthEmailField && (
+                        <>
+                          <label htmlFor="authEmail">Auth Email:</label>
+                          <input
+                            type="email"
+                            id="authEmail"
+                            value={authEmail}
+                            onChange={(e) => setAuthEmail(e.target.value)}
+                            className="form-control"
+                          />
+                        </>
+                      )}
                     </ModalBody>
                     <ModalFooter style={{ border: "none" }}>
                       <Button
                         color="primary"
+                        // onClick={() => {
+                        //   updateAppoitnment(selectedId, "booked");
+                        // }}
                         onClick={() => {
-                          updateAppoitnment(selectedId, "booked");
+                          updateAppointmentAndSubmit();
                         }}
                       >
-                        Yes
+                        {showAuthEmailField ? "Submit" : "Yes"}
                       </Button>
-                      <Button
-                        style={{ backgroundColor: "#4285f4", border: "none" }}
-                        onClick={() => {
-                          bookedAndSyncWithGoogleCalendar(
-                            selectedId,
-                            "booked",
-                            authEmail
-                          );
-                        }}
-                      >
-                        Sync with Google Calendar
-                      </Button>
+                      {!showAuthEmailField && (
+                        <Button
+                          style={{ backgroundColor: "#4285f4", border: "none" }}
+                          // onClick={() => {
+                          //   bookedAndSyncWithGoogleCalendar(
+                          //     selectedId,
+                          //     "booked",
+                          //     authEmail
+                          //   );
+                          // }}
+                          onClick={() => {
+                            setShowAuthEmailField(true);
+                          }}
+                        >
+                          Sync with Google Calendar
+                        </Button>
+                      )}
                       <Button color="secondary" onClick={toggle_one}>
                         No
                       </Button>
