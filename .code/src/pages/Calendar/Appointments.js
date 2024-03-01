@@ -31,6 +31,7 @@ import {
 } from "reactstrap";
 //Import Breadcrumb
 import Breadcrumbs from "../../components/Common/Breadcrumb";
+import { FormGroup } from "react-bootstrap";
 // import { toast } from "react-toastify";
 
 const Appointment = () => {
@@ -952,37 +953,68 @@ const Appointment = () => {
                   </Modal>
                   <Modal isOpen={modalOne} toggle={toggle_one}>
                     <ModalHeader style={{ border: "none" }} toggle={toggle_one}>
-                      Are you Sure?
+                      Are you sure you want to schedule the current appointment?
                     </ModalHeader>
                     <ModalBody>
-                      <label htmlFor="authEmail">Auth Email:</label>
-                      <input
-                        type="email"
-                        id="authEmail"
-                        value={authEmail}
-                        onChange={(e) => setAuthEmail(e.target.value)}
-                      />
+                      <Form>
+                        <FormGroup>
+                          <div style={{ marginBottom: "10px" }}>
+                            <h6 style={{ marginBottom: "5px" }}>Auth Email:</h6>
+                            <Label for="authEmail">
+                              <small >
+                                (Please enter the email address you want to sync
+                                your appointments with)
+                              </small>
+                            </Label>
+                          </div>
+                          <Input
+                            type="email"
+                            id="authEmail"
+                            value={authEmail}
+                            onChange={(e) => setAuthEmail(e.target.value)}
+                            className="form-control"
+                          />
+                        </FormGroup>
+                      </Form>
                     </ModalBody>
                     <ModalFooter style={{ border: "none" }}>
                       <Button
                         color="primary"
-                        onClick={() => {
-                          updateAppoitnment(selectedId, "booked");
-                        }}
+                        onClick={() => updateAppointment(selectedId, "booked")}
                       >
                         Yes
                       </Button>
                       <Button
-                        style={{ backgroundColor: "#4285f4", border: "none" }}
-                        onClick={() => {
+                        style={{
+                          backgroundColor: "#4285f4",
+                          border: "none",
+                          display: "flex",
+                          alignItems: "center",
+                        }}
+                        onClick={() =>
                           bookedAndSyncWithGoogleCalendar(
                             selectedId,
                             "booked",
                             authEmail
-                          );
-                        }}
+                          )
+                        }
                       >
-                        Sync with Google Calendar
+                        <span style={{ color: "white" }}>Sync</span>
+                        <div
+                          style={{
+                            height: "24px",
+                            width: "27px",
+                            // backgroundColor: "white",
+                            borderRadius: "50%",
+                            // marginLeft: "5px",
+                          }}
+                        >
+                          <img
+                            src="/images/google.png"
+                            alt="Google Logo"
+                            style={{ height: "21px" }}
+                          />
+                        </div>
                       </Button>
                       <Button color="secondary" onClick={toggle_one}>
                         No
