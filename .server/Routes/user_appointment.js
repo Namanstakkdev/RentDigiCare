@@ -27,7 +27,6 @@ const Layout = require("../Database/Layout");
 const Reason_types = require("../Database/CalendarReasonTypes");
 const user_appointment = require("../Database/user_appointment");
 
-
 router.post("/update_status", async (req, res) => {
   try {
     const { apptId, status } = req.body;
@@ -56,7 +55,6 @@ router.post("/update_status", async (req, res) => {
     return res.status(500).json({ message: "Internal server error" });
   }
 });
-
 
 router.post("/set-availability", async (req, res) => {
   try {
@@ -1519,7 +1517,7 @@ router.post("/get-company-projectmanager-slot", async (req, res) => {
 
 //application filter for graph
 router.get("/dashboardfilter", async (req, res) => {
-  console.log(req.query, "----------------");
+  console.log(req.query, "Req.query in dashboardfilter");
   try {
     let appointment = "";
 
@@ -1552,10 +1550,13 @@ router.get("/dashboardfilter", async (req, res) => {
       }
       if (role == "manager") {
         matchConditions.eventAssignedTo = ObjectID(req.query.propertyManagerID);
-      } else {
-        let company = await Company.findOne({ domain: req.query.domain });
-        matchConditions.eventAssignedTo = ObjectID(company._id);
       }
+      
+      if (role === "company" && req.query.propertyManagerID) {
+        matchConditions.eventAssignedTo = ObjectID(req.query.propertyManagerID);
+      }
+
+      console.log({ matchConditions });
       appointment = await user_appointment.aggregate([
         {
           $match: matchConditions,
