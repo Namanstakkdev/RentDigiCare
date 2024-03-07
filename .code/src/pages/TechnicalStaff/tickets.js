@@ -463,7 +463,7 @@ const TechnicalStaffTickets = () => {
         setportalTikets(response.data.tickets);
         setTotalTickets(response.data.totalCount);
         setPropertyList(response.data.propertyList);
-        setTicketIDs(response.data.tickets.map((t) => t._id));
+        // setTicketIDs(response.data.tickets.map((t) => t._id));
         setRequestTypes(response.data.requestTypes);
         setNotesCount(response.data.notesCount);
         setStats({
@@ -485,6 +485,18 @@ const TechnicalStaffTickets = () => {
       setportalTikets([]);
 
       console.log(error); // TODO proper error
+    }
+  };
+
+  const getTechnicalStaffTicketIds = async (type) => {
+    try {
+      const response = await axios.post(VENDOR_PORTAL_TICKETS);
+
+      if (response.data.status == 200) {
+        setTicketIDs(response.data.tickets.map((t) => t._id));
+      }
+    } catch (error) {
+      console.log(error);
     }
   };
 
@@ -568,6 +580,7 @@ const TechnicalStaffTickets = () => {
 
   useEffect(async () => {
     getTechnicalStaffTickets();
+    getTechnicalStaffTicketIds();
     // getProperties();
     // const getSpeciality = async (e) => {
     // }
@@ -1143,19 +1156,28 @@ const TechnicalStaffTickets = () => {
                                         value={property}
                                         onChange={(e) => {
                                           // const propertyData = JSON.parse(e.target.value)
-                                          setPropertyID(e.value);
-                                          setProperty(e);
-                                          console.log(e);
+
+                                          if (e.value === "all") {
+                                            setPropertyID(null);
+                                            setProperty(e);
+                                          } else {
+                                            setPropertyID(e.value);
+                                            setProperty(e);
+                                          }
+
                                           // domain = this.state.propertyList.find(o => o._id === propertyData.ID);
                                           // domain = domain.companyDomain
                                           // console.log(domain)
                                         }}
-                                        options={propertyList?.map((p) => {
-                                          return {
-                                            value: p._id,
-                                            label: p.title,
-                                          };
-                                        })}
+                                        options={[
+                                          { value: "all", label: "All" },
+                                          ...propertyList?.map((p) => {
+                                            return {
+                                              value: p._id,
+                                              label: p.title,
+                                            };
+                                          }),
+                                        ]}
                                       />
                                     </div>
                                   </div>

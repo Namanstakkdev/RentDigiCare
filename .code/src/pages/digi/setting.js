@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useLocation } from "react-router-dom";
 import MetaTags from "react-meta-tags";
 import {
   Row,
@@ -25,10 +26,13 @@ import jwt_decode from "jwt-decode";
 
 // TODO Validations
 const Setting = () => {
+  const location = useLocation();
   const decode = jwt_decode(window.localStorage.accessToken);
 
   // sync with google fields
   const [email, setEmail] = useState("");
+  const [accessTokenExpirationTime, setAccessTokenExpirationTime] =
+    useState(null);
 
   // update password fields
   const [oldPassword, setOldPassword] = useState("");
@@ -154,6 +158,26 @@ const Setting = () => {
       );
     } catch (error) {
       console.log(error);
+    }
+  };
+
+  const getExpirationTime = async () => {
+    try {
+      const response = await axios.post(
+        `/calender/getExpirationTime/${decode.id}`
+      );
+
+      if (response.status === 200) {
+        const expirationTimeStr = response.data.token.expiresAt;
+        const expirationTime = parseInt(expirationTimeStr);
+        const expirationDate = new Date(expirationTime);
+        const date = expirationDate.toLocaleString();
+        setAccessTokenExpirationTime(date);
+      } else {
+        console.error(`Failed to get expiration time for user ${decode.id}`);
+      }
+    } catch (error) {
+      console.error("Error retrieving expiration time:", error.message);
     }
   };
 
@@ -472,6 +496,10 @@ const Setting = () => {
       );
     }
   }, [location.search]);
+
+  useEffect(() => {
+    getExpirationTime();
+  }, []);
 
   if (decode.role === "admin") {
     return (
@@ -1385,6 +1413,22 @@ const Setting = () => {
                         </div>
                       </div>
                     </div>
+
+                    <div className="row mt-3">
+                      <div className="col-lg-6">
+                        <div className="mb-3">
+                          <Label className="form-label">
+                            Access Token Expiration Time
+                          </Label>
+                          <Input
+                            type="text"
+                            readOnly
+                            value={accessTokenExpirationTime} // Set the value here dynamically
+                            className="form-control"
+                          />
+                        </div>
+                      </div>
+                    </div>
                   </CardBody>
                 </Card>
               </Col>
@@ -1883,6 +1927,22 @@ const Setting = () => {
                               display: "none",
                             }}
                           ></span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="row mt-3">
+                      <div className="col-lg-6">
+                        <div className="mb-3">
+                          <Label className="form-label">
+                            Access Token Expiration Time
+                          </Label>
+                          <Input
+                            type="text"
+                            readOnly
+                            value={accessTokenExpirationTime} // Set the value here dynamically
+                            className="form-control"
+                          />
                         </div>
                       </div>
                     </div>

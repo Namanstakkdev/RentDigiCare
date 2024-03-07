@@ -603,8 +603,6 @@ router.post("/googleAuth", async (req, res) => {
 
 const storeAccessToken = async (authEmail, access_token, expires_in) => {
   try {
-    const expires_at = Date.now() + expires_in * 1000;
-
     const existingToken = await CalendarToken.findOne({
       userId: authEmail.userId,
     });
@@ -615,7 +613,7 @@ const storeAccessToken = async (authEmail, access_token, expires_in) => {
         {
           authEmail: authEmail.authEmail,
           accessToken: access_token,
-          expiresAt: expires_at,
+          expiresAt: expires_in,
         },
         { new: true }
       );
@@ -628,7 +626,7 @@ const storeAccessToken = async (authEmail, access_token, expires_in) => {
         firstname: authEmail.firstname,
         lastname: authEmail.lastname,
         accessToken: access_token,
-        expiresAt: expires_at,
+        expiresAt: expires_in,
       });
     }
   } catch (error) {
@@ -664,8 +662,8 @@ router.get("/add-event", async (req, res) => {
       const encodedResponse = encodeURIComponent(JSON.stringify(responseData));
 
       res.redirect(
-        `${process.env.DOMAIN}/setting?response=${encodedResponse}`
-        // `http://localhost:3000/setting?response=${encodedResponse}`
+        // `${process.env.DOMAIN}/setting?response=${encodedResponse}`
+        `http://localhost:3000/setting?response=${encodedResponse}`
       );
     } else {
       const responseData = {
@@ -676,8 +674,8 @@ router.get("/add-event", async (req, res) => {
       const encodedResponse = encodeURIComponent(JSON.stringify(responseData));
 
       res.redirect(
-        `${process.env.DOMAIN}/setting?response=${encodedResponse}`
-        // `http://localhost:3000/setting?response=${encodedResponse}`
+        // `${process.env.DOMAIN}/setting?response=${encodedResponse}`
+        `http://localhost:3000/setting?response=${encodedResponse}`
       );
     }
   } catch (error) {
@@ -820,7 +818,7 @@ router.post("/create-event", async (req, res) => {
             ],
           },
         };
-       /*  await eventUpdate(
+        /*  await eventUpdate(
           existingToken.accessToken,
           existingEvent.eventId,
           updateCalenderEvent
@@ -877,6 +875,19 @@ router.post("/create-event", async (req, res) => {
   } catch (error) {
     console.error("Error creating event:", error);
     res.status(500).send({ error: "Error creating event" });
+  }
+});
+
+router.post("/getExpirationTime/:userId", async (req, res) => {
+  try {
+    const userId = ObjectId(req.params.userId);
+    const token = await CalendarToken.findOne({ userId });
+    res
+      .status(200)
+      .send({ message: "Expiration Time found successfully", token });
+  } catch (error) {
+    console.error("Error:", error);
+    res.status(500).send("Internal Server Error");
   }
 });
 

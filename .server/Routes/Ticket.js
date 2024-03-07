@@ -2381,16 +2381,19 @@ router.post("/technicalstaff/:technicalstaff", async (req, res) => {
       query.status = { $eq: req.body.status };
     }
     if (req.body.startDate && req.body.endDate) {
+      const startDate = moment(req.body.startDate, "YYYY-MM-DD");
+      const endDate = moment(req.body.endDate, "YYYY-MM-DD").endOf("day");
+
       query.createdAt = {
-        $gte: moment(req.body.startDate),
-        $lt: moment(req.body.endDate),
+        $gte: startDate.toDate(),
+        $lte: endDate.toDate(),
       };
     }
     if (req.body.filterID) {
-      query._id = req.body.filterID;
+      query._id = ObjectId(req.body.filterID);
     }
     if (req.body.propertyID) {
-      query.propertyID = req.body.propertyID;
+      query.propertyID = ObjectId(req.body.propertyID);
     }
 
     const countQuery = function (callback) {
