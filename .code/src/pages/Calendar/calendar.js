@@ -319,7 +319,7 @@ function Calendarurl() {
     return new Promise(function (resolve, reject) {
       if (!newSlot) {
         let oldMoment = addMoment;
-        addMoment = moment(addMoment, ["h:mm A"]).add(30, "m").format("LT");
+        addMoment = moment(addMoment, ["h:mm A"]).add(15, "m").format("LT");
         let slot = `${oldMoment} - ${addMoment}`;
 
         if (!BookedEvents.includes(oldMoment)) {
@@ -329,7 +329,7 @@ function Calendarurl() {
           resolve(); // Resolve without the index if the slot is booked
         }
       } else {
-        addMoment = moment(startTime, ["h:mm A"]).add(30, "m").format("LT");
+        addMoment = moment(startTime, ["h:mm A"]).add(15, "m").format("LT");
         let slot = `${startTime} - ${addMoment}`;
         if (!BookedEvents.includes(startTime)) {
           splitedTime.push({ slot, index });

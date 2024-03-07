@@ -2,6 +2,7 @@ const router = require("express").Router();
 const logger = require("../Logger/LoggerFactory").getProductionLogger();
 const { google } = require("googleapis");
 const moment = require("moment");
+const mongoose = require("mongoose");
 const jwt = require("jsonwebtoken");
 const {
   GOOGLE_CALENDAR_ID,
@@ -57,8 +58,14 @@ const CalendarReasonTypes = require("../Database/CalendarReasonTypes");
 const PropertyManager = require("../Database/PropertyManager");
 const ObjectId = require("mongodb").ObjectId;
 
-const eventUpdate = (eventId, event) => {
-  // const calendar = google.calendar({ version: "v3", auth });
+const AuthEmail = require("../Database/AuthEmail.js");
+const CalendarToken = require("../Database/CalendarToken.js");
+
+const eventUpdate = async (accessToken, eventId, event) => {
+  const calendar = google.calendar("v3");
+
+  auth2Client.setCredentials({ access_token: accessToken });
+
   calendar.events.patch(
     {
       auth: auth2Client,
@@ -573,79 +580,145 @@ router.get("/get-availability", async (req, res) => {
   }
 });
 
-const insertEventGoogleCalendar = async (event, accessToken) => {
+router.post("/googleAuth", async (req, res) => {
+  const userId = mongoose.Types.ObjectId(req.body.userId);
+  const existingUserId = await AuthEmail.findOne({ userId });
+  const emailData = req.body;
+
+  if (existingUserId) {
+    await AuthEmail.findOneAndUpdate({ userId }, emailData, {
+      new: true,
+    });
+  } else {
+    await AuthEmail.create(emailData);
+  }
+
+  const authUrl = auth2Client.generateAuthUrl({
+    access_type: "offline",
+    scope: SCOPES,
+    prompt: "consent",
+  });
+  res.status(200).send(authUrl);
+});
+
+const storeAccessToken = async (authEmail, access_token, expires_in) => {
   try {
-    console.log("Access Token in function:", accessToken);
-    console.log("Event in function:", event);
+    const expires_at = Date.now() + expires_in * 1000;
 
-    console.log("Constructed Event", event);
-
-    const calendar = google.calendar({
-      version: "v3",
-      auth: "AIzaSyC9iuP9dmClgizbZz-F-O-GmqxB5VQT4m4",
+    const existingToken = await CalendarToken.findOne({
+      userId: authEmail.userId,
     });
 
-    const response = await calendar.events.insert({
-      calendarId: "primary",
-      sendUpdates: "all",
-      sendNotifications: true,
-      auth: auth2Client,
-      resource: event,
-    });
-
-    console.log("Event created: %s", response.data);
-  } catch (err) {
-    console.error("Error inserting event into Google Calendar:", err);
-
-    // Check if the error indicates a lack of permission
-    if (
-      err.code === 403 &&
-      err.errors &&
-      err.errors.length > 0 &&
-      err.errors[0].reason === "forbidden"
-    ) {
-      console.error(
-        "Permission error: The authenticated user does not have permission to add events to this calendar."
+    if (existingToken) {
+      await CalendarToken.findOneAndUpdate(
+        { userId: authEmail.userId },
+        {
+          authEmail: authEmail.authEmail,
+          accessToken: access_token,
+          expiresAt: expires_at,
+        },
+        { new: true }
       );
-      // You can handle this case and provide a user-friendly response
     } else {
-      // Handle other types of errors or rethrow the original error
-      throw err;
+      await CalendarToken.create({
+        userId: authEmail.userId,
+        authEmail: authEmail.authEmail,
+        companyId: authEmail.companyId,
+        role: authEmail.role,
+        firstname: authEmail.firstname,
+        lastname: authEmail.lastname,
+        accessToken: access_token,
+        expiresAt: expires_at,
+      });
     }
+  } catch (error) {
+    console.error("Error storing access token:", error);
+    throw error;
   }
 };
 
 router.get("/add-event", async (req, res) => {
   try {
-    const code = req.query.code;
+    const { code } = req.query;
 
     const { tokens } = await auth2Client.getToken(code);
-
     const idToken = tokens.id_token;
     const decodedToken = jwt.decode(idToken, { complete: true });
 
     const email = decodedToken.payload.email;
+    const authEmail = await AuthEmail.findOne({ authEmail: email });
 
-    tokens.expiry_date = Date.now() + tokens.expiry_date * 1000;
-    auth2Client.setCredentials(tokens);
+    if (authEmail) {
+      auth2Client.setCredentials(tokens);
+      await storeAccessToken(
+        authEmail,
+        tokens.access_token,
+        tokens.expiry_date
+      );
 
-    const accessToken = tokens.access_token;
+      const responseData = {
+        message: "Synced successfully",
+        status: 200,
+      };
 
-    auth2Client.setCredentials({
-      access_token: accessToken,
-      scope: tokens.scope,
-      expiry_date: tokens.expiry_date,
+      const encodedResponse = encodeURIComponent(JSON.stringify(responseData));
+
+      res.redirect(
+        `${process.env.DOMAIN}/setting?response=${encodedResponse}`
+        // `http://localhost:3000/setting?response=${encodedResponse}`
+      );
+    } else {
+      const responseData = {
+        message: "Invalid Auth Email",
+        status: 400,
+      };
+
+      const encodedResponse = encodeURIComponent(JSON.stringify(responseData));
+
+      res.redirect(
+        `${process.env.DOMAIN}/setting?response=${encodedResponse}`
+        // `http://localhost:3000/setting?response=${encodedResponse}`
+      );
+    }
+  } catch (error) {
+    console.error("Error retrieving access token:", error);
+    res.status(500).send("Error retrieving access token.");
+  }
+});
+
+const createGoogleCalendarEvent = async (accessToken, eventData) => {
+  try {
+    const calendar = google.calendar("v3");
+
+    auth2Client.setCredentials({ access_token: accessToken });
+
+    const response = await calendar.events.insert({
+      auth: auth2Client,
+      calendarId: "primary",
+      sendUpdates: "all",
+      sendNotifications: true,
+      resource: eventData,
     });
 
-    const event = await Events.findOne({ authEmail: email });
+    return response.data.htmlLink;
+  } catch (error) {
+    console.error("Error creating Google Calendar event:", error);
+    throw error;
+  }
+};
 
-    if (event) {
+router.post("/create-event", async (req, res) => {
+  try {
+    const userId = mongoose.Types.ObjectId(req.body.userId);
+    const existingToken = await CalendarToken.findOne({ userId });
+
+    if (existingToken) {
       const managerAvailability = await ManagerAvailability.findOne({
-        eventAssignedTo: event.manager_id,
+        eventAssignedTo: req.body.userId,
       });
 
       const dayAvailability = managerAvailability.daysOfWeekAvailability.find(
-        (dayItem) => dayItem.day === event.day
+        (dayItem) => dayItem.day === req.body.day
       );
 
       if (!dayAvailability || !dayAvailability.available) {
@@ -656,18 +729,18 @@ router.get("/add-event", async (req, res) => {
       }
 
       const bookedEvents = await Calender_events.find({
-        eventDate: event.eventDate,
-        eventAssignedTo: event.manager_id,
+        eventDate: req.body.eventDate,
+        eventAssignedTo: req.body.userId,
       });
 
       const isSlotBooked = () =>
         bookedEvents.some((booked) => {
           const eventStartTime = Math.ceil(
-            moment(event.StartTime, "h:mm A").valueOf() / 1000
+            moment(req.body.StartTime, "h:mm A").valueOf() / 1000
           );
 
           const eventEndTime = Math.ceil(
-            moment(event.endTime, "h:mm A").valueOf() / 1000
+            moment(req.body.endTime, "h:mm A").valueOf() / 1000
           );
 
           const bookedStartTime = Math.ceil(
@@ -684,69 +757,56 @@ router.get("/add-event", async (req, res) => {
         });
 
       if (bookedEvents.length > 0 && isSlotBooked()) {
-        const responseData = {
-          message: "Slot is already booked",
-          status: 500,
-        };
-
-        const encodedResponse = encodeURIComponent(
-          JSON.stringify(responseData)
-        );
-
-        res.redirect(
-          // `${process.env.DOMAIN}/apps-calendar?response=${encodedResponse}`
-          `http://localhost:3000/apps-calendar?response=${encodedResponse}`
-        );
+        res.status(400).send({ message: "Slot is already booked" });
       }
 
       let eve;
       const eventData = {
-        eventId: event.event_id,
-        eventAssignedTo: event.manager_id,
-        assignedToType: event.role,
-        description: event.description,
-        eventDate: event.eventDate,
-        startTime: event.StartTime,
-        endTime: event.endTime,
-        createdBy: event.createdBy,
-        type: event.type,
-        title: event.title,
-        propertyId: event.propertyId,
-        companyDomain: event.companyDomain,
+        eventId: req.body.event_id,
+        eventAssignedTo: req.body.userId,
+        assignedToType: req.body.role,
+        description: req.body.description,
+        eventDate: req.body.eventDate,
+        startTime: req.body.StartTime,
+        endTime: req.body.endTime,
+        createdBy: req.body.createdBy,
+        type: req.body.type,
+        title: req.body.title,
+        propertyId: req.body.propertyId,
+        companyDomain: req.body.companyDomain,
       };
 
       // Check if event with the provided ID exists
       const existingEvent = await Calender_events.findOne({
-        eventId: event.event_id,
+        eventId: req.body.event_id,
       });
 
+      console.log({ existingEvent });
+
       if (existingEvent) {
-        // Update the existing event
-        eve = await Calender_events.findByIdAndUpdate(
-          event.event_id,
+        eve = await Calender_events.findOneAndUpdate(
+          { eventId: req.body.event_id },
           eventData,
-          {
-            new: true,
-          }
+          { new: true }
         );
         console.log("Updated event in create-event:", eve);
         const updateCalenderEvent = {
-          summary: event.title,
-          description: event.description,
+          summary: req.body.title,
+          description: req.body.description,
           start: {
-            dateTime: moment(event.eventDate + "T" + event.StartTime, [
+            dateTime: moment(req.body.eventDate + "T" + req.body.StartTime, [
               "YYYY-MM-DDTHH:mm",
             ]).toISOString(),
-            timeZone: "Asia/Kolkata",
+            timeZone: "America/Denver",
           },
           end: {
-            dateTime: moment(event.eventDate + "T" + event.endTime, [
+            dateTime: moment(req.body.eventDate + "T" + req.body.endTime, [
               "YYYY-MM-DDTHH:mm",
             ]).toISOString(),
-            timeZone: "Asia/Kolkata",
+            timeZone: "America/Denver",
           },
-          attendees: event.authEmail,
-          reminders: event.reminders || {
+          attendees: req.body.authEmail,
+          reminders: req.body.reminders || {
             useDefault: false,
             overrides: [
               {
@@ -760,27 +820,32 @@ router.get("/add-event", async (req, res) => {
             ],
           },
         };
-        // eventUpdate(event.event_id, updateCalenderEvent);
+       /*  await eventUpdate(
+          existingToken.accessToken,
+          existingEvent.eventId,
+          updateCalenderEvent
+        ); */
+        // res.status(200).send({ message: "Successfully Updated" });
       } else {
         // Create a new event
         eve = await Calender_events.create(eventData);
         const newCalenderEvent = {
           id: eve._id,
-          summary: event.title,
-          description: event.description,
+          summary: req.body.title,
+          description: req.body.description,
           start: {
-            dateTime: moment(event.eventDate + "T" + event.StartTime, [
+            dateTime: moment(req.body.eventDate + "T" + req.body.StartTime, [
               "YYYY-MM-DDTHH:mm",
             ]).toISOString(),
             timeZone: "America/Denver",
           },
           end: {
-            dateTime: moment(event.eventDate + "T" + event.endTime, [
+            dateTime: moment(req.body.eventDate + "T" + req.body.endTime, [
               "YYYY-MM-DDTHH:mm",
             ]).toISOString(),
             timeZone: "America/Denver",
           },
-          attendees: event.authEmail,
+          attendees: req.body.authEmail,
           reminders: {
             useDefault: false,
             overrides: [
@@ -795,64 +860,23 @@ router.get("/add-event", async (req, res) => {
             ],
           },
         };
-        if (auth2Client.credentials && auth2Client.credentials.access_token) {
-          await insertEventGoogleCalendar(
-            newCalenderEvent,
-            auth2Client.credentials.access_token
-          );
 
-          const responseData = {
-            success: true,
-            message: existingEvent ? "Successfully Updated" : "Event added",
-            status: 200,
-          };
+        console.log("New Calender Event:", newCalenderEvent);
 
-          const encodedResponse = encodeURIComponent(
-            JSON.stringify(responseData)
-          );
-
-          res.redirect(
-            `http://localhost:3000/apps-calendar?response=${encodedResponse}`
-          );
-        } else {
-          const responseData = {
-            message: "Authentication failed.",
-            status: 500,
-          };
-
-          const encodedResponse = encodeURIComponent(
-            JSON.stringify(responseData)
-          );
-
-          res.redirect(
-            `http://localhost:3000/apps-calendar?response=${encodedResponse}`
-          );
-        }
+        const eventLink = await createGoogleCalendarEvent(
+          existingToken.accessToken,
+          newCalenderEvent
+        );
+        res
+          .status(200)
+          .send({ message: "Event created successfully", eventLink });
       }
     } else {
-      const responseData = {
-        message: "Bad request",
-        status: 400,
-      };
-
-      const encodedResponse = encodeURIComponent(JSON.stringify(responseData));
-
-      res.redirect(
-        `http://localhost:3000/apps-calendar?response=${encodedResponse}`
-      );
+      res.status(400).send({ message: "Access token not found for the user" });
     }
   } catch (error) {
-    console.error(error);
-    const responseData = {
-      message: "Something went wrong!",
-      status: 500,
-    };
-
-    const encodedResponse = encodeURIComponent(JSON.stringify(responseData));
-
-    res.redirect(
-      `http://localhost:3000/apps-calendar?response=${encodedResponse}`
-    );
+    console.error("Error creating event:", error);
+    res.status(500).send({ error: "Error creating event" });
   }
 });
 

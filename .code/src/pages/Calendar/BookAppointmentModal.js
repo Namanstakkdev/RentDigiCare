@@ -277,7 +277,7 @@ const BookAppointmentModal = ({ open, setOpen, id, defaultDate }) => {
       if (!newSlot) {
         let oldMoment = addMoment;
         // console.log("addMoment  3: ", addMoment);
-        addMoment = moment(addMoment, ["h:mm A"]).add(30, "m").format("LT");
+        addMoment = moment(addMoment, ["h:mm A"]).add(15, "m").format("LT");
         // console.log("addMoment  4: ", addMoment);
         let slot = `${oldMoment} - ${addMoment}`;
 
@@ -290,7 +290,7 @@ const BookAppointmentModal = ({ open, setOpen, id, defaultDate }) => {
         }
       } else {
         // console.log("addMoment  0: ", addMoment);
-        addMoment = moment(startTime, ["h:mm A"]).add(30, "m").format("LT");
+        addMoment = moment(startTime, ["h:mm A"]).add(15, "m").format("LT");
         // console.log("addMoment  2: ", addMoment);
         let slot = `${startTime} - ${addMoment}`;
         if (!BookedEvents.includes(startTime)) {

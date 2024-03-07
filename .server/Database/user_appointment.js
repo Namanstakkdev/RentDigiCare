@@ -1,7 +1,5 @@
 const mongoose = require("mongoose");
 
-
-
 const UserAppointmentAchema = mongoose.Schema({
   eventAssignedTo: {
     type: mongoose.Schema.ObjectId,
@@ -77,7 +75,7 @@ const UserAppointmentAchema = mongoose.Schema({
   statusUpdate: {
     type: String,
     required: true,
-    default: "scheduled",
+    default: "Scheduled",
   },
   createdAt: {
     type: Date,
@@ -85,8 +83,4 @@ const UserAppointmentAchema = mongoose.Schema({
   },
 });
 
-
-
-
-
-module.exports = mongoose.model("User_appointment", UserAppointmentAchema)
+module.exports = mongoose.model("User_appointment", UserAppointmentAchema);

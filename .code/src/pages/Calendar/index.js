@@ -85,8 +85,7 @@ const Calender = (props) => {
 
   const GET_TICKETS = "/calender/";
   const GET_AVAILABILITY = "/calender/get-availability";
-  // const ADD_EVENT = "/calender/add-event";
-  const ADD_EVENT = "/calender/auth";
+  const ADD_EVENT = "/calender/create-event";
   const GET_MANAGERS = "/company/get_managers";
   const GET_MANAGERS_SLOTS =
     "/user_appointment/get-company-projectmanager-slot";
@@ -647,8 +646,7 @@ const Calender = (props) => {
     }
 
     const reqData = {
-      authEmail: values.auth_email,
-      manager_id: values.manager ? values.manager : decode.id,
+      userId: values.manager ? values.manager : decode.id,
       day: moment(values.date).format("ddd"),
       eventDate: values.date,
       StartTime: startTime,
@@ -663,26 +661,14 @@ const Calender = (props) => {
       role: role,
       available: true,
     };
-    console.log("Request Date:", reqData);
 
     try {
       const response = await axios.post(ADD_EVENT, reqData);
 
-      if (response.status == 200) {
-        console.log("Response:", response.data);
-        window.location.href = response.data;
+      if (response.status === 200) {
+        toggleCategory();
+        toast.success(response.data.message);
 
-        const urlParams = new URLSearchParams(window.location.search);
-        const encodedResponse = urlParams.get("response");
-
-        if (encodedResponse) {
-          const decodedResponse = JSON.stringify(
-            decodeURIComponent(encodedResponse)
-          );
-          console.log(decodedResponse);
-        } else {
-          console.error("Response data not found in the URL");
-        }
         // let updatedEvent = response.data.updatedEvent;
 
         // if (response.data.message == "Successfully Updated") {
@@ -1787,20 +1773,6 @@ const Calender = (props) => {
                             }}
                             value={event.email ? event.email : ""}
                             disabled={true}
-                          />
-                        </Col>
-
-                        <Col className="col-12 mb-3">
-                          <AvField
-                            name="auth_email"
-                            label="Auth Email"
-                            type="text"
-                            errorMessage="Please Enter the email used for google auth"
-                            validate={{
-                              required: { value: true },
-                            }}
-                            value=""
-                            disabled={false}
                           />
                         </Col>
 

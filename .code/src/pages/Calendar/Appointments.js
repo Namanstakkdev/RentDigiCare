@@ -31,10 +31,13 @@ import {
 } from "reactstrap";
 //Import Breadcrumb
 import Breadcrumbs from "../../components/Common/Breadcrumb";
+import { FormGroup } from "react-bootstrap";
 // import { toast } from "react-toastify";
 
 const Appointment = () => {
   const decode2 = jwt_decode(window.localStorage.getItem("accessToken"));
+  const authUser = JSON.parse(window.localStorage.getItem("authUser"));
+  const companyId = authUser.userData.companyId;
   const [booked, setbooked] = useState([]);
   const [modal, setModal] = useState(false);
   const [modalOne, setModalOne] = useState(false);
@@ -67,11 +70,12 @@ const Appointment = () => {
   });
   const [statusTypeList, setStatusTypeList] = useState([]);
   const decode = jwt_decode(window.localStorage.accessToken);
+
   useEffect(() => {
     const getAppointmentStatusTypes = async () => {
       try {
         const response = await axios.post("appointmentStatus/getStatus", {
-          company_id: decode.id,
+          company_id: companyId,
         });
         if (response.data.appointmentStatus) {
           const Data = response.data.appointmentStatus.reverse();
@@ -86,10 +90,6 @@ const Appointment = () => {
   }, [pageNumber]);
 
   const pageTotal = Math.ceil(stats.total / pageLimit);
-
-  const [authEmail, setAuthEmail] = useState("");
-  const [showAuthEmailField, setShowAuthEmailField] = useState(false);
-
   const currentDateUTC = new Date().toISOString();
 
   const filteredBooked = booked.map((item) => {
@@ -231,7 +231,7 @@ const Appointment = () => {
     }
   };
 
-  const bookedAndSyncWithGoogleCalendar = async (id, status, authEmail) => {
+  const bookedAndSyncWithGoogleCalendar = async (id, status) => {
     const update = {
       method: "POST",
       headers: {
@@ -267,8 +267,7 @@ const Appointment = () => {
           );
 
           const reqData = {
-            authEmail: authEmail || decode2.email,
-            manager_id: decode2.id,
+            userId: decode2.id,
             day: moment(event.date).format("ddd"),
             eventDate: event.date,
             StartTime: event.startTime,
@@ -286,30 +285,14 @@ const Appointment = () => {
             available: true,
           };
 
-          console.log("Request Data:", reqData);
-
           setTimeout(async () => {
             toast("Sync with calendar process start");
 
             try {
-              const ADD_EVENT = "/calender/auth";
+              const ADD_EVENT = "/calender/create-event";
               const response = await axios.post(ADD_EVENT, reqData);
-
               if (response.status === 200) {
-                console.log("Response:", response.data);
-                window.location.href = response.data;
-
-                const urlParams = new URLSearchParams(window.location.search);
-                const encodedResponse = urlParams.get("response");
-
-                if (encodedResponse) {
-                  const decodedResponse = JSON.stringify(
-                    decodeURIComponent(encodedResponse)
-                  );
-                  console.log(decodedResponse);
-                } else {
-                  console.error("Response data not found in the URL");
-                }
+                toast.success(response.data.message);
               }
             } catch (error) {
               console.log(error);
@@ -320,16 +303,6 @@ const Appointment = () => {
     } catch (error) {
       console.error("Error updating event status:", error);
     }
-  };
-
-  const updateAppointmentAndSubmit = () => {
-    if (showAuthEmailField) {
-      bookedAndSyncWithGoogleCalendar(selectedId, "booked", authEmail);
-    } else {
-      updateAppoitnment(selectedId, "booked");
-    }
-
-    toggle_one();
   };
 
   const deleteAppoitnment = async () => {
@@ -956,49 +929,39 @@ const Appointment = () => {
                     <ModalHeader style={{ border: "none" }} toggle={toggle_one}>
                       Are you sure you want to schedule the current appointment?
                     </ModalHeader>
-                    <ModalBody>
-                      {showAuthEmailField && (
-                        <>
-                          <label htmlFor="authEmail">Auth Email:</label>
-                          <input
-                            type="email"
-                            id="authEmail"
-                            value={authEmail}
-                            onChange={(e) => setAuthEmail(e.target.value)}
-                            className="form-control"
-                          />
-                        </>
-                      )}
-                    </ModalBody>
                     <ModalFooter style={{ border: "none" }}>
                       <Button
                         color="primary"
-                        // onClick={() => {
-                        //   updateAppoitnment(selectedId, "booked");
-                        // }}
+                        onClick={() => updateAppoitnment(selectedId, "booked")}
+                      >
+                        Yes
+                      </Button>
+                      <Button
+                        style={{
+                          backgroundColor: "#4285f4",
+                          border: "none",
+                          display: "flex",
+                          alignItems: "center",
+                        }}
                         onClick={() => {
-                          updateAppointmentAndSubmit();
+                          bookedAndSyncWithGoogleCalendar(selectedId, "booked");
                         }}
                       >
-                        {showAuthEmailField ? "Submit" : "Yes"}
-                      </Button>
-                      {!showAuthEmailField && (
-                        <Button
-                          style={{ backgroundColor: "#4285f4", border: "none" }}
-                          // onClick={() => {
-                          //   bookedAndSyncWithGoogleCalendar(
-                          //     selectedId,
-                          //     "booked",
-                          //     authEmail
-                          //   );
-                          // }}
-                          onClick={() => {
-                            setShowAuthEmailField(true);
+                        <span style={{ color: "white" }}>Sync</span>
+                        <div
+                          style={{
+                            height: "24px",
+                            width: "27px",
+                            borderRadius: "50%",
                           }}
                         >
-                          Sync with Google Calendar
-                        </Button>
-                      )}
+                          <img
+                            src="/images/google.png"
+                            alt="Google Logo"
+                            style={{ height: "21px" }}
+                          />
+                        </div>
+                      </Button>
                       <Button color="secondary" onClick={toggle_one}>
                         No
                       </Button>

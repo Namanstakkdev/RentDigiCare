@@ -123,7 +123,7 @@ const Calender_availabilty = () => {
   const calculateTime = async (i) => {
     return new Promise(function (resolve, reject) {
       if (time.length > 0) {
-        addMoment = moment(addMoment).add(30, "m");
+        addMoment = moment(addMoment).add(15, "m");
         time.push(addMoment.format("LT"));
         resolve();
       } else {
@@ -144,8 +144,6 @@ const Calender_availabilty = () => {
     });
     return localTime.toUpperCase().trim();
   };
-
-  console.log({ splitTime });
 
   const getManagerAvailability = async () => {
     try {

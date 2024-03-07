@@ -33,8 +33,13 @@ const AppointmentStatus = () => {
     value: label,
   });
 
-  const defaultOptions = [createOption("No show"), createOption("Completed")];
-  const [appointmentStatusTypes, setAppointmentStatusTypes] = useState(defaultOptions);
+  const defaultOptions = [
+    createOption("No show"),
+    createOption("Completed"),
+    createOption("Scheduled"),
+  ];
+  const [appointmentStatusTypes, setAppointmentStatusTypes] =
+    useState(defaultOptions);
   const [createLoadings, setCreateLoadings] = useState(false);
 
   const handleCreate = (inputValue) => {
@@ -83,18 +88,18 @@ const AppointmentStatus = () => {
     //   setshowError(false);
     // }
     // if (newRequestType != "") {
-      // try {
-        // const response = await axios.post("requesttype/editrequesttype", {
-        //   id: selectedId,
-        //   request_type: newRequestType?.value,
-        // });
+    // try {
+    // const response = await axios.post("requesttype/editrequesttype", {
+    //   id: selectedId,
+    //   request_type: newRequestType?.value,
+    // });
 
-        // if (response.data.status === 200) {
-        //   getRequestTypes();
-        //   setIsEdit(false);
-        //   setNewRequestType("");
-        //   tog_large();
-        // }
+    // if (response.data.status === 200) {
+    //   getRequestTypes();
+    //   setIsEdit(false);
+    //   setNewRequestType("");
+    //   tog_large();
+    // }
     //   } catch (error) {
     //     console.log(error);
     //   }
@@ -219,22 +224,20 @@ const AppointmentStatus = () => {
 
                               <td>
                                 <div className="d-flex gap-3">
-                                  <Link className="text-success" to="#">
+                                  {/* <Link className="text-success" to="#">
                                     <i
                                       className="mdi mdi-pencil font-size-18"
                                       id="edittooltip"
                                       onClick={() => {
                                         setIsEdit(true);
                                         setSelectedId(item._id);
-                                        setNewAppointmentStatus(
-                                          item.status
-                                        );
+                                        setNewAppointmentStatus(item.status);
                                         tog_large();
                                       }}
                                       data-toggle="modal"
                                       data-target=".bs-example-modal-lg"
                                     ></i>
-                                  </Link>
+                                  </Link> */}
                                   <Link className="text-danger" to="#">
                                     <i
                                       className="mdi mdi-delete font-size-18"
