@@ -69,13 +69,14 @@ const Appointment = () => {
     pending: 0,
   });
   const [statusTypeList, setStatusTypeList] = useState([]);
+  const [disableSyncButton, setDisableSyncButton] = useState(false);
   const decode = jwt_decode(window.localStorage.accessToken);
 
   useEffect(() => {
     const getAppointmentStatusTypes = async () => {
       try {
         const response = await axios.post("appointmentStatus/getStatus", {
-          company_id: companyId,
+          company_id: companyId ?? decode.id,
         });
         if (response.data.appointmentStatus) {
           const Data = response.data.appointmentStatus.reverse();
@@ -304,6 +305,34 @@ const Appointment = () => {
       console.error("Error updating event status:", error);
     }
   };
+
+  const getExpirationTime = async () => {
+    try {
+      const response = await axios.post(
+        `/calender/getExpirationTime/${decode.id}`
+      );
+
+      if (response.status === 200) {
+        const expirationTimeStr = response.data.token.expiresAt;
+        const expirationTimeEpoch = parseInt(expirationTimeStr);
+        const currentTimeEpoch = new Date().getTime();
+
+        if (!expirationTimeEpoch || currentTimeEpoch > expirationTimeEpoch) {
+          setDisableSyncButton(true);
+        } else {
+          setDisableSyncButton(false);
+        }
+      } else {
+        console.error(`Failed to get expiration time for user ${decode.id}`);
+      }
+    } catch (error) {
+      console.error("Error retrieving expiration time:", error.message);
+    }
+  };
+
+  useEffect(() => {
+    getExpirationTime();
+  }, []);
 
   const deleteAppoitnment = async () => {
     let update = {
@@ -946,6 +975,7 @@ const Appointment = () => {
                         onClick={() => {
                           bookedAndSyncWithGoogleCalendar(selectedId, "booked");
                         }}
+                        disabled={disableSyncButton}
                       >
                         <span style={{ color: "white" }}>Sync</span>
                         <div

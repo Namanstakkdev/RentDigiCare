@@ -751,6 +751,10 @@ router.post("/filter_tickets_company", authToken, async (req, res) => {
         query.propertyID = ObjectId(req.body.propertyID);
       }
 
+      if (req.body.vendorID) {
+        query.assignSpecificVendors = [ObjectId(req.body.vendorID)];
+      }
+
       const countQuery = function (callback) {
         Ticket.find(query, { __v: 0 })
           .sort({ _id: -1 })

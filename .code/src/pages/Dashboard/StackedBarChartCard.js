@@ -103,6 +103,7 @@ const StackedBarChartCard = ({
       data: applicationData?.map((v) => v?.denied),
     },
   ];
+  
   const appointmentChartData = [
     {
       label: "Booked",

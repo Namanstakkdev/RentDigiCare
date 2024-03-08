@@ -275,6 +275,7 @@ const Dashboard = () => {
                     !decode.applicationPrivilege ? (
                       ""
                     ) : (
+                      <>
                       <Col xs="6 " className="mb-4">
                         <Row>
                           <Col>
@@ -289,6 +290,22 @@ const Dashboard = () => {
                           </Col>
                         </Row>
                       </Col>
+
+                      <Col xs="6 " className="mb-4">
+                        <Row>
+                          <Col>
+                            <StackedBarChartCard
+                              type="applicant"
+                              title="Maintenance Request"
+                              propertyManagerID={managerID.value}
+                              selectedStartDate={selectedStartDate}
+                              selectedEndDate={selectedEndDate}
+                              selectedProperty={selectedProperty}
+                            />
+                          </Col>
+                        </Row>
+                      </Col>
+                      </>
                     )}
                     {decode.role === "manager" && !decode.ticketPrivilege ? (
                       ""

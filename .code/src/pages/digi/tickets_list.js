@@ -95,7 +95,9 @@ const TicketList = () => {
   const [pageNumber, setPageNumber] = useState(1);
   const [propertyManagerList, setPropertyManagerList] = useState([]);
   const [filterPropertyManager, setFilterPropertyManager] = useState("");
+  const [filterVendor, setFilterVendor] = useState("");
   const [selectPropertyName, setSelectPropertyName] = useState(null);
+  const [selectVendorName, setSelectVendorName] = useState(null);
   const [pages, setPages] = useState([]);
   const [pageLimit, setPageLimit] = useState(10);
   const [requestTypes, setRequestTypes] = useState([]);
@@ -120,6 +122,7 @@ const TicketList = () => {
   const pageTotal = Math.ceil(stats.total / pageLimit);
   const [ticketIDs, setTicketIDs] = useState([]);
   const [filterID, setFiletrID] = useState("");
+  const [comapnyVendors, setComapnyVendors] = useState([]);
 
   const [url, setUrl] = useState("");
   const [copied, setcopied] = useState(false);
@@ -249,6 +252,7 @@ const TicketList = () => {
           propertyID: selectProperty.value,
           ticketID: filterID.value,
           propertyManagerID: filterPropertyManager,
+          vendorID: filterVendor,
           suite: filtername,
           companyDomain: decode.domain,
           requestType: requestTypeFilter.value,
@@ -403,7 +407,21 @@ const TicketList = () => {
     }
   };
 
+  const getVendors = async () => {
+    try {
+      const GET_VENDORS = "/vendor/get_vendors/" + decode.id;
+      const response = await axios.get(GET_VENDORS);
+
+      if (response.data.success) {
+        setComapnyVendors(response.data.vendors);
+      }
+    } catch (error) {
+      console.log(error); 
+    }
+  };
+
   useEffect(async () => {
+    getVendors();
     getTicket();
     getCompanyUrl();
   }, []);
@@ -1323,6 +1341,37 @@ const TicketList = () => {
                                       </div>
                                     </div>
                                   )}
+
+                                  {userRole === "company" && (
+                                    <div className="col-md-3">
+                                      <div className="mb-3">
+                                        <Label className="form-Label">
+                                          Vendors
+                                        </Label>
+                                        <Select
+                                          value={selectVendorName}
+                                          options={comapnyVendors?.map(
+                                            (item) => {
+                                              return {
+                                                value: item._id,
+                                                label:  
+                                                  item.first_name +
+                                                  " " +
+                                                  item.last_name,
+                                              };
+                                            }
+                                          )}
+                                          placeholder="Search By Name"
+                                          onChange={(e) => {
+                                            {
+                                              setSelectVendorName(e);
+                                              setFilterVendor(e.value);
+                                            }
+                                          }}
+                                        />
+                                      </div>
+                                    </div>
+                                  )}
                                   <div className="col-md-3">
                                     <div className="mb-3">
                                       <Label
@@ -1465,17 +1514,18 @@ const TicketList = () => {
                           <th scope="col">ID</th>
                           <th style={{ minWidth: "110px" }}>Suite No.</th>
                           <th scope="col">Type</th>
-                          {decode.role !== "customer" && (
-                            <>
-                              <th>Property</th>
-                              <th style={{ minWidth: "110px" }}>
-                                Submitted By
-                              </th>
-                            </>
-                          ) 
-                          // : (
-                          //   <th>Suit</th>
-                          // )
+                          {
+                            decode.role !== "customer" && (
+                              <>
+                                <th>Property</th>
+                                <th style={{ minWidth: "110px" }}>
+                                  Submitted By
+                                </th>
+                              </>
+                            )
+                            // : (
+                            //   <th>Suit</th>
+                            // )
                           }
                           <th scope="col" style={{ minWidth: "80px" }}>
                             Created

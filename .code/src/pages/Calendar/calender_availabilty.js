@@ -102,35 +102,15 @@ const Calender_availabilty = () => {
 
   const time = [];
 
-  let addMoment;
-
-  // const calculateTime = async (i) => {
-  //   return new Promise(function (resolve, reject) {
-  //     if (time.length > 0) {
-  //       addMoment = moment(addMoment).add(30, "m");
-
-  //       time.push(addMoment.format("LT"));
-
-  //       resolve();
-  //     } else {
-  //       addMoment = moment("6.30");
-  //       time.push(moment("6.30").format("LT"));
-  //       resolve();
-  //     }
-  //   });
-  // };
-
   const calculateTime = async (i) => {
     return new Promise(function (resolve, reject) {
-      if (time.length > 0) {
-        addMoment = moment(addMoment).add(15, "m");
+      let addMoment = moment("00:00", "HH:mm");
+      for (let j = 0; j < 96; j++) {
         time.push(addMoment.format("LT"));
-        resolve();
-      } else {
-        addMoment = moment("00:00", "HH:mm");
-        time.push(addMoment.format("LT"));
-        resolve();
+        addMoment.add(15, "m");
       }
+
+      resolve();
     });
   };
 
@@ -150,8 +130,6 @@ const Calender_availabilty = () => {
       const response = await axios.get(
         `${GET_AVAILABILITY}/?manager_id=${decode.id}`
       );
-
-      console.log({ response });
 
       if (response.data.status == 200) {
         const convertedAvailability =
@@ -175,18 +153,9 @@ const Calender_availabilty = () => {
   useEffect(() => {
     getManagerAvailability();
 
-    const timeRecurresive = (i) => {
-      calculateTime(i).then(() => {
-        if (i < 47) {
-          i++;
-          timeRecurresive(i);
-        } else {
-          setSplitTime(time);
-        }
-      });
-    };
-
-    timeRecurresive(0);
+    calculateTime().then(() => {
+      setSplitTime(time);
+    });
   }, []);
 
   // const convertToUTC = (localTime) => {
