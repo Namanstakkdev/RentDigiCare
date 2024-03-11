@@ -827,20 +827,26 @@ router.post("/create-event", async (req, res) => {
       } else {
         // Create a new event
         eve = await Calender_events.create(eventData);
+
+        console.table({
+          EventDate: req.body.eventDate,
+          StartTime: req.body.StartTime,
+          EndTime: req.body.endTime,
+        });
+        const startTime = moment(req.body.eventDate + " " + req.body.StartTime, "YYYY-MM-DD h:mm A");
+        const endTime = moment(req.body.eventDate + " " + req.body.endTime, "YYYY-MM-DD h:mm A");
+        
+      
         const newCalenderEvent = {
           id: eve._id,
           summary: req.body.title,
           description: req.body.description,
           start: {
-            dateTime: moment(req.body.eventDate + "T" + req.body.StartTime, [
-              "YYYY-MM-DDTHH:mm",
-            ]).toISOString(),
+            dateTime: startTime.tz('America/Denver').toISOString(),
             timeZone: "America/Denver",
           },
           end: {
-            dateTime: moment(req.body.eventDate + "T" + req.body.endTime, [
-              "YYYY-MM-DDTHH:mm",
-            ]).toISOString(),
+            dateTime: endTime.tz('America/Denver').toISOString(),
             timeZone: "America/Denver",
           },
           attendees: req.body.authEmail,
