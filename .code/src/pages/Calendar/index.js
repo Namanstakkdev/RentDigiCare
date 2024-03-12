@@ -201,6 +201,8 @@ const Calender = (props) => {
   const [reason_err, setReasonErr] = useState("");
   const [calendarId, setCalendarId] = useState("");
   const [defaultDate, setDefaultDate] = useState("");
+  const [disableSyncButton, setDisableSyncButton] = useState(false);
+
   const tog_view = () => {
     setmodal_view(!modal_view);
   };
@@ -613,11 +615,35 @@ const Calender = (props) => {
     // toggle();
   };
 
+  const getExpirationTime = async () => {
+    try {
+      const response = await axios.post(
+        `/calender/getExpirationTime/${decode.id}`
+      );
+
+      if (response.status === 200) {
+        const expirationTimeStr = response.data.token.expiresAt;
+        const expirationTimeEpoch = parseInt(expirationTimeStr);
+        const currentTimeEpoch = new Date().getTime();
+
+        if (!expirationTimeEpoch || currentTimeEpoch > expirationTimeEpoch) {
+          setDisableSyncButton(true);
+        } else {
+          setDisableSyncButton(false);
+        }
+      } else {
+        console.error(`Failed to get expiration time for user ${decode.id}`);
+      }
+    } catch (error) {
+      console.error("Error retrieving expiration time:", error.message);
+    }
+  };
+
+  useEffect(() => {
+    getExpirationTime();
+  }, []);
+
   const handleValidEventSubmitcategory = async (event, values) => {
-    console.log(
-      "HandleValidEventSubmitcategory get called:",
-      moment(values.date).format("ddd")
-    );
     setAddEventError("");
     const [startTime, endTime] = values.time.split(" - ");
 
@@ -1834,8 +1860,9 @@ const Calender = (props) => {
                             <button
                               type="submit"
                               className="btn btn-success save-event me-2"
+                              disabled={disableSyncButton}
                             >
-                              Save
+                              { disableSyncButton ? "Access Token expired" : "Sync"}
                             </button>
 
                             <button

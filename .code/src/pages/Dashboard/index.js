@@ -295,7 +295,7 @@ const Dashboard = () => {
                         <Row>
                           <Col>
                             <StackedBarChartCard
-                              type="applicant"
+                              type="ticket2"
                               title="Maintenance Request"
                               propertyManagerID={managerID.value}
                               selectedStartDate={selectedStartDate}

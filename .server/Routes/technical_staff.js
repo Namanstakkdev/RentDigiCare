@@ -465,6 +465,164 @@ router.post("/get_technical_staff", authToken, async (req, res) => {
   }
 });
 
+router.get("/get_technical_staff/:companyID", async (req, res) => {
+  try {
+    let query = {};
+    const results = {};
+    const companyId = req.params.companyID
+        ? ObjectId(req.params.companyID)
+        : null;
+    
+    if (companyId) {
+      query.assigned_companies = { $in: [companyId]};
+    }
+
+    const stats = await TechnicalStaff.aggregate([
+      {
+        $match: query,
+      },
+      {
+        $group: {
+          _id: null,
+          total: { $sum: 1 },
+          pending: {
+            $sum: {
+              $cond: [{ $eq: ["$status", "Pending"] }, 1, 0],
+            },
+          },
+          verified: {
+            $sum: {
+              $cond: [{ $eq: ["$status", "Verified"] }, 1, 0],
+            },
+          },
+          rejected: {
+            $sum: {
+              $cond: [{ $eq: ["$status", "Rejected"] }, 1, 0],
+            },
+          },
+          suspended: {
+            $sum: {
+              $cond: [{ $eq: ["$status", "Suspended"] }, 1, 0],
+            },
+          },
+        },
+      },
+      {
+        $project: {
+          total: 1,
+          verified: 1,
+          pending: 1,
+          rejected: 1,
+          suspended: 1,
+          _id: 0,
+        },
+      },
+    ]);
+
+
+    const technicalStaff = await TechnicalStaff.aggregate([
+      {
+        $lookup: {
+          from: "tickets",
+          localField: "_id",
+          foreignField: "assignedTo",
+          as: "tickets",
+          pipeline: [
+            {
+              $group: {
+                _id: null,
+                total: { $sum: 1 },
+                totalRating: {
+                  $avg: {
+                    $convert: {
+                      input: "$ratings",
+                      to: "int",
+                    },
+                  },
+                },
+                open: {
+                  $sum: {
+                    $cond: {
+                      if: { $eq: ["$status", "Open"] },
+                      then: 1,
+                      else: 0,
+                    },
+                  },
+                },
+                closed: {
+                  $sum: {
+                    $cond: {
+                      if: { $eq: ["$status", "Closed"] },
+                      then: 1,
+                      else: 0,
+                    },
+                  },
+                },
+                completed: {
+                  $sum: {
+                    $cond: {
+                      if: { $eq: ["$status", "Completed"] },
+                      then: 1,
+                      else: 0,
+                    },
+                  },
+                },
+              },
+            },
+          ],
+        },
+      },
+      {
+        $set: { rating: "$tickets.totalRating" },
+      },
+      {
+        $lookup: {
+          from: "technicalstaffspecialties",
+          localField: "specialties",
+          foreignField: "_id",
+          as: "specialties",
+        },
+      },
+      {
+        $lookup: {
+          from: "properties",
+          localField: "assigned_properties",
+          foreignField: "_id",
+          as: "assigned_properties",
+        },
+      },
+      {
+        $addFields: {
+          properties: {
+            $map: {
+              input: "$assigned_properties",
+              as: "property",
+              in: { title: "$$property.title", _id: "$$property._id" }
+            }
+          },
+          propertiesTitle: "$assigned_properties.title",
+        },
+      },
+      {
+        $match: query,
+      },
+    ]);
+    console.log(query);
+    
+    const uniqueProperty = [...new Set(technicalStaff.flatMap(obj => obj.propertiesTitle))]; 
+    const uniqueProperties = [...new Set(technicalStaff.flatMap(obj => obj.properties.map(property => ({ title: property.title, _id: property._id }))))];
+
+    res
+      .status(200)
+      .send({ success: true, technicalStaff, uniqueProperty, uniqueProperties, stats: stats?.[0], results });
+  } catch (e) {
+    res.status(201).send({
+      success: false,
+      errorMessage: e.message || "Something went wrong",
+    });
+  }
+})
+
 router.post(
   "/delete_technical_staff",
   /*authToken,*/ async (req, res) => {

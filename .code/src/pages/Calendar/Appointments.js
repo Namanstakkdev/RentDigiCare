@@ -198,6 +198,23 @@ const Appointment = () => {
         toast.error(
           `Appointment ${status === "rejected" ? "rejected" : "canceled"}`
         );
+
+        if (status === "canceled") {
+          setTimeout("Deleting calendar event start");
+          try {
+            const DELETE_EVENT = "/calender/delete-event";
+            const response = await axios.post(DELETE_EVENT, {
+              userId: decode.id,
+              event_id: id,
+            });
+            if (response.status === 200) {
+              toast.success(response.data.message);
+            }
+          } catch (error) {
+            console.log(error);
+            toast.error(error.message);
+          }
+        }
       }
     }
     // console.log(data, "data");
@@ -267,12 +284,31 @@ const Appointment = () => {
             (event) => event._id === id
           );
 
+          const convertToLocalTime = (utcTime) => {
+            let utcDate;
+
+            if (utcTime.includes("T")) {
+              utcDate = new Date(utcTime);
+            } else {
+              utcDate = new Date(`1970-01-01T${utcTime}`);
+            }
+
+            const localTime = utcDate.toLocaleTimeString(undefined, {
+              hour: "numeric",
+              minute: "numeric",
+              hour12: true,
+              timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+            });
+
+            return localTime;
+          };
+
           const reqData = {
             userId: decode2.id,
-            day: moment(event.date).format("ddd"),
-            eventDate: event.date,
-            StartTime: event.startTime,
-            endTime: event.endTime,
+            day: moment(event.date.split("T")[0]).format("ddd"),
+            eventDate: event.date.split("T")[0],
+            StartTime: convertToLocalTime(event.startTime),
+            endTime: convertToLocalTime(event.endTime),
             createdBy: decode2.id,
             type: filteredEvent.reasonType[0].reasonType,
             propertyId: filteredEvent.properties[0].title,
@@ -977,7 +1013,9 @@ const Appointment = () => {
                         }}
                         disabled={disableSyncButton}
                       >
-                        <span style={{ color: "white" }}>Sync</span>
+                        <span style={{ color: "white" }}>
+                          {disableSyncButton ? "Access Token expired" : "Sync"}
+                        </span>
                         <div
                           style={{
                             height: "24px",

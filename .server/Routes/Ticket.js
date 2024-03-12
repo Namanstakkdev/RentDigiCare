@@ -147,6 +147,144 @@ router.get("/dashboardfilter", async (req, res) => {
   }
 });
 
+router.get("/dashboardfilter2", async (req, res) => {
+  try {
+    const {
+      role,
+      domain,
+      startDate,
+      endDate,
+      filterBy,
+      propertyManagerID,
+      propertyId,
+    } = req.query;
+
+    if (!role || !domain) {
+      return res.status(400).json({
+        status: 400,
+        message: "Role and domain are required fields.",
+      });
+    }
+
+    const searchCriteria = {};
+    if (startDate && endDate) {
+      searchCriteria.createdAt = {
+        $gte: new Date(startDate),
+        $lte: new Date(endDate),
+      };
+    }
+
+    let matchConditions = {};
+    if (filterBy === "barChart") {
+      if (propertyManagerID !== "") {
+        matchConditions.managers = {
+          $in: [mongoose.Types.ObjectId(propertyManagerID)],
+        };
+      } else if (role === "company") {
+        matchConditions.companyDomain = domain;
+      }
+
+      if (propertyId !== "") {
+        matchConditions._id = mongoose.Types.ObjectId(propertyId);
+      }
+    }
+
+    const ticketAggregationPipeline = [
+      { $match: matchConditions },
+      { $addFields: { propertyId: "$_id" } },
+      {
+        $lookup: {
+          from: "tickets",
+          localField: "propertyId",
+          foreignField: "propertyID",
+          as: "ticket",
+          pipeline: [{ $match: searchCriteria }],
+        },
+      },
+      { $unwind: "$ticket" },
+      {
+        $group: {
+          _id: {
+            month: {
+              $dateToString: { format: "%Y-%m", date: "$ticket.createdAt" },
+            },
+            year: {
+              $dateToString: { format: "%Y", date: "$ticket.createdAt" },
+            },
+          },
+          total: { $sum: 1 },
+          open: {
+            $sum: {
+              $cond: {
+                if: { $eq: ["$ticket.status", "Open"] },
+                then: 1,
+                else: 0,
+              },
+            },
+          },
+          inprogress: {
+            $sum: {
+              $cond: {
+                if: { $eq: ["$ticket.status", "Inprogress"] },
+                then: 1,
+                else: 0,
+              },
+            },
+          },
+          completed: {
+            $sum: {
+              $cond: {
+                if: { $eq: ["$ticket.status", "Completed"] },
+                then: 1,
+                else: 0,
+              },
+            },
+          },
+        },
+      },
+      { $sort: { "_id.year": 1, "_id.month": 1 } },
+      {
+        $project: {
+          _id: 1,
+          month: { $concat: ["$_id.year", "-", "$_id.month"] },
+          total: 1,
+          open: 1,
+          inprogress: 1,
+          completed: 1,
+        },
+      },
+    ];
+
+    const ticket = await Property.aggregate(ticketAggregationPipeline);
+
+    const aggregatedResults = ticket.reduce((acc, cur) => {
+      const { month, ...rest } = cur;
+      if (!acc[month]) {
+        acc[month] = { month, ...rest };
+      } else {
+        acc[month].total += rest.total;
+        acc[month].open += rest.open;
+        acc[month].inprogress += rest.inprogress;
+        acc[month].completed += rest.completed;
+      }
+      return acc;
+    }, {});
+
+    const results = Object.values(aggregatedResults);
+
+    return res.status(200).json({
+      status: 200,
+      data: results,
+    });
+  } catch (error) {
+    console.error("Error in /dashboardfilter2 endpoint:", error);
+    return res.status(500).json({
+      status: 500,
+      message: "Internal server error.",
+    });
+  }
+});
+
 // Getting all the Maintenance Request for company
 router.post("/ticket_list", authToken, async (req, res) => {
   if (req.body.domain !== undefined) {
@@ -753,6 +891,10 @@ router.post("/filter_tickets_company", authToken, async (req, res) => {
 
       if (req.body.vendorID) {
         query.assignSpecificVendors = [ObjectId(req.body.vendorID)];
+      }
+
+      if (req.body.technicalStaffID) {
+        query.assignedTo = ObjectId(req.body.technicalStaffID);
       }
 
       const countQuery = function (callback) {

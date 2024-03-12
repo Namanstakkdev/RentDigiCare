@@ -726,38 +726,6 @@ router.post("/create-event", async (req, res) => {
         });
       }
 
-      const bookedEvents = await Calender_events.find({
-        eventDate: req.body.eventDate,
-        eventAssignedTo: req.body.userId,
-      });
-
-      const isSlotBooked = () =>
-        bookedEvents.some((booked) => {
-          const eventStartTime = Math.ceil(
-            moment(req.body.StartTime, "h:mm A").valueOf() / 1000
-          );
-
-          const eventEndTime = Math.ceil(
-            moment(req.body.endTime, "h:mm A").valueOf() / 1000
-          );
-
-          const bookedStartTime = Math.ceil(
-            moment(booked.startTime, "h:mm A").valueOf() / 1000
-          );
-
-          const bookedEndTime = Math.ceil(
-            moment(booked.endTime, "h:mm A").valueOf() / 1000
-          );
-
-          return (
-            eventStartTime === bookedStartTime && eventEndTime === bookedEndTime
-          );
-        });
-
-      if (bookedEvents.length > 0 && isSlotBooked()) {
-        res.status(400).send({ message: "Slot is already booked" });
-      }
-
       let eve;
       const eventData = {
         eventId: req.body.event_id,
@@ -779,8 +747,6 @@ router.post("/create-event", async (req, res) => {
         eventId: req.body.event_id,
       });
 
-      console.log({ existingEvent });
-
       if (existingEvent) {
         eve = await Calender_events.findOneAndUpdate(
           { eventId: req.body.event_id },
@@ -788,19 +754,24 @@ router.post("/create-event", async (req, res) => {
           { new: true }
         );
         console.log("Updated event in create-event:", eve);
+
+        const startTime = moment(
+          req.body.eventDate + " " + req.body.StartTime,
+          "YYYY-MM-DD h:mm A"
+        );
+        const endTime = moment(
+          req.body.eventDate + " " + req.body.endTime,
+          "YYYY-MM-DD h:mm A"
+        );
         const updateCalenderEvent = {
           summary: req.body.title,
           description: req.body.description,
           start: {
-            dateTime: moment(req.body.eventDate + "T" + req.body.StartTime, [
-              "YYYY-MM-DDTHH:mm",
-            ]).toISOString(),
+            dateTime: startTime.tz("America/Denver").toISOString(),
             timeZone: "America/Denver",
           },
           end: {
-            dateTime: moment(req.body.eventDate + "T" + req.body.endTime, [
-              "YYYY-MM-DDTHH:mm",
-            ]).toISOString(),
+            dateTime: endTime.tz("America/Denver").toISOString(),
             timeZone: "America/Denver",
           },
           attendees: req.body.authEmail,
@@ -818,35 +789,35 @@ router.post("/create-event", async (req, res) => {
             ],
           },
         };
-        /*  await eventUpdate(
+        await eventUpdate(
           existingToken.accessToken,
-          existingEvent.eventId,
+          req.body.event_id,
           updateCalenderEvent
-        ); */
-        // res.status(200).send({ message: "Successfully Updated" });
+        );
+        return res.status(200).send({ message: "Successfully Updated" });
       } else {
         // Create a new event
         eve = await Calender_events.create(eventData);
 
-        console.table({
-          EventDate: req.body.eventDate,
-          StartTime: req.body.StartTime,
-          EndTime: req.body.endTime,
-        });
-        const startTime = moment(req.body.eventDate + " " + req.body.StartTime, "YYYY-MM-DD h:mm A");
-        const endTime = moment(req.body.eventDate + " " + req.body.endTime, "YYYY-MM-DD h:mm A");
-        
-      
+        const startTime = moment(
+          req.body.eventDate + " " + req.body.StartTime,
+          "YYYY-MM-DD h:mm A"
+        );
+        const endTime = moment(
+          req.body.eventDate + " " + req.body.endTime,
+          "YYYY-MM-DD h:mm A"
+        );
+
         const newCalenderEvent = {
-          id: eve._id,
+          id: req.body.event_id,
           summary: req.body.title,
           description: req.body.description,
           start: {
-            dateTime: startTime.tz('America/Denver').toISOString(),
+            dateTime: startTime.tz("America/Denver").toISOString(),
             timeZone: "America/Denver",
           },
           end: {
-            dateTime: endTime.tz('America/Denver').toISOString(),
+            dateTime: endTime.tz("America/Denver").toISOString(),
             timeZone: "America/Denver",
           },
           attendees: req.body.authEmail,
@@ -871,16 +842,18 @@ router.post("/create-event", async (req, res) => {
           existingToken.accessToken,
           newCalenderEvent
         );
-        res
+        return res
           .status(200)
           .send({ message: "Event created successfully", eventLink });
       }
     } else {
-      res.status(400).send({ message: "Access token not found for the user" });
+      return res
+        .status(400)
+        .send({ message: "Access token not found for the user" });
     }
   } catch (error) {
     console.error("Error creating event:", error);
-    res.status(500).send({ error: "Error creating event" });
+    return res.status(500).send({ error: "Error creating event" });
   }
 });
 
@@ -922,36 +895,36 @@ router.post("/get-todays-event", async (req, res) => {
 
 router.post("/delete-event", async (req, res) => {
   try {
-    let deleted = await Calender_events.find({ _id: req.body.event_id })
-      .remove()
-      .exec();
+    const userId = mongoose.Types.ObjectId(req.body.userId);
+    const existingToken = await CalendarToken.findOne({ userId });
 
-    var params = {
+    if (!existingToken) {
+      return res.status(400).send({ success: false, message: "Access token not found for the user", status: 400 });
+    }
+
+    // Delete the event from the database
+    await Calender_events.deleteOne({ eventId: req.body.event_id });
+
+    // Set up parameters for Google Calendar API
+    const params = {
       auth: auth2Client,
       calendarId: "primary",
       eventId: req.body.event_id,
     };
 
-    // const calendar = google.calendar({ version: "v3", auth });
-
+    // Call the Google Calendar API to delete the event
+    const calendar = google.calendar("v3");
+    auth2Client.setCredentials({ access_token: existingToken.accessToken });
     calendar.events.delete(params, function (err) {
       if (err) {
-        console.log("The API returned an error: " + err);
-        return;
+        console.error("The API returned an error:", err);
+        return res.status(500).send({ success: false, message: "Failed to delete event", status: 500 });
       }
-      console.log("Event deleted.");
+      res.status(200).send({ success: true, message: "Event deleted successfully", status: 200 });
     });
-
-    res
-      .status(200)
-      .send({ success: true, message: "Successfully Updated", status: 200 });
-  } catch (e) {
-    console.log(e);
-    res.status(200).send({
-      success: false,
-      message: e.details || "Something went wrong",
-      status: 202,
-    });
+  } catch (error) {
+    console.error("Error deleting event:", error);
+    res.status(500).send({ success: false, message: "Something went wrong", status: 500 });
   }
 });
 

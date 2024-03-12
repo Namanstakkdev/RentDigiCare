@@ -96,8 +96,11 @@ const TicketList = () => {
   const [propertyManagerList, setPropertyManagerList] = useState([]);
   const [filterPropertyManager, setFilterPropertyManager] = useState("");
   const [filterVendor, setFilterVendor] = useState("");
+  const [filterTechnicalStaff, setFilterTechnicalStaff] = useState("");
   const [selectPropertyName, setSelectPropertyName] = useState(null);
   const [selectVendorName, setSelectVendorName] = useState(null);
+  const [selectTechnicalStaffName, setSelectTechnicalStaffName] =
+    useState(null);
   const [pages, setPages] = useState([]);
   const [pageLimit, setPageLimit] = useState(10);
   const [requestTypes, setRequestTypes] = useState([]);
@@ -122,6 +125,7 @@ const TicketList = () => {
   const pageTotal = Math.ceil(stats.total / pageLimit);
   const [ticketIDs, setTicketIDs] = useState([]);
   const [filterID, setFiletrID] = useState("");
+  const [comapnyTechnicalStaff, setComapnyTechnicalStaff] = useState([]);
   const [comapnyVendors, setComapnyVendors] = useState([]);
 
   const [url, setUrl] = useState("");
@@ -253,6 +257,7 @@ const TicketList = () => {
           ticketID: filterID.value,
           propertyManagerID: filterPropertyManager,
           vendorID: filterVendor,
+          technicalStaffID: filterTechnicalStaff, 
           suite: filtername,
           companyDomain: decode.domain,
           requestType: requestTypeFilter.value,
@@ -416,12 +421,26 @@ const TicketList = () => {
         setComapnyVendors(response.data.vendors);
       }
     } catch (error) {
-      console.log(error); 
+      console.log(error);
+    }
+  };
+
+  const getTechnicalStaff = async () => {
+    try {
+      const GET_TECHNICAL_STAFF =
+        "/technicalStaff/get_technical_staff/" + decode.id;
+      const response = await axios.get(GET_TECHNICAL_STAFF);
+      if (response.data.success) {
+        setComapnyTechnicalStaff(response.data.technicalStaff);
+      }
+    } catch (error) {
+      console.log(error);
     }
   };
 
   useEffect(async () => {
     getVendors();
+    getTechnicalStaff();
     getTicket();
     getCompanyUrl();
   }, []);
@@ -1354,7 +1373,7 @@ const TicketList = () => {
                                             (item) => {
                                               return {
                                                 value: item._id,
-                                                label:  
+                                                label:
                                                   item.first_name +
                                                   " " +
                                                   item.last_name,
@@ -1366,6 +1385,37 @@ const TicketList = () => {
                                             {
                                               setSelectVendorName(e);
                                               setFilterVendor(e.value);
+                                            }
+                                          }}
+                                        />
+                                      </div>
+                                    </div>
+                                  )}
+
+                                  {userRole === "company" && (
+                                    <div className="col-md-3">
+                                      <div className="mb-3">
+                                        <Label className="form-Label">
+                                          Technical Staff
+                                        </Label>
+                                        <Select
+                                          value={selectTechnicalStaffName}
+                                          options={comapnyTechnicalStaff?.map(
+                                            (item) => {
+                                              return {
+                                                value: item._id,
+                                                label:
+                                                  item.first_name +
+                                                  " " +
+                                                  item.last_name,
+                                              };
+                                            }
+                                          )}
+                                          placeholder="Search By Name"
+                                          onChange={(e) => {
+                                            {
+                                              setSelectTechnicalStaffName(e);
+                                              setFilterTechnicalStaff(e.value);
                                             }
                                           }}
                                         />

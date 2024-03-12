@@ -16,6 +16,7 @@ const StackedBarChartCard = ({
   propertyManagerID,
 }) => {
   const [applicationData, setApplicationData] = useState([]);
+  const [ticket2Data, setTicket2Data] = useState([]);
   const decode = jwt_decode(window.localStorage.getItem("accessToken"));
   const [loading, setLoading] = useState(false);
   const getApplicantData = async (val) => {
@@ -45,6 +46,45 @@ const StackedBarChartCard = ({
           .then(function (response) {
             setLoading(false);
             setApplicationData(response.data.data);
+          })
+          .catch(function (error) {
+            setLoading(false);
+            console.log(error);
+          });
+      }
+    } catch (error) {
+      setLoading(false);
+      console.log(error?.message);
+    }
+  };
+
+  const getTicketData = async () => {
+    try {
+      const startDate =
+        selectedStartDate !== ""
+          ? moment(selectedStartDate).format("YYYY-MM-DD")
+          : "";
+      const endDate =
+        selectedEndDate !== ""
+          ? moment(selectedEndDate).format("YYYY-MM-DD")
+          : "";
+      if (startDate === "" && endDate !== "") {
+        return false;
+      } else {
+        setLoading(true);
+        await axios
+          .get(
+            `/ticket/dashboardfilter2?filterBy=barChart&startDate=${startDate}&endDate=${endDate}&propertyManagerID=${propertyManagerID}&role=${decode?.role
+            }&domain=${decode?.domain ? decode.domain : ""}&propertyId=${selectedProperty.value ? selectedProperty?.value : ""}`,
+            {
+              headers: {
+                Authorization: `Bearer ${window.localStorage.getItem("accessToken")}`,
+              }
+            }
+          )
+          .then(function (response) {
+            setLoading(false);
+            setTicket2Data(response.data.data);
           })
           .catch(function (error) {
             setLoading(false);
@@ -101,6 +141,36 @@ const StackedBarChartCard = ({
       hoverBackgroundColor: "#D0312D98",
       hoverBorderColor: "#D0312D98",
       data: applicationData?.map((v) => v?.denied),
+    },
+  ];
+
+  const ticket2ChartData = [
+    {
+      label: "Open",
+      backgroundColor: "#FFBF0098",
+      borderColor: "#FFBF0098",
+      borderWidth: 1,
+      hoverBackgroundColor: "#FFBF0098",
+      hoverBorderColor: "#FFBF0098",
+      data: ticket2Data?.map((v) => v?.open),
+    },
+    {
+      label: "Inprogress",
+      backgroundColor: "#00A36C98 ",
+      borderColor: "#00A36C98 ",
+      borderWidth: 1,
+      hoverBackgroundColor: "#00A36C98",
+      hoverBorderColor: "#00A36C98",
+      data: ticket2Data?.map((v) => v?.inprogress),
+    },
+    {
+      label: "Completed",
+      backgroundColor: "#D0312D98",
+      borderColor: "#D0312D98 ",
+      borderWidth: 1,
+      hoverBackgroundColor: "#D0312D98",
+      hoverBorderColor: "#D0312D98",
+      data: ticket2Data?.map((v) => v?.completed),
     },
   ];
   
@@ -302,8 +372,10 @@ const StackedBarChartCard = ({
   ];
 
   useEffect(() => {
-    if (type !== "rent") {
+    if (type !== "rent" && type !== "ticket2") {
       getApplicantData(type);
+    } else if (type === "ticket2") {
+      getTicketData();
     }
   }, [selectedEndDate, selectedStartDate, type, propertyManagerID, selectedProperty]);
 
@@ -313,6 +385,8 @@ const StackedBarChartCard = ({
         return applicantChartData;
       case "ticket":
         return ticketsChartData;
+      case "ticket2":
+        return ticket2ChartData;  
       case "property":
         return propertyChartData;
       case "leads":
@@ -330,13 +404,17 @@ const StackedBarChartCard = ({
 
   const horiData = {
     labels:
-      type === "rent"
-        ? rentData?.map((v) =>
-          moment(v?._id?.month, "YYYY/MM")?.format("MMM-YYYY")
-        )
-        : applicationData?.map((v) =>
-          moment(v?._id?.month, "YYYY/MM")?.format("MMM-YYYY")
-        ),
+    type === "rent"
+    ? rentData?.map((v) =>
+        moment(v?._id?.month, "YYYY/MM")?.format("MMM-YYYY")
+      )
+    : type === "ticket2"
+    ? ticket2Data?.map((v) =>
+        moment(v?._id?.month, "YYYY/MM")?.format("MMM-YYYY")
+      )
+    : applicationData?.map((v) =>
+        moment(v?._id?.month, "YYYY/MM")?.format("MMM-YYYY")
+      ),
     datasets: getFinalData(type),
   };
   const customStyle = {

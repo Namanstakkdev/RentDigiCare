@@ -753,24 +753,18 @@ router.post("/add_slot", async (req, res) => {
 
     const findBooked = async (startTime, endTime) => {
       const requestStartTimeEpoch = Math.ceil(
-        moment(req.body.StartTime, "h:mm A").valueOf() / 1000
+        moment(req.body.StartTime).valueOf() / 1000
       );
       const requestEndTimeEpoch = Math.ceil(
-        moment(req.body.endTime, "h:mm A").valueOf() / 1000
+        moment(req.body.endTime).valueOf() / 1000
       );
-      const startTimeEpoch = Math.ceil(
-        moment(startTime, "h:mm A").valueOf() / 1000
-      );
-      const endTimeEpoch = Math.ceil(
-        moment(endTime, "h:mm A").valueOf() / 1000
-      );
-
+      const startTimeEpoch = Math.ceil(moment(startTime).valueOf() / 1000);
+      const endTimeEpoch = Math.ceil(moment(endTime).valueOf() / 1000);
       return new Promise((resolve, reject) => {
         // Compare times
         alreadyBooked =
           requestStartTimeEpoch === startTimeEpoch &&
           requestEndTimeEpoch === endTimeEpoch;
-
         resolve(alreadyBooked);
       });
     };
