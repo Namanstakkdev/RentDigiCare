@@ -200,7 +200,6 @@ import BlogDetail from "../pages/blog/BlogDetail";
 
 // Newsletter module
 import Newsletters from "../pages/Newsletter/Newsletters";
-import ManagementReports from "../pages/ManagerReports/ManagementReports";
 import WorkScheduling from "../pages/ManagerReports/WorkScheduling";
 import Reminders from "../components/Reminders";
 import ReminderTemplate from "../components/ReminderTemplates";
@@ -369,7 +368,6 @@ const userRoutes = [
 
   //Manager Reports
   { path: "/work-scheduling", component: WorkScheduling },
-  { path: "/calendar-reports", component: ManagementReports },
 
   // this route should be at the end of all other routes
   { path: "/", exact: true, component: () => <Redirect to="/dashboard" /> },

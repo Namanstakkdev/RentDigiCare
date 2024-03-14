@@ -712,23 +712,8 @@ const SidebarContent = (props) => {
                 </li>
                 {decode.company == "GSK Properties" && role === "company" && (
                   <>
+
                     <li>
-                      <Link to="/#" className="has-arrow ">
-                        <FeatherIcon icon="file-text" />
-                        <span>Manager Reports</span>
-                      </Link>
-                      <ul className="sub-menu">
-                        {/* <li>
-                        <Link to="/work-scheduling">Work Schedule</Link>
-                      </li> */}
-
-                        <li>
-                          <Link to="/calendar-reports">Management Reports</Link>
-                        </li>
-                      </ul>
-                    </li>
-
-                    {/* <li>
                       <Link to="/#" className="has-arrow ">
                         <FeatherIcon icon="file-text" />
                         <span>Email Reminders</span>
@@ -738,7 +723,7 @@ const SidebarContent = (props) => {
                           <Link to="/scheduled-jobs">Scheduled Jobs</Link>
                         </li>
                       </ul>
-                    </li> */}
+                    </li>
                   </>
                 )}
 

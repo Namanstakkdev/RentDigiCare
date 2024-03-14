@@ -8,6 +8,7 @@ import moment from "moment";
 import Select from "react-select";
 //import Breadcrumbs
 import Breadcrumbs from "../../components/Common/Breadcrumb";
+import ManagementReports from "../ManagerReports/ManagementReports";
 
 import {
   Card,
@@ -87,10 +88,13 @@ const options = {
 const Dashboard = () => {
   const role = window.localStorage.getItem("role");
   const { userData } = JSON.parse(window.localStorage.getItem("authUser"));
-  var propertyManagerID = role === "manager" ? {label:"" ,value:userData?.id} :{label:"" ,value:""};
+  var propertyManagerID =
+    role === "manager"
+      ? { label: "", value: userData?.id }
+      : { label: "", value: "" };
   const decode = jwt_decode(window.localStorage.getItem("accessToken"));
   const [managerID, setManagerID] = useState(propertyManagerID);
-  console.log(managerID, "dsssssss")
+  console.log(managerID, "dsssssss");
 
   const COMPANY_DASHBOARD_URL = "/dashboard/company_stat";
   const MANAGER_DASHBOARD_URL = "/dashboard/manager_stat";
@@ -110,7 +114,7 @@ const Dashboard = () => {
       console.log("Response:", response);
 
       if (response.data.success) {
-        setPropertyList(response.data.propertyList)
+        setPropertyList(response.data.propertyList);
         console.log("newwww", response.data);
         setCompanyData(response.data);
         setLoading(false);
@@ -142,17 +146,14 @@ const Dashboard = () => {
     }
   };
 
-
   useEffect(() => {
     if (role === "company" || role === "admin") {
-
       getDashboardData(COMPANY_DASHBOARD_URL, {
         companyId: decode.id,
         companyDomain: decode.domain,
       });
       getManagers();
     } else if (role === "manager") {
-   
       getDashboardData(MANAGER_DASHBOARD_URL, {
         managerId: decode.id,
       });
@@ -183,35 +184,32 @@ const Dashboard = () => {
                 </div>
               </div>
             ) : (
+              <>
               <div>
                 <div className="row d-flex align-items-end">
                   {decode.role === "company" && (
-                  
-                     <div className="col-md-3 col-sm-3  mb-3">
+                    <div className="col-md-3 col-sm-3  mb-3">
                       <label className="">Select Manager :</label>
                       <Select
                         placeholder="Select a manager"
-
-                        value={managerID.value ? managerID:""}
+                        value={managerID.value ? managerID : ""}
                         className="appsCalender-filter-select"
                         options={companyManagers}
                         onChange={(e) => changedata(e)}
                       />
                     </div>
-                    
-                   
                   )}
 
                   <div className="col-md-3 col-sm-3  mb-3">
-                      <label className="">Select Property :</label>
-                      <Select
-                        placeholder="Select a property"
-                        value={selectedProperty.value ? selectedProperty:""}
-                        className="appsCalender-filter-select"
-                        options={propertyList}
-                        onChange={(e) => setSelectedProperty(e)}
-                      />
-                    </div>
+                    <label className="">Select Property :</label>
+                    <Select
+                      placeholder="Select a property"
+                      value={selectedProperty.value ? selectedProperty : ""}
+                      className="appsCalender-filter-select"
+                      options={propertyList}
+                      onChange={(e) => setSelectedProperty(e)}
+                    />
+                  </div>
                   <div className="col-md-3 col-sm-3 mb-3 ">
                     <label className="mx-2">Start Date :</label>
                     <input
@@ -250,10 +248,10 @@ const Dashboard = () => {
                       type="submit"
                       className="btn btn-primary"
                       onClick={() => {
-                        setManagerID({label:"",value:""})
-                        setSelectedStartDate("")
-                        setSelectedEndDate("")
-                        setSelectedProperty("")
+                        setManagerID({ label: "", value: "" });
+                        setSelectedStartDate("");
+                        setSelectedEndDate("");
+                        setSelectedProperty("");
                       }}
                     >
                       Clear
@@ -276,35 +274,65 @@ const Dashboard = () => {
                       ""
                     ) : (
                       <>
-                      <Col xs="6 " className="mb-4">
-                        <Row>
-                          <Col>
-                            <StackedBarChartCard
-                              type="applicant"
-                              title="Applications"
-                              propertyManagerID={managerID.value}
-                              selectedStartDate={selectedStartDate}
-                              selectedEndDate={selectedEndDate}
-                              selectedProperty={selectedProperty}
-                            />
-                          </Col>
-                        </Row>
-                      </Col>
+                        <Col xs="6 " className="mb-4">
+                          <Row>
+                            <Col>
+                              <StackedBarChartCard
+                                type="applicant"
+                                title="Applications"
+                                propertyManagerID={managerID.value}
+                                selectedStartDate={selectedStartDate}
+                                selectedEndDate={selectedEndDate}
+                                selectedProperty={selectedProperty}
+                              />
+                            </Col>
+                          </Row>
+                        </Col>
 
-                      <Col xs="6 " className="mb-4">
-                        <Row>
-                          <Col>
-                            <StackedBarChartCard
-                              type="ticket2"
-                              title="Maintenance Request"
-                              propertyManagerID={managerID.value}
-                              selectedStartDate={selectedStartDate}
-                              selectedEndDate={selectedEndDate}
-                              selectedProperty={selectedProperty}
-                            />
-                          </Col>
-                        </Row>
-                      </Col>
+                        <Col xs="6 " className="mb-4">
+                          <Row>
+                            <Col>
+                              <StackedBarChartCard
+                                type="ticket2"
+                                title="Maintenance Request"
+                                propertyManagerID={managerID.value}
+                                selectedStartDate={selectedStartDate}
+                                selectedEndDate={selectedEndDate}
+                                selectedProperty={selectedProperty}
+                              />
+                            </Col>
+                          </Row>
+                        </Col>
+
+                        <Col xs="6 " className="mb-4">
+                          <Row>
+                            <Col>
+                              <StackedBarChartCard
+                                type="ticket3"
+                                title="Maintenance Request For Technical Staffs"
+                                propertyManagerID={managerID.value}
+                                selectedStartDate={selectedStartDate}
+                                selectedEndDate={selectedEndDate}
+                                selectedProperty={selectedProperty}
+                              />
+                            </Col>
+                          </Row>
+                        </Col>
+
+                        <Col xs="6 " className="mb-4">
+                          <Row>
+                            <Col>
+                              <StackedBarChartCard
+                                type="ticket4"
+                                title="Maintenance Request For Vendors"
+                                propertyManagerID={managerID.value}
+                                selectedStartDate={selectedStartDate}
+                                selectedEndDate={selectedEndDate}
+                                selectedProperty={selectedProperty}
+                              />
+                            </Col>
+                          </Row>
+                        </Col>
                       </>
                     )}
                     {decode.role === "manager" && !decode.ticketPrivilege ? (
@@ -327,60 +355,61 @@ const Dashboard = () => {
                       /> */}
                       </Col>
                     )}
-                    {
-                      decode.role === 'company' && decode.domain === 'https://www.gskproperties.ca/' &&
-                      <Col xs="6" className="mb-4">
-                      <Row>
-                        <Col>
-                          <StackedBarChartCard
-                            type="leads"
-                            title="Leads"
-                            propertyManagerID={managerID.value}
-                            selectedStartDate={selectedStartDate}
-                            selectedEndDate={selectedEndDate}
-                              selectedProperty={selectedProperty}
-                          />
+                    {decode.role === "company" &&
+                      decode.domain === "https://www.gskproperties.ca/" && (
+                        <Col xs="6" className="mb-4">
+                          <Row>
+                            <Col>
+                              <StackedBarChartCard
+                                type="leads"
+                                title="Leads"
+                                propertyManagerID={managerID.value}
+                                selectedStartDate={selectedStartDate}
+                                selectedEndDate={selectedEndDate}
+                                selectedProperty={selectedProperty}
+                              />
+                            </Col>
+                          </Row>
                         </Col>
-                      </Row>
-                    </Col>
-                    }
+                      )}
                     {decode.role === "company" || decode.role === "manager" ? (
                       <Col xs="6 " className="mb-4">
-                      <Row>
-                        <Col>
-                          <StackedBarChartCard
-                            type="property"
-                            title="Properties"
-                            propertyManagerID={managerID.value}
-                            selectedStartDate={selectedStartDate}
-                            selectedEndDate={selectedEndDate}
-                            selectedProperty={selectedProperty}
-                          />
-                        </Col>
-                      </Row>
-                    </Col>
+                        <Row>
+                          <Col>
+                            <StackedBarChartCard
+                              type="property"
+                              title="Properties"
+                              propertyManagerID={managerID.value}
+                              selectedStartDate={selectedStartDate}
+                              selectedEndDate={selectedEndDate}
+                              selectedProperty={selectedProperty}
+                            />
+                          </Col>
+                        </Row>
+                      </Col>
                     ) : (
                       ""
                     )}
-                    {decode.role === "company"? (
+                    {decode.role === "company" ? (
                       <Col xs="6 " className="mb-4">
-                      <Row>
-                        <Col>
-                          <StackedBarChartCard
-                            type="property_manager"
-                            title="Property Managers"
-                            propertyManagerID={managerID.value}
-                            selectedStartDate={selectedStartDate}
-                            selectedEndDate={selectedEndDate}
-                            selectedProperty={selectedProperty}
-                          />
-                        </Col>
-                      </Row>
-                    </Col>
+                        <Row>
+                          <Col>
+                            <StackedBarChartCard
+                              type="property_manager"
+                              title="Property Managers"
+                              propertyManagerID={managerID.value}
+                              selectedStartDate={selectedStartDate}
+                              selectedEndDate={selectedEndDate}
+                              selectedProperty={selectedProperty}
+                            />
+                          </Col>
+                        </Row>
+                      </Col>
                     ) : (
                       ""
                     )}
-                    {decode.role === "manager" && !decode.calendarPrivilege || decode.role == 'admin'? (
+                    {(decode.role === "manager" && !decode.calendarPrivilege) ||
+                    decode.role == "admin" ? (
                       ""
                     ) : (
                       <Col xs="6" className="mb-4">
@@ -409,17 +438,16 @@ const Dashboard = () => {
                             propertyManagerID={propertyManagerID}
                             selectedStartDate={selectedStartDate}
                             selectedEndDate={selectedEndDate}
-                              selectedProperty={selectedProperty}
+                            selectedProperty={selectedProperty}
                           />
                         </Col>
                       </Row>
                     </Col>
                   </Row>
-              
-               
-                  
                 </Card>
+              <ManagementReports />
               </div>
+              </>
             )}
           </div>
         </div>

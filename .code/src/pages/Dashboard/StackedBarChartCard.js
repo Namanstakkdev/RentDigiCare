@@ -2,7 +2,7 @@ import moment from "moment";
 import React from "react";
 import { useState } from "react";
 import { useEffect } from "react";
-import { Card ,Container } from "reactstrap";
+import { Card, Container } from "reactstrap";
 import jwt_decode from "jwt-decode";
 import HorizontalBarCard from "../AllCharts/chartjs/horizontalBarChart.js";
 import axios from "../api/axios.js";
@@ -17,6 +17,8 @@ const StackedBarChartCard = ({
 }) => {
   const [applicationData, setApplicationData] = useState([]);
   const [ticket2Data, setTicket2Data] = useState([]);
+  const [ticket3Data, setTicket3Data] = useState([]);
+  const [ticket4Data, setTicket4Data] = useState([]);
   const decode = jwt_decode(window.localStorage.getItem("accessToken"));
   const [loading, setLoading] = useState(false);
   const getApplicantData = async (val) => {
@@ -35,12 +37,17 @@ const StackedBarChartCard = ({
         setLoading(true);
         await axios
           .get(
-            `/${val}/dashboardfilter?filterBy=barChart&startDate=${startDate}&endDate=${endDate}&propertyManagerID=${propertyManagerID}&role=${decode?.role
-            }&domain=${decode?.domain ? decode.domain : ""}&propertyId=${selectedProperty.value ? selectedProperty?.value : ""}`,
+            `/${val}/dashboardfilter?filterBy=barChart&startDate=${startDate}&endDate=${endDate}&propertyManagerID=${propertyManagerID}&role=${
+              decode?.role
+            }&domain=${decode?.domain ? decode.domain : ""}&propertyId=${
+              selectedProperty.value ? selectedProperty?.value : ""
+            }`,
             {
               headers: {
-                Authorization: `Bearer ${window.localStorage.getItem("accessToken")}`,
-              }
+                Authorization: `Bearer ${window.localStorage.getItem(
+                  "accessToken"
+                )}`,
+              },
             }
           )
           .then(function (response) {
@@ -74,17 +81,110 @@ const StackedBarChartCard = ({
         setLoading(true);
         await axios
           .get(
-            `/ticket/dashboardfilter2?filterBy=barChart&startDate=${startDate}&endDate=${endDate}&propertyManagerID=${propertyManagerID}&role=${decode?.role
-            }&domain=${decode?.domain ? decode.domain : ""}&propertyId=${selectedProperty.value ? selectedProperty?.value : ""}`,
+            `/ticket/dashboardfilter2?filterBy=barChart&startDate=${startDate}&endDate=${endDate}&propertyManagerID=${propertyManagerID}&role=${
+              decode?.role
+            }&domain=${decode?.domain ? decode.domain : ""}&propertyId=${
+              selectedProperty.value ? selectedProperty?.value : ""
+            }`,
             {
               headers: {
-                Authorization: `Bearer ${window.localStorage.getItem("accessToken")}`,
-              }
+                Authorization: `Bearer ${window.localStorage.getItem(
+                  "accessToken"
+                )}`,
+              },
             }
           )
           .then(function (response) {
             setLoading(false);
             setTicket2Data(response.data.data);
+          })
+          .catch(function (error) {
+            setLoading(false);
+            console.log(error);
+          });
+      }
+    } catch (error) {
+      setLoading(false);
+      console.log(error?.message);
+    }
+  };
+
+  const getTicketData2 = async () => {
+    try {
+      const startDate =
+        selectedStartDate !== ""
+          ? moment(selectedStartDate).format("YYYY-MM-DD")
+          : "";
+      const endDate =
+        selectedEndDate !== ""
+          ? moment(selectedEndDate).format("YYYY-MM-DD")
+          : "";
+      if (startDate === "" && endDate !== "") {
+        return false;
+      } else {
+        setLoading(true);
+        await axios
+          .get(
+            `/ticket/dashboardfilter3?filterBy=barChart&startDate=${startDate}&endDate=${endDate}&propertyManagerID=${propertyManagerID}&role=${
+              decode?.role
+            }&domain=${decode?.domain ? decode.domain : ""}&propertyId=${
+              selectedProperty.value ? selectedProperty?.value : ""
+            }`,
+            {
+              headers: {
+                Authorization: `Bearer ${window.localStorage.getItem(
+                  "accessToken"
+                )}`,
+              },
+            }
+          )
+          .then(function (response) {
+            setLoading(false);
+            setTicket3Data(response.data.data);
+          })
+          .catch(function (error) {
+            setLoading(false);
+            console.log(error);
+          });
+      }
+    } catch (error) {
+      setLoading(false);
+      console.log(error?.message);
+    }
+  };
+
+  const getTicketData3 = async () => {
+    try {
+      const startDate =
+        selectedStartDate !== ""
+          ? moment(selectedStartDate).format("YYYY-MM-DD")
+          : "";
+      const endDate =
+        selectedEndDate !== ""
+          ? moment(selectedEndDate).format("YYYY-MM-DD")
+          : "";
+      if (startDate === "" && endDate !== "") {
+        return false;
+      } else {
+        setLoading(true);
+        await axios
+          .get(
+            `/ticket/dashboardfilter4?filterBy=barChart&startDate=${startDate}&endDate=${endDate}&propertyManagerID=${propertyManagerID}&role=${
+              decode?.role
+            }&domain=${decode?.domain ? decode.domain : ""}&propertyId=${
+              selectedProperty.value ? selectedProperty?.value : ""
+            }`,
+            {
+              headers: {
+                Authorization: `Bearer ${window.localStorage.getItem(
+                  "accessToken"
+                )}`,
+              },
+            }
+          )
+          .then(function (response) {
+            setLoading(false);
+            setTicket4Data(response.data.data);
           })
           .catch(function (error) {
             setLoading(false);
@@ -173,7 +273,67 @@ const StackedBarChartCard = ({
       data: ticket2Data?.map((v) => v?.completed),
     },
   ];
-  
+
+  const ticket3ChartData = [
+    {
+      label: "Open",
+      backgroundColor: "#FFBF0098",
+      borderColor: "#FFBF0098",
+      borderWidth: 1,
+      hoverBackgroundColor: "#FFBF0098",
+      hoverBorderColor: "#FFBF0098",
+      data: ticket3Data?.map((v) => v?.open),
+    },
+    {
+      label: "Inprogress",
+      backgroundColor: "#00A36C98 ",
+      borderColor: "#00A36C98 ",
+      borderWidth: 1,
+      hoverBackgroundColor: "#00A36C98",
+      hoverBorderColor: "#00A36C98",
+      data: ticket3Data?.map((v) => v?.inprogress),
+    },
+    {
+      label: "Completed",
+      backgroundColor: "#D0312D98",
+      borderColor: "#D0312D98 ",
+      borderWidth: 1,
+      hoverBackgroundColor: "#D0312D98",
+      hoverBorderColor: "#D0312D98",
+      data: ticket3Data?.map((v) => v?.completed),
+    },
+  ];
+
+  const ticket4ChartData = [
+    {
+      label: "Open",
+      backgroundColor: "#FFBF0098",
+      borderColor: "#FFBF0098",
+      borderWidth: 1,
+      hoverBackgroundColor: "#FFBF0098",
+      hoverBorderColor: "#FFBF0098",
+      data: ticket4Data?.map((v) => v?.open),
+    },
+    {
+      label: "Inprogress",
+      backgroundColor: "#00A36C98 ",
+      borderColor: "#00A36C98 ",
+      borderWidth: 1,
+      hoverBackgroundColor: "#00A36C98",
+      hoverBorderColor: "#00A36C98",
+      data: ticket4Data?.map((v) => v?.inprogress),
+    },
+    {
+      label: "Completed",
+      backgroundColor: "#D0312D98",
+      borderColor: "#D0312D98 ",
+      borderWidth: 1,
+      hoverBackgroundColor: "#D0312D98",
+      hoverBorderColor: "#D0312D98",
+      data: ticket4Data?.map((v) => v?.completed),
+    },
+  ];
+
   const appointmentChartData = [
     {
       label: "Booked",
@@ -309,7 +469,6 @@ const StackedBarChartCard = ({
     },
   ];
 
-
   const leadsChartData = [
     {
       label: "Pending",
@@ -349,7 +508,6 @@ const StackedBarChartCard = ({
     },
   ];
 
-
   const tempRentChartData = [
     {
       label: "Collected",
@@ -372,12 +530,22 @@ const StackedBarChartCard = ({
   ];
 
   useEffect(() => {
-    if (type !== "rent" && type !== "ticket2") {
+    if (!["rent", "ticket2", "ticket3", "ticket4"].includes(type)) {
       getApplicantData(type);
     } else if (type === "ticket2") {
       getTicketData();
+    } else if (type === "ticket3") {
+      getTicketData2();
+    } else if (type === "ticket4") {
+      getTicketData3();
     }
-  }, [selectedEndDate, selectedStartDate, type, propertyManagerID, selectedProperty]);
+  }, [
+    selectedEndDate,
+    selectedStartDate,
+    type,
+    propertyManagerID,
+    selectedProperty,
+  ]);
 
   const getFinalData = (val) => {
     switch (val) {
@@ -386,7 +554,11 @@ const StackedBarChartCard = ({
       case "ticket":
         return ticketsChartData;
       case "ticket2":
-        return ticket2ChartData;  
+        return ticket2ChartData;
+      case "ticket3":
+        return ticket3ChartData;
+      case "ticket4":
+        return ticket4ChartData;
       case "property":
         return propertyChartData;
       case "leads":
@@ -394,9 +566,9 @@ const StackedBarChartCard = ({
       case "rent":
         return tempRentChartData;
       case "property_manager":
-        return ManagerChartData; 
-        case "user_appointment":
-          return appointmentChartData; 
+        return ManagerChartData;
+      case "user_appointment":
+        return appointmentChartData;
       default:
         return applicantChartData;
     }
@@ -404,39 +576,47 @@ const StackedBarChartCard = ({
 
   const horiData = {
     labels:
-    type === "rent"
-    ? rentData?.map((v) =>
-        moment(v?._id?.month, "YYYY/MM")?.format("MMM-YYYY")
-      )
-    : type === "ticket2"
-    ? ticket2Data?.map((v) =>
-        moment(v?._id?.month, "YYYY/MM")?.format("MMM-YYYY")
-      )
-    : applicationData?.map((v) =>
-        moment(v?._id?.month, "YYYY/MM")?.format("MMM-YYYY")
-      ),
+      type === "rent"
+        ? rentData?.map((v) =>
+            moment(v?._id?.month, "YYYY/MM")?.format("MMM-YYYY")
+          )
+        : type === "ticket2"
+        ? ticket2Data?.map((v) =>
+            moment(v?._id?.month, "YYYY/MM")?.format("MMM-YYYY")
+          )
+        : type === "ticket3"
+        ? ticket3Data?.map((v) =>
+            moment(v?._id?.month, "YYYY/MM")?.format("MMM-YYYY")
+          )
+        : type === "ticket4"
+        ? ticket4Data?.map((v) =>
+            moment(v?._id?.month, "YYYY/MM")?.format("MMM-YYYY")
+          )
+        : applicationData?.map((v) =>
+            moment(v?._id?.month, "YYYY/MM")?.format("MMM-YYYY")
+          ),
+
     datasets: getFinalData(type),
   };
   const customStyle = {
-    textAlign: 'center',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center', 
-    height: '100%',
-    maxHeight: '100%',
-    boxSizing: 'border-box'
+    textAlign: "center",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    height: "100%",
+    maxHeight: "100%",
+    boxSizing: "border-box",
   };
 
   // if (window.matchMedia('(min-width: 768px)').matches) {
   //   customStyle.height = '290px'; // set the height to 290 pixels for medium and large screens
   // }
 
-
   return (
     <Card className="shadow p-2 bg-white rounded h-100 w-100 ">
       <div className="row align-items-center ">
         {Object.keys(horiData)?.length === 0 &&
-          horiData.constructor === Object ? (
+        horiData.constructor === Object ? (
           <div>No Records Found</div>
         ) : (
           <div className="">
@@ -454,11 +634,11 @@ const StackedBarChartCard = ({
                 </h5>
                 <div>
                   {title === "Rent" ? (
-                   <Container>
-                   <div style={customStyle}>
-                     <h4>Coming soon</h4>
-                   </div>
-                 </Container>
+                    <Container>
+                      <div style={customStyle}>
+                        <h4>Coming soon</h4>
+                      </div>
+                    </Container>
                   ) : (
                     <HorizontalBarCard data={horiData} />
                   )}

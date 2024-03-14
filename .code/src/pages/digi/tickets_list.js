@@ -204,6 +204,10 @@ const TicketList = () => {
     setSelectProperty({ value: "", label: "" });
     setFiltername("");
     setFilterPropertyManager("");
+    setSelectTechnicalStaffName(null);
+    setFilterTechnicalStaff("");
+    setSelectVendorName(null);
+    setFilterVendor("");
     setRequestTypeFilter({ value: "", label: "" });
     setFiletrID("");
     setcol5(!col5);
