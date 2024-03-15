@@ -118,6 +118,8 @@ const Appointment = () => {
     if (type === "filter") {
       setPageNumber(1);
     }
+
+    console.log("Console.,.sfa",startDate, endDate);
     let query = {
       pageNumber: pageNumber,
       manager_id: decode2.id,
@@ -320,8 +322,20 @@ const Appointment = () => {
             event_id: id,
             role: role,
             available: true,
+            timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
           };
 
+          console.log(
+            Intl.DateTimeFormat().resolvedOptions().timeZone,
+            "Timezone"
+          );
+
+          console.log("MY event Time", event.starTime, event.endTime);
+          console.log(
+            "MY event Time",
+            convertToLocalTime(event.startTime),
+            convertToLocalTime(event.endTime)
+          );
           setTimeout(async () => {
             toast("Sync with calendar process start");
 

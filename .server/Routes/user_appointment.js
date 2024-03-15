@@ -193,141 +193,138 @@ router.get("/get-availability", async (req, res) => {
 router.post("/get-pending-slot", async (req, res) => {
   try {
     const { manager_id } = req.body;
-    if (manager_id) {
-      // const currentDate = Math.ceil(moment().valueOf() / 1000);
-      // console.log(currentDate)
-      // const expireSlot = await User_appointment.updateMany({
-      //   endTimeEpoch: {
-      //     $lte: currentDate,
-      //   },
-      // }, { $set: { status: "expired" } });
-      const page = parseInt(req.body.pageNumber) || 1;
-      const PAGE_LIMIT = req.body.limit || 10;
-      const startIndex = (page - 1) * PAGE_LIMIT;
-      const endIndex = page * PAGE_LIMIT;
-      const paginatedResults = {};
-      let query = {
-        eventAssignedTo: ObjectID(manager_id),
-      };
-      if (req.body.status) {
-        query.status = req.body.status;
-      }
-      if (req.body.property) {
-        query.propertyId = ObjectID(req.body.property);
-      }
-      if (req.body.reasonId) {
-        query.reasonId = ObjectID(req.body.reasonId);
-      }
-      if (req.body.startDate && req.body.endDate) {
-        query.createdAt = {
-          $gte: moment(req.body.startDate).toDate(),
-          $lte: moment(req.body.endDate).endOf("day").toDate(),
-        };
-      }
-      const bookedSlot = await User_appointment.aggregate([
-        {
-          $match: query,
-        },
-        {
-          $lookup: {
-            from: "calendar_reason_types",
-            localField: "reasonId",
-            foreignField: "_id",
-            as: "reasonType",
-          },
-        },
-        {
-          $lookup: {
-            from: "layouts",
-            localField: "layoutId",
-            foreignField: "_id",
-            as: "layouts",
-          },
-        },
-        {
-          $lookup: {
-            from: "properties",
-            localField: "propertyId",
-            foreignField: "_id",
-            as: "properties",
-          },
-        },
-        {
-          $sort: {
-            _id: -1,
-          },
-        },
-        {
-          $skip: (page - 1) * PAGE_LIMIT,
-        },
-        {
-          $limit: PAGE_LIMIT,
-        },
-      ]);
-
-      const countQuery = await User_appointment.find(query, { __v: 0 }).count();
-      const propertyIds = await User_appointment.find({
-        eventAssignedTo: ObjectID(manager_id),
-      }).distinct("propertyId");
-      const properties = await Property.find({
-        _id: { $in: propertyIds },
-      }).select({ _id: 1, title: 1 });
-      const reasonIds = await User_appointment.find({
-        eventAssignedTo: ObjectID(manager_id),
-      }).distinct("reasonId");
-      const reasons = await Reason_types.find({
-        _id: { $in: reasonIds },
-      }).select({ _id: 1, reasonType: 1 });
-      const totalFilterResult = await User_appointment.aggregate([
-        { $match: query },
-        { $group: { _id: "$status", count: { $sum: 1 } } },
-      ]);
-
-      const applicationTotal = totalFilterResult?.reduce((acc, count) => {
-        acc[count._id] = count.count;
-        acc["Total"] = (acc["Total"] || 0) + count.count;
-        return acc;
-      }, {});
-
-      if (
-        endIndex < (await User_appointment.find(query).countDocuments().exec())
-      ) {
-        paginatedResults.next = {
-          page: page + 1,
-          limit: PAGE_LIMIT,
-        };
-      }
-
-      if (startIndex > 0) {
-        paginatedResults.previous = {
-          page: page - 1,
-          limit: PAGE_LIMIT,
-        };
-      }
-
-      res.json({
-        status: 200,
-        message: "The resources has been fetched",
-        bookedSlot: bookedSlot,
-        totalCount: countQuery,
-        total: applicationTotal,
-        properties: properties,
-        reasons: reasons,
-      });
-    } else {
-      res.json({
-        status: 201,
-        message: "Something Went Wrong !",
-        bookedSlot: [],
-      });
+    if (!manager_id) {
+      return res
+        .status(400)
+        .json({ status: 400, message: "Manager ID is required." });
     }
-  } catch (error) {
-    logger.error(error);
-    console.log(error);
-    res.json({
-      status: 500,
-      message: "Something Went Wrong !",
+
+    const page = parseInt(req.body.pageNumber) || 1;
+    const PAGE_LIMIT = req.body.limit || 10;
+    const startIndex = (page - 1) * PAGE_LIMIT;
+
+    const pipeline = [{ $match: { eventAssignedTo: ObjectID(manager_id) } }];
+
+    if (req.body.status) {
+      pipeline.push({ $match: { status: req.body.status } });
+    }
+
+    if (req.body.property) {
+      pipeline.push({ $match: { propertyId: ObjectID(req.body.property) } });
+    }
+
+    if (req.body.reasonId) {
+      pipeline.push({ $match: { reasonId: ObjectID(req.body.reasonId) } });
+    }
+
+   if (req.body.startDate && req.body.endDate) {
+     const startDate = new Date(req.body.startDate);
+     const endDate = new Date(req.body.endDate);
+     pipeline.push({
+       $match: {
+         $or: [
+           {
+             $and: [
+               { date: { $gte: startDate } },
+               { date: { $lt: endDate } }, 
+             ],
+           },
+           {
+             startTime: { $gte: startDate },
+             endTime: { $lte: endDate },
+           },
+         ],
+       },
+     });
+
+   }
+
+    pipeline.push({
+      $lookup: {
+        from: "calendar_reason_types",
+        localField: "reasonId",
+        foreignField: "_id",
+        as: "reasonType",
+      },
     });
+
+    pipeline.push({
+      $lookup: {
+        from: "layouts",
+        localField: "layoutId",
+        foreignField: "_id",
+        as: "layouts",
+      },
+    });
+
+    pipeline.push({
+      $lookup: {
+        from: "properties",
+        localField: "propertyId",
+        foreignField: "_id",
+        as: "properties",
+      },
+    });
+
+    pipeline.push({ $sort: { _id: -1 } });
+    pipeline.push({ $skip: startIndex });
+    pipeline.push({ $limit: PAGE_LIMIT });
+
+    const bookedSlot = await User_appointment.aggregate(pipeline);
+
+    const countQuery = await User_appointment.countDocuments({
+      eventAssignedTo: ObjectID(manager_id),
+    });
+
+    const propertyIds = await User_appointment.distinct("propertyId", {
+      eventAssignedTo: ObjectID(manager_id),
+    });
+    const properties = await Property.find({
+      _id: { $in: propertyIds },
+    }).select({ _id: 1, title: 1 });
+
+    const reasonIds = await User_appointment.distinct("reasonId", {
+      eventAssignedTo: ObjectID(manager_id),
+    });
+    const reasons = await Reason_types.find({ _id: { $in: reasonIds } }).select(
+      { _id: 1, reasonType: 1 }
+    );
+
+    const totalFilterResult = await User_appointment.aggregate([
+      { $match: { eventAssignedTo: ObjectID(manager_id) } },
+      { $group: { _id: "$status", count: { $sum: 1 } } },
+    ]);
+
+    const applicationTotal = totalFilterResult.reduce((acc, count) => {
+      acc[count._id] = count.count;
+      acc["Total"] = (acc["Total"] || 0) + count.count;
+      return acc;
+    }, {});
+
+    const endIndex = startIndex + PAGE_LIMIT;
+    const paginatedResults = {};
+
+    if (endIndex < countQuery) {
+      paginatedResults.next = { page: page + 1, limit: PAGE_LIMIT };
+    }
+
+    if (startIndex > 0) {
+      paginatedResults.previous = { page: page - 1, limit: PAGE_LIMIT };
+    }
+
+    res.json({
+      status: 200,
+      message: "The resources have been fetched",
+      bookedSlot: bookedSlot || [],
+      totalCount: countQuery,
+      total: applicationTotal,
+      properties,
+      reasons,
+      paginatedResults,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ status: 500, message: "Something went wrong." });
   }
 });
 
@@ -1545,7 +1542,7 @@ router.get("/dashboardfilter", async (req, res) => {
       if (role == "manager") {
         matchConditions.eventAssignedTo = ObjectID(req.query.propertyManagerID);
       }
-      
+
       if (role === "company" && req.query.propertyManagerID) {
         matchConditions.eventAssignedTo = ObjectID(req.query.propertyManagerID);
       }

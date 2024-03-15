@@ -726,6 +726,8 @@ router.post("/create-event", async (req, res) => {
         });
       }
 
+      const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone
+
       let eve;
       const eventData = {
         eventId: req.body.event_id,
@@ -740,12 +742,16 @@ router.post("/create-event", async (req, res) => {
         title: req.body.title,
         propertyId: req.body.propertyId,
         companyDomain: req.body.companyDomain,
+        timeZone
       };
 
       // Check if event with the provided ID exists
       const existingEvent = await Calender_events.findOne({
         eventId: req.body.event_id,
       });
+
+
+      console.log(req.body.StartTime, "StartTime Te")
 
       if (existingEvent) {
         eve = await Calender_events.findOneAndUpdate(
@@ -763,16 +769,18 @@ router.post("/create-event", async (req, res) => {
           req.body.eventDate + " " + req.body.endTime,
           "YYYY-MM-DD h:mm A"
         );
+
+        console.log(req.body.timeZone,"Timezone");
         const updateCalenderEvent = {
           summary: req.body.title,
           description: req.body.description,
           start: {
-            dateTime: startTime.tz("America/Denver").toISOString(),
-            timeZone: "America/Denver",
+            dateTime: startTime.tz(req.body.timeZone).toISOString(),
+            timeZone: req.body.timeZone,
           },
           end: {
-            dateTime: endTime.tz("America/Denver").toISOString(),
-            timeZone: "America/Denver",
+            dateTime: endTime.tz(req.body.timeZone).toISOString(),
+            timeZone: req.body.timeZone,
           },
           attendees: req.body.authEmail,
           reminders: req.body.reminders || {
@@ -808,17 +816,22 @@ router.post("/create-event", async (req, res) => {
           "YYYY-MM-DD h:mm A"
         );
 
+          // console.log("Test StartTime",req.body.StartTime)
+          // console.log("Test EndTime", req.body.endTime);
+          console.log("Test EndTime", startTime);
+          console.log("Test EndTime", endTime);
+
         const newCalenderEvent = {
           id: req.body.event_id,
           summary: req.body.title,
           description: req.body.description,
           start: {
-            dateTime: startTime.tz("America/Denver").toISOString(),
-            timeZone: "America/Denver",
+            dateTime: startTime.tz(req.body.timeZone).toISOString(),
+            timeZone: req.body.timeZone,
           },
           end: {
-            dateTime: endTime.tz("America/Denver").toISOString(),
-            timeZone: "America/Denver",
+            dateTime: endTime.tz(req.body.timeZone).toISOString(),
+            timeZone: req.body.timeZone,
           },
           attendees: req.body.authEmail,
           reminders: {

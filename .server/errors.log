@@ -110,3 +110,36 @@
 21:08:48 [31merror[39m: the match filter must be an expression in an object
 21:08:57 [31merror[39m: the match filter must be an expression in an object
 21:09:58 [31merror[39m: the match filter must be an expression in an object
+23:59:45 [31merror[39m: Cast to ObjectId failed for value "Guardian Villa Townhomes" (type string) at path "_id" for model "property"
+00:02:07 [31merror[39m: Cast to ObjectId failed for value "Guardian Villa Townhomes" (type string) at path "_id" for model "property"
+01:05:27 [31merror[39m: Cast to ObjectId failed for value "Guardian Villa Townhomes" (type string) at path "_id" for model "property"
+01:29:48 [31merror[39m: startDateUTC is not defined
+01:29:55 [31merror[39m: startDateUTC is not defined
+01:29:55 [31merror[39m: startDateUTC is not defined
+01:29:56 [31merror[39m: startDateUTC is not defined
+01:30:07 [31merror[39m: startDateUTC is not defined
+01:30:08 [31merror[39m: startDateUTC is not defined
+01:30:08 [31merror[39m: startDateUTC is not defined
+01:30:25 [31merror[39m: Cast to ObjectId failed for value "Guardian Villa Townhomes" (type string) at path "_id" for model "property"
+01:30:25 [31merror[39m: startDateUTC is not defined
+01:30:25 [31merror[39m: startDateUTC is not defined
+01:30:29 [31merror[39m: startDateUTC is not defined
+01:30:30 [31merror[39m: startDateUTC is not defined
+01:30:30 [31merror[39m: startDateUTC is not defined
+01:36:43 [31merror[39m: datetime is not defined
+01:37:01 [31merror[39m: Cast to ObjectId failed for value "Guardian Villa Townhomes" (type string) at path "_id" for model "property"
+01:45:45 [31merror[39m: startDateUTC.replace is not a function
+01:45:59 [31merror[39m: Cast to ObjectId failed for value "Guardian Villa Townhomes" (type string) at path "_id" for model "property"
+14:32:36 [31merror[39m: Cast to ObjectId failed for value "Guardian Villa Townhomes" (type string) at path "_id" for model "property"
+14:48:51 [31merror[39m: Cast to ObjectId failed for value "Guardian Villa Townhomes" (type string) at path "_id" for model "property"
+15:30:56 [31merror[39m: Cast to ObjectId failed for value "Guardian Villa Townhomes" (type string) at path "_id" for model "property"
+15:34:16 [31merror[39m: query is not defined
+15:34:17 [31merror[39m: query is not defined
+15:34:19 [31merror[39m: query is not defined
+15:35:09 [31merror[39m: Cast to ObjectId failed for value "Guardian Villa Townhomes" (type string) at path "_id" for model "property"
+15:35:10 [31merror[39m: query is not defined
+15:35:10 [31merror[39m: query is not defined
+15:35:13 [31merror[39m: query is not defined
+15:35:13 [31merror[39m: query is not defined
+15:35:13 [31merror[39m: query is not defined
+15:57:08 [31merror[39m: Cast to ObjectId failed for value "Guardian Villa Townhomes" (type string) at path "_id" for model "property"

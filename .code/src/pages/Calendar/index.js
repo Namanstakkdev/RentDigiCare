@@ -671,6 +671,8 @@ const Calender = (props) => {
       role = "technicalStaff";
     }
 
+    const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+
     const reqData = {
       userId: values.manager ? values.manager : decode.id,
       day: moment(values.date).format("ddd"),
@@ -686,6 +688,7 @@ const Calender = (props) => {
       event_id: selectedEventId,
       role: role,
       available: true,
+      timeZone,
     };
 
     try {
@@ -1862,7 +1865,9 @@ const Calender = (props) => {
                               className="btn btn-success save-event me-2"
                               disabled={disableSyncButton}
                             >
-                              { disableSyncButton ? "Access Token expired" : "Sync"}
+                              {disableSyncButton
+                                ? "Access Token expired"
+                                : "Sync"}
                             </button>
 
                             <button
