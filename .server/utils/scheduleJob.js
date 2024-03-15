@@ -34,12 +34,9 @@ exports.sendMailforAppointment_half_hour = async () => {
     const currentTimestamp = Math.ceil(
       moment().subtract(30, "minutes").valueOf() / 1000
     );
-    //console.log(currentTimestamp); // e.g. 1612615168236
     const halfAnHourFromNow = Math.ceil(
       moment().add(30, "minutes").valueOf() / 1000
     );
-    //console.log(halfAnHourFromNow); // e.g. 1612618768236
-    //1672992901
     const findSlot = await User_appointment.find({
       startTimeEpoch: {
         $gte: currentTimestamp,
