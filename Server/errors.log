@@ -1,0 +1,149 @@
+10:04:21 [31merror[39m: Cast to ObjectId failed for value "MNG48155913" (type string) at path "_id" for model "PropertyManager"
+17:01:12 [31merror[39m: Operation `companies.findOne()` buffering timed out after 10000ms
+21:28:47 [31merror[39m: Cannot read property 'slots' of undefined
+21:29:47 [31merror[39m: Cannot read property 'slots' of undefined
+21:30:00 [31merror[39m: Cannot read property 'slots' of undefined
+21:31:39 [31merror[39m: Cannot read property 'slots' of undefined
+21:39:49 [31merror[39m: Cannot read property 'slots' of undefined
+21:41:26 [31merror[39m: Cannot read property 'slots' of undefined
+21:42:35 [31merror[39m: Cannot read property 'slots' of undefined
+21:44:48 [31merror[39m: Cannot read property 'slots' of undefined
+21:45:42 [31merror[39m: Cannot read property 'slots' of undefined
+21:46:37 [31merror[39m: Cannot read property 'slots' of undefined
+21:49:23 [31merror[39m: Cannot read property 'slots' of undefined
+21:50:40 [31merror[39m: Cannot read property 'slots' of undefined
+21:53:35 [31merror[39m: Cannot read property 'slots' of undefined
+21:56:48 [31merror[39m: Cannot read property 'slots' of undefined
+22:00:23 [31merror[39m: Cast to ObjectId failed for value "Chappelle Garden Apartments" (type string) at path "propertyId" because of "BSONTypeError"
+15:02:03 [31merror[39m: Cast to ObjectId failed for value "Chappelle Garden Apartments" (type string) at path "propertyId" because of "BSONTypeError"
+20:22:35 [31merror[39m: Operation `companies.findOne()` buffering timed out after 10000ms
+13:17:32 [31merror[39m: localTimezone is not defined
+13:17:34 [31merror[39m: localTimezone is not defined
+13:17:35 [31merror[39m: localTimezone is not defined
+13:17:36 [31merror[39m: localTimezone is not defined
+13:17:37 [31merror[39m: localTimezone is not defined
+13:17:41 [31merror[39m: localTimezone is not defined
+14:04:33 [31merror[39m: convertToLocalTime is not defined
+14:04:34 [31merror[39m: convertToLocalTime is not defined
+14:13:42 [31merror[39m: Invalid time value
+14:17:53 [31merror[39m: l is not defined
+14:18:10 [31merror[39m: l is not defined
+14:18:11 [31merror[39m: l is not defined
+14:48:13 [31merror[39m: userTime is not defined
+14:48:30 [31merror[39m: userTime is not defined
+14:49:10 [31merror[39m: utcStartTime.format is not a function
+14:49:11 [31merror[39m: utcStartTime.format is not a function
+15:47:49 [31merror[39m: userTime.format(...).isBetween is not a function
+15:47:50 [31merror[39m: userTime.format(...).isBetween is not a function
+19:25:28 [31merror[39m: Cannot read property 'query' of undefined
+19:25:36 [31merror[39m: Cannot read property 'query' of undefined
+19:27:12 [31merror[39m: totalFilterResult?.reduce is not a function
+19:27:15 [31merror[39m: totalFilterResult?.reduce is not a function
+16:58:32 [31merror[39m: Argument passed in does not match the accepted types
+16:58:51 [31merror[39m: Argument passed in does not match the accepted types
+17:21:58 [31merror[39m: Argument passed in does not match the accepted types
+15:47:26 [31merror[39m: Cast to ObjectId failed for value "Guardian Villa Townhomes" (type string) at path "_id" for model "property"
+16:50:14 [31merror[39m: Cast to ObjectId failed for value "Guardian Villa Townhomes" (type string) at path "_id" for model "property"
+18:07:17 [31merror[39m: Cast to ObjectId failed for value "Guardian Villa Townhomes" (type string) at path "_id" for model "property"
+19:13:07 [31merror[39m: Cast to ObjectId failed for value "Guardian Villa Townhomes" (type string) at path "_id" for model "property"
+15:26:04 [31merror[39m: Cast to ObjectId failed for value "Guardian Villa Townhomes" (type string) at path "_id" for model "property"
+16:59:39 [31merror[39m: Cast to ObjectId failed for value "Guardian Villa Townhomes" (type string) at path "_id" for model "property"
+16:50:10 [31merror[39m: Cast to ObjectId failed for value "Guardian Villa Townhomes" (type string) at path "_id" for model "property"
+18:55:00 [31merror[39m: Cast to ObjectId failed for value "Guardian Villa Townhomes" (type string) at path "_id" for model "property"
+14:10:49 [31merror[39m: Cast to ObjectId failed for value "Guardian Villa Townhomes" (type string) at path "_id" for model "property"
+14:10:55 [31merror[39m: Cast to ObjectId failed for value "Guardian Villa Townhomes" (type string) at path "_id" for model "property"
+15:18:31 [31merror[39m: the match filter must be an expression in an object
+15:19:35 [31merror[39m: the match filter must be an expression in an object
+15:21:11 [31merror[39m: the match filter must be an expression in an object
+15:21:38 [31merror[39m: the match filter must be an expression in an object
+15:23:56 [31merror[39m: the match filter must be an expression in an object
+15:26:47 [31merror[39m: the match filter must be an expression in an object
+15:27:50 [31merror[39m: the match filter must be an expression in an object
+15:28:10 [31merror[39m: the match filter must be an expression in an object
+15:29:10 [31merror[39m: the match filter must be an expression in an object
+15:40:32 [31merror[39m: the match filter must be an expression in an object
+15:49:03 [31merror[39m: the match filter must be an expression in an object
+16:28:58 [31merror[39m: the match filter must be an expression in an object
+16:32:10 [31merror[39m: the match filter must be an expression in an object
+16:44:27 [31merror[39m: the match filter must be an expression in an object
+16:57:44 [31merror[39m: the match filter must be an expression in an object
+17:00:58 [31merror[39m: the match filter must be an expression in an object
+17:02:24 [31merror[39m: the match filter must be an expression in an object
+17:11:08 [31merror[39m: the match filter must be an expression in an object
+17:14:08 [31merror[39m: the match filter must be an expression in an object
+17:15:29 [31merror[39m: the match filter must be an expression in an object
+17:19:09 [31merror[39m: the match filter must be an expression in an object
+17:19:54 [31merror[39m: the match filter must be an expression in an object
+17:20:33 [31merror[39m: the match filter must be an expression in an object
+17:25:20 [31merror[39m: the match filter must be an expression in an object
+17:26:17 [31merror[39m: the match filter must be an expression in an object
+17:26:27 [31merror[39m: the match filter must be an expression in an object
+17:26:59 [31merror[39m: the match filter must be an expression in an object
+17:52:11 [31merror[39m: the match filter must be an expression in an object
+17:58:31 [31merror[39m: the match filter must be an expression in an object
+18:03:53 [31merror[39m: the match filter must be an expression in an object
+18:43:41 [31merror[39m: the match filter must be an expression in an object
+18:44:27 [31merror[39m: the match filter must be an expression in an object
+18:45:16 [31merror[39m: the match filter must be an expression in an object
+18:46:00 [31merror[39m: the match filter must be an expression in an object
+18:46:56 [31merror[39m: the match filter must be an expression in an object
+18:48:16 [31merror[39m: the match filter must be an expression in an object
+18:48:26 [31merror[39m: the match filter must be an expression in an object
+18:49:00 [31merror[39m: the match filter must be an expression in an object
+18:51:31 [31merror[39m: the match filter must be an expression in an object
+18:55:01 [31merror[39m: the match filter must be an expression in an object
+18:55:29 [31merror[39m: the match filter must be an expression in an object
+18:55:57 [31merror[39m: the match filter must be an expression in an object
+18:59:35 [31merror[39m: the match filter must be an expression in an object
+19:02:07 [31merror[39m: the match filter must be an expression in an object
+19:07:52 [31merror[39m: the match filter must be an expression in an object
+19:08:06 [31merror[39m: the match filter must be an expression in an object
+21:07:20 [31merror[39m: the match filter must be an expression in an object
+21:07:31 [31merror[39m: the match filter must be an expression in an object
+21:07:43 [31merror[39m: the match filter must be an expression in an object
+21:07:53 [31merror[39m: the match filter must be an expression in an object
+21:08:02 [31merror[39m: the match filter must be an expression in an object
+21:08:11 [31merror[39m: the match filter must be an expression in an object
+21:08:19 [31merror[39m: the match filter must be an expression in an object
+21:08:27 [31merror[39m: the match filter must be an expression in an object
+21:08:35 [31merror[39m: the match filter must be an expression in an object
+21:08:48 [31merror[39m: the match filter must be an expression in an object
+21:08:57 [31merror[39m: the match filter must be an expression in an object
+21:09:58 [31merror[39m: the match filter must be an expression in an object
+23:59:45 [31merror[39m: Cast to ObjectId failed for value "Guardian Villa Townhomes" (type string) at path "_id" for model "property"
+00:02:07 [31merror[39m: Cast to ObjectId failed for value "Guardian Villa Townhomes" (type string) at path "_id" for model "property"
+01:05:27 [31merror[39m: Cast to ObjectId failed for value "Guardian Villa Townhomes" (type string) at path "_id" for model "property"
+01:29:48 [31merror[39m: startDateUTC is not defined
+01:29:55 [31merror[39m: startDateUTC is not defined
+01:29:55 [31merror[39m: startDateUTC is not defined
+01:29:56 [31merror[39m: startDateUTC is not defined
+01:30:07 [31merror[39m: startDateUTC is not defined
+01:30:08 [31merror[39m: startDateUTC is not defined
+01:30:08 [31merror[39m: startDateUTC is not defined
+01:30:25 [31merror[39m: Cast to ObjectId failed for value "Guardian Villa Townhomes" (type string) at path "_id" for model "property"
+01:30:25 [31merror[39m: startDateUTC is not defined
+01:30:25 [31merror[39m: startDateUTC is not defined
+01:30:29 [31merror[39m: startDateUTC is not defined
+01:30:30 [31merror[39m: startDateUTC is not defined
+01:30:30 [31merror[39m: startDateUTC is not defined
+01:36:43 [31merror[39m: datetime is not defined
+01:37:01 [31merror[39m: Cast to ObjectId failed for value "Guardian Villa Townhomes" (type string) at path "_id" for model "property"
+01:45:45 [31merror[39m: startDateUTC.replace is not a function
+01:45:59 [31merror[39m: Cast to ObjectId failed for value "Guardian Villa Townhomes" (type string) at path "_id" for model "property"
+14:32:36 [31merror[39m: Cast to ObjectId failed for value "Guardian Villa Townhomes" (type string) at path "_id" for model "property"
+14:48:51 [31merror[39m: Cast to ObjectId failed for value "Guardian Villa Townhomes" (type string) at path "_id" for model "property"
+15:30:56 [31merror[39m: Cast to ObjectId failed for value "Guardian Villa Townhomes" (type string) at path "_id" for model "property"
+15:34:16 [31merror[39m: query is not defined
+15:34:17 [31merror[39m: query is not defined
+15:34:19 [31merror[39m: query is not defined
+15:35:09 [31merror[39m: Cast to ObjectId failed for value "Guardian Villa Townhomes" (type string) at path "_id" for model "property"
+15:35:10 [31merror[39m: query is not defined
+15:35:10 [31merror[39m: query is not defined
+15:35:13 [31merror[39m: query is not defined
+15:35:13 [31merror[39m: query is not defined
+15:35:13 [31merror[39m: query is not defined
+15:57:08 [31merror[39m: Cast to ObjectId failed for value "Guardian Villa Townhomes" (type string) at path "_id" for model "property"
+18:47:48 [31merror[39m: Cast to ObjectId failed for value "Guardian Villa Townhomes" (type string) at path "_id" for model "property"
+21:07:16 [31merror[39m: the match filter must be an expression in an object
+21:16:24 [31merror[39m: the match filter must be an expression in an object
+21:16:24 [31merror[39m: the match filter must be an expression in an object

@@ -1,0 +1,11 @@
+export const INTERCOM_SETUP = "INTERCOM_SETUP";
+export const UNDERGROUND_PARKING = "UNDERGROUND_PARKING";
+export const SURFACE_PARKING = "SURFACE_PARKING";
+export const NOTICES = "NOTICES";
+export const CUSTUMER_SIGNATURE = "CUSTUMER_SIGNATURE";
+export const MANAGER_SIGNATURE = "MANAGER_SIGNATURE";
+export const GET_APPLICANT_INFO = "GET_APPLICANT_INFO";
+export const ERROR = "ERROR";
+export const ERROR_2 = "ERROR_2";
+export const ERROR_7 = "ERROR_7";
+export const RESET_INTI = "RESET_INTI";

@@ -1,0 +1,11 @@
+export const FOMR_DATA_1 = "FOMR_DATA_1";
+export const FOMR_DATA_2 = "FOMR_DATA_2";
+export const FOMR_DATA_3 = "FOMR_DATA_3";
+export const FOMR_DATA_7 = "FOMR_DATA_7";
+export const CUSTUMER_SIGNATURE = "CUSTUMER_SIGNATURE";
+export const MANAGER_SIGNATURE = "MANAGER_SIGNATURE";
+export const GET_APPLICANT_INFO = "GET_APPLICANT_INFO";
+export const ERROR = "ERROR";
+export const ERROR_2 = "ERROR_2";
+export const ERROR_7 = "ERROR_7";
+export const RESET_INTI = "RESET_INTI";
